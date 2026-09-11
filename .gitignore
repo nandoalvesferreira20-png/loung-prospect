@@ -5,6 +5,7 @@
 venv/
 env/
 ENV/
+.venv-*/
 
 # =====================================
 # Python
@@ -18,7 +19,9 @@ __pycache__/
 # =====================================
 build/
 dist/
-*.spec
+*.egg-info/
+.eggs/
+# Arquivos .spec são configuração de build e devem poder ser versionados.
 
 # =====================================
 # PyInstaller
@@ -38,12 +41,18 @@ logs/
 exports/
 *.xlsx
 *.csv
+# Somente dados sintéticos devem ser colocados nesta pasta.
+!tests/fixtures/**/*.xlsx
+!tests/fixtures/**/*.csv
+~$*.xlsx
 
 # =====================================
 # Configurações Locais
 # =====================================
 .env
 .env.*
+!.env.example
+!.env.template
 config/local.json
 
 # =====================================
@@ -68,7 +77,11 @@ desktop.ini
 # =====================================
 .pytest_cache/
 .coverage
+.coverage.*
+coverage.xml
 htmlcov/
+.tox/
+.nox/
 
 # =====================================
 # MyPy
@@ -86,9 +99,10 @@ htmlcov/
 playwright-report/
 test-results/
 
-# Se um dia vocês usarem PLAYWRIGHT_BROWSERS_PATH=0,
-# descomente a linha abaixo para NÃO versionar os navegadores.
-# .local-browsers/
+# Navegadores instalados localmente (PLAYWRIGHT_BROWSERS_PATH=0).
+.local-browsers/
+# Estado autenticado do navegador: pode conter cookies e tokens.
+playwright/.auth/
 
 # =====================================
 # Arquivos Temporários

@@ -1,13 +1,9 @@
 import argparse
+import sys
 import time
 from urllib.parse import quote_plus
 import pandas as pd
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
-from app import LoungLeadsApp
-
-if __name__ == "__main__":
-    app = LoungLeadsApp()
-    app.mainloop()
 
 
 def safe_text(locator, default=""):
@@ -203,7 +199,8 @@ def run(cidades, segmentos, max_results, output, headless=False):
     print(f"Total de leads únicos: {len(df)}")
 
 
-if __name__ == "__main__":
+def cli_main(argv=None):
+    """Executa a CLI legada sem abrir a interface gráfica."""
     parser = argparse.ArgumentParser(description="Loung Leads - coletor inicial sem API")
     parser.add_argument("--cidades", nargs="+", required=True, help="Ex: Santos Praia_Grande")
     parser.add_argument("--segmentos", nargs="+", required=True, help="Ex: clinica_odontologica clinica_medica")
@@ -211,9 +208,30 @@ if __name__ == "__main__":
     parser.add_argument("--output", default="leads_loungtech.xlsx", help="Arquivo .xlsx ou .csv")
     parser.add_argument("--headless", action="store_true", help="Rodar sem abrir navegador")
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     cidades = [c.replace("_", " ") for c in args.cidades]
     segmentos = [s.replace("_", " ") for s in args.segmentos]
 
     run(cidades, segmentos, args.max, args.output, headless=args.headless)
+
+
+def gui_main():
+    """Executa somente a interface gráfica."""
+    from app import LoungLeadsApp
+
+    app = LoungLeadsApp()
+    app.mainloop()
+
+
+def main(argv=None):
+    """Sem argumentos abre a GUI; com argumentos mantém a CLI legada."""
+    argv = sys.argv[1:] if argv is None else argv
+    if argv:
+        cli_main(argv)
+    else:
+        gui_main()
+
+
+if __name__ == "__main__":
+    main()

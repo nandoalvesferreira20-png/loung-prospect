@@ -16,13 +16,25 @@ pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
-## 3. Rodar teste pequeno
+## 3. Abrir a interface gráfica
+
+```bash
+python main.py
+```
+
+Sem argumentos, somente a interface gráfica é executada. Fechar a janela encerra
+o programa, sem iniciar a CLI.
+
+## 4. Rodar teste pequeno pela CLI legada
+
+Com argumentos, somente a CLI é executada, sem abrir a interface gráfica.
+Os comandos e os formatos de saída `.xlsx` e `.csv` da CLI foram preservados.
 
 ```bash
 python main.py --cidades Praia_Grande --segmentos clinica_odontologica --max 5 --output leads_teste.xlsx
 ```
 
-## 4. Rodar com mais cidades
+## 5. Rodar com mais cidades pela CLI legada
 
 ```bash
 python main.py --cidades Praia_Grande Santos Sao_Vicente --segmentos clinica_odontologica clinica_medica consultorio_medico clinica_estetica --max 10 --output leads_loungtech.xlsx
