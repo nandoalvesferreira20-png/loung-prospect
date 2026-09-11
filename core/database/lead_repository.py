@@ -94,3 +94,14 @@ class LeadRepository:
     def count_leads(self) -> int:
         with closing(connect_database(self.path)) as connection:
             return connection.execute("SELECT COUNT(*) FROM leads").fetchone()[0]
+
+    def update_details(self, lead_id, *, status, responsavel, observacoes):
+        """Save workspace edits atomically."""
+        with closing(connect_database(self.path)) as connection:
+            with connection:
+                cursor = connection.execute(
+                    "UPDATE leads SET status = ?, responsavel = ?, observacoes = ?, updated_at = ? WHERE id = ?",
+                    (status, responsavel, observacoes, datetime.now(timezone.utc).isoformat(), lead_id),
+                )
+                if cursor.rowcount == 0:
+                    raise LeadNotFoundError(f"Lead not found: {lead_id}")

@@ -3,12 +3,13 @@ from ui.theme import COLORS, FONT
 
 
 class Sidebar(ctk.CTkFrame):
-    def __init__(self, master, on_dashboard, on_search, on_prototype=None):
+    def __init__(self, master, on_dashboard, on_search, on_prototype=None, on_workspace=None):
         super().__init__(master, width=250, fg_color=COLORS["sidebar"], corner_radius=0)
 
         self.on_dashboard = on_dashboard
         self.on_search = on_search
         self.on_prototype = on_prototype
+        self.on_workspace = on_workspace
 
         self.build_ui()
 
@@ -56,6 +57,10 @@ class Sidebar(ctk.CTkFrame):
             text_color=COLORS["text"], command=self.on_prototype,
         )
         self.prototype_btn.pack(fill="x", padx=18, pady=6)
+        self.workspace_btn = ctk.CTkButton(self, text="📋 Carteira de Leads", height=42, anchor="w",
+                                         fg_color="transparent", hover_color=COLORS["card_light"],
+                                         command=self.on_workspace)
+        self.workspace_btn.pack(fill="x", padx=18, pady=6)
 
         ctk.CTkButton(
             self,
@@ -108,6 +113,10 @@ class Sidebar(ctk.CTkFrame):
         ).pack(anchor="w", pady=(6, 0))
 
     def set_active(self, page):
+        self.workspace_btn.configure(fg_color=COLORS["primary"] if page == "workspace" else "transparent")
+        if page == "workspace":
+            self.dashboard_btn.configure(fg_color="transparent")
+            self.search_btn.configure(fg_color="transparent")
         self.prototype_btn.configure(fg_color=COLORS["primary"] if page == "prototype" else "transparent")
         if page == "prototype":
             self.dashboard_btn.configure(fg_color="transparent")

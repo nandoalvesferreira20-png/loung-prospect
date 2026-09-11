@@ -6,6 +6,7 @@ from ui.home import HomePage
 from ui.dashboard import DashboardPage
 from ui.prototype_studio import PrototypeStudioPage
 from ui.prototype_logic import PrototypeSession
+from ui.lead_workspace import LeadWorkspacePage
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -26,6 +27,7 @@ class LoungLeadsApp(ctk.CTk):
             on_dashboard=self.show_dashboard,
             on_search=self.show_search,
             on_prototype=self.show_prototype,
+            on_workspace=self.show_workspace,
         )
         self.sidebar.pack(side="left", fill="y")
 
@@ -52,3 +54,8 @@ class LoungLeadsApp(ctk.CTk):
         self.clear_content()
         self.sidebar.set_active("prototype")
         PrototypeStudioPage(self.content, self.prototype_session).pack(fill="both", expand=True)
+
+    def show_workspace(self):
+        self.clear_content()
+        self.sidebar.set_active("workspace")
+        LeadWorkspacePage(self.content).pack(fill="both", expand=True)
