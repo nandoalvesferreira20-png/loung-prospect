@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from .models import ObservationStatus, QualificationInput
+from core.validator import website_observation
 
 
 def adapt_record_to_qualification_input(
@@ -14,7 +15,8 @@ def adapt_record_to_qualification_input(
     Empty/whitespace-only strings and None become unavailable values. Nonempty
     strings are kept exactly as received; other known-field types are rejected.
     OBSERVED means present in the record, not independently verified (including
-    WhatsApp). No absent value is classified as NOT_FOUND.
+    WhatsApp). Website NOT_FOUND requires an explicit completed verification
+    report matching the source; blank values alone remain UNVERIFIED.
 
     The current Segmento key wins even when empty. Only an explicit lead_id is
     copied as an identifier; its stability is the caller's responsibility.
@@ -44,4 +46,5 @@ def adapt_record_to_qualification_input(
             ObservationStatus.UNVERIFIED if value is None
             else ObservationStatus.OBSERVED
         )
+    observations["website"] = website_observation(record)
     return QualificationInput(**values, observations=observations)
