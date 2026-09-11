@@ -83,11 +83,12 @@ def generate_prototype(request: PrototypeRequest) -> PrototypeResult:
                     raise ValueError(f"Unsupported template entry: {entry}")
 
         inspect(source)
+        root.mkdir(parents=True, exist_ok=True)
+        root = root.resolve(strict=True)
         prototype_id = str(uuid4())
         destination = root / f"{safe_slug(request.lead.company_name)}-{prototype_id}"
         if destination.resolve().parent != root:
             raise ValueError("Unsafe output path")
-        root.mkdir(parents=True, exist_ok=True)
         destination.mkdir(exist_ok=False)
         created = True
         for entry, is_directory in entries:

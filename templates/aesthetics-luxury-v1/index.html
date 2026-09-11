@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ company_name }} · Aesthetics Luxury</title><link rel="stylesheet" href="css/style.css"><script src="js/script.js" defer></script></head>
+<body>
+<a class="skip" href="#conteudo">Ir para o conteúdo</a>
+<header class="header wrap"><a class="brand" href="#inicio">{{ company_name }}</a><nav aria-label="Navegação principal"><a href="#sobre">Sobre</a><a href="#contato">Contato</a></nav></header>
+<main id="conteudo">
+<section class="hero wrap" id="inicio"><div><p class="eyebrow">Estética · Um momento para você {{#if city}}· {{ city }}{{/if}}</p><h1>Seu tempo.<br>Seu cuidado.<br><em>Sua expressão.</em></h1><p class="intro">{{ company_name }}</p><p class="muted">Um convite para conversar sobre cuidado pessoal, com atenção às suas escolhas.</p>{{#if contact_url}}<a class="button" href="{{ contact_url }}">{{ contact_label }} <span aria-hidden="true">↗</span></a>{{/if}}</div><div class="hero-art" aria-hidden="true"><div class="slab one"></div><div class="slab two"></div><span>UM MOMENTO DE ATENÇÃO</span></div></section>
+<section class="about wrap" id="sobre"><p class="eyebrow">Apresentação</p><h2>O cuidado começa<br>por ouvir você.</h2><div><p class="intro">Um convite para conversar sobre cuidado pessoal, com atenção às suas escolhas.</p><p class="muted">Conheça {{ company_name }}. Converse sobre suas expectativas e consulte os atendimentos disponíveis, sem antecipar procedimentos ou resultados.</p></div></section>
+<section class="principles wrap" aria-labelledby="principles-title"><p class="eyebrow">Atendimento</p><h2 id="principles-title">Espaço para suas escolhas.</h2><div class="cards"><article><span class="number">01</span><h3>Individualidade</h3><p>Compartilhe suas preferências e o que você procura.</p></article><article><span class="number">02</span><h3>Clareza</h3><p>Esclareça dúvidas sobre as possibilidades de atendimento.</p></article><article><span class="number">03</span><h3>Tempo</h3><p>Consulte a disponibilidade e planeje sua visita com tranquilidade.</p></article></div></section>
+<section class="contact wrap" id="contato"><div><p class="eyebrow">Contato e localização</p><h2>Reserve um momento<br>para conversar.</h2><p>Consulte as informações de atendimento diretamente.</p></div><div class="contact-details">
+{{#if city}}<p><span>Cidade</span>{{ city }}</p>{{/if}}
+{{#if address}}<p><span>Endereço informado</span>{{ address }}</p>{{/if}}
+{{#if phone}}<p><span>Telefone informado</span>{{ phone }}</p>{{/if}}
+{{#if whatsapp}}<p><span>WhatsApp informado</span>{{ whatsapp }}</p>{{/if}}
+{{#if contact_url}}<a class="button" href="{{ contact_url }}">{{ contact_label }} <span aria-hidden="true">↗</span></a>{{/if}}
+</div></section>
+</main><footer class="footer wrap"><span>{{ company_name }}</span><span>Protótipo demonstrativo · sujeito à revisão</span></footer>
+</body></html>

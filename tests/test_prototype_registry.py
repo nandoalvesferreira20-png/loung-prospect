@@ -19,7 +19,7 @@ def write_template(root, directory="one", **overrides):
 
 def test_initial_template_and_default_api():
     templates = registry.list_templates()
-    assert len(templates) == 1
+    assert len(templates) == 4
     template = registry.get_template("dentist-modern-v1")
     assert isinstance(template, PrototypeTemplate)
     assert template.version == "1.0.0"
