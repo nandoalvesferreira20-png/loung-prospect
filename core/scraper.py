@@ -10,6 +10,7 @@ from playwright.sync_api import sync_playwright
 from core.extractor import extract_company_data
 from core.exporter import export_excel
 from core.maps import collect_links
+from core.qualification.service import qualify_records
 
 
 def run_scraper(
@@ -21,6 +22,7 @@ def run_scraper(
     log: Callable[[str], None] = print,
     on_progress: Callable[[int, int, str], None] | None = None,
     should_stop: Callable[[], bool] | None = None,
+    qualification_enabled: bool = False,
 ) -> dict:
     """
     Executa o processo completo de prospecção.
@@ -32,6 +34,12 @@ def run_scraper(
     - quantidade de falhas;
     - tempo de execução;
     - caminho do arquivo.
+
+    Quando habilitada, a qualificação acrescenta apenas a chave "qualificacoes":
+    lista de {"registro": dict, "resultado": QualificationResult}, na ordem
+    deduplicada. Não altera o Excel nem os campos comerciais. Leads já coletados
+    também são qualificados após cancelamento; lote vazio não chama o serviço.
+    Falhas individuais ficam no resultado, sem alterar os contadores de coleta.
     """
 
     on_progress = on_progress or (
@@ -265,12 +273,21 @@ def run_scraper(
     # =========================================
 
     df = pd.DataFrame(rows)
+    qualifications = []
 
     if not df.empty:
         df = df.drop_duplicates(
             subset=["Empresa", "Endereço"],
             keep="first"
         )
+
+        if qualification_enabled:
+            records = df.to_dict(orient="records")
+            results = qualify_records(records)
+            qualifications = [
+                {"registro": record, "resultado": result}
+                for record, result in zip(records, results, strict=True)
+            ]
 
         exported_path = export_excel(
             df=df,
@@ -302,6 +319,9 @@ def run_scraper(
         else None,
         "erros": errors
     }
+
+    if qualification_enabled:
+        summary["qualificacoes"] = qualifications
 
     log(
         f"🏁 Processo {status}. "
