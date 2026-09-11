@@ -116,3 +116,12 @@ tmp/
 # =====================================
 *.bak
 *.old
+
+# Banco local e arquivos auxiliares de transação
+data/
+*.db
+*.sqlite
+*.sqlite3
+*.db-*
+*.sqlite-*
+*.sqlite3-*
