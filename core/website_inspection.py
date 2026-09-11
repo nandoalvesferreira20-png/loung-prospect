@@ -5,6 +5,46 @@ from urllib.parse import urlsplit
 from core.validator import WebsiteVerification, with_website_verification
 
 
+# Positive evidence requires a scoped, visible control, not a fully settled panel.
+EXPLICIT_WEBSITE = r"""() => {
+    const visible = el => el.getClientRects().length > 0;
+    const panels = [...document.querySelectorAll('[role="main"]')]
+        .filter(el => visible(el) && el.querySelector('h1'));
+    if (panels.length !== 1) return null;
+    const panel = panels[0];
+    const controls = [...panel.querySelectorAll('a, button')].filter(el =>
+        visible(el) && (el.getAttribute('data-item-id') === 'authority' ||
+        /^(website|site)\s*:/i.test(el.getAttribute('aria-label') || '')));
+    const links = [...new Set(controls.map(el => el.getAttribute('href')).filter(Boolean))];
+    if (links.length !== 1) return null;
+    return {name: panel.querySelector('h1').textContent.trim(), url: location.href,
+            explicit_href: links[0]};
+}"""
+
+
+def inspect_explicit_website(page, record):
+    """Copy a URL only when the current company panel identifies its provenance.
+
+    No provider or hostname allowlist is used. This positive observation does not
+    certify panel completeness, website ownership or the availability of the URL.
+    """
+    source = record["Google Maps"]
+    try:
+        snapshot = page.evaluate(EXPLICIT_WEBSITE)
+        if snapshot and snapshot.get("explicit_href"):
+            href = snapshot["explicit_href"]
+            parsed = urlsplit(href)
+            if (snapshot["name"] == record["Empresa"] and snapshot["url"] == source
+                    and parsed.scheme in ("http", "https") and parsed.hostname):
+                return with_website_verification(
+                    {**record, "Site": href},
+                    WebsiteVerification(source, True, True, website_source="explicit_website_control"),
+                )
+    except Exception:
+        return with_website_verification(record, WebsiteVerification(source, error=True))
+    return None
+
+
 PANEL_SNAPSHOT = r"""() => {
     const visible = el => el.getClientRects().length > 0;
     const panels = [...document.querySelectorAll('[role="main"]')]
@@ -46,7 +86,7 @@ def enrich_website_verification(page, record):
                 if site and site in links:
                     parsed = urlsplit(site)
                     if parsed.scheme in ("http", "https") and parsed.hostname:
-                        check = WebsiteVerification(source, True, True)
+                        check = WebsiteVerification(source, True, True, website_source="explicit_website_control")
                 elif not site and not links:
                     check = WebsiteVerification(source, True, False)
     except Exception:

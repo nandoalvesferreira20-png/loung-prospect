@@ -27,6 +27,7 @@ class WebsiteVerification:
     completed: bool = False
     website_found: bool | None = None
     error: bool = False
+    website_source: str = "unknown"
 
 
 def website_observation(record: Mapping[str, Any]) -> ObservationStatus:

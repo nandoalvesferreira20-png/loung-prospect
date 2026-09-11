@@ -3,6 +3,24 @@ import customtkinter as ctk
 from core.exporter import open_excel, open_folder
 
 
+def format_finish_summary(summary):
+    """Present scalar summary values without interpreting qualification objects."""
+    info = (
+        f"Leads exportados: {summary['leads']}\n"
+        f"Falhas na coleta: {summary['falhas']}\n"
+        f"Tempo: {summary['tempo_segundos']:.1f}s"
+    )
+    qualification = summary.get("qualification_summary")
+    if qualification is not None:
+        info += (
+            f"\n\nQualificados: {qualification['qualified']}"
+            f"\nOportunidades de website: {qualification['website_opportunities']}"
+            f"\nDados insuficientes: {qualification['insufficient_data']}"
+            f"\nErros de qualificação: {qualification['error']}"
+        )
+    return info
+
+
 def show_finish_dialog(parent, summary):
     """
     Exibe o popup de conclusão da busca.
@@ -10,7 +28,7 @@ def show_finish_dialog(parent, summary):
 
     dialog = ctk.CTkToplevel(parent)
     dialog.title("Busca finalizada")
-    dialog.geometry("430x320")
+    dialog.geometry("480x440" if "qualification_summary" in summary else "430x320")
     dialog.resizable(False, False)
 
     dialog.grab_set()
@@ -23,11 +41,7 @@ def show_finish_dialog(parent, summary):
         font=("Arial", 24, "bold")
     ).pack(pady=(20, 10))
 
-    info = (
-        f"Leads encontrados: {summary['leads']}\n"
-        f"Falhas: {summary['falhas']}\n"
-        f"Tempo: {summary['tempo_segundos']:.1f}s"
-    )
+    info = format_finish_summary(summary)
 
     ctk.CTkLabel(
         dialog,

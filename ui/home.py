@@ -136,6 +136,13 @@ class HomePage(ctk.CTkFrame):
         # Botões
         # =========================
 
+        self.qualification_switch = ctk.CTkSwitch(
+            card,
+            text="Qualificar leads automaticamente",
+        )
+        self.qualification_switch.deselect()
+        self.qualification_switch.pack(anchor="w", padx=25, pady=(12, 0))
+
         buttons = ctk.CTkFrame(
             card,
             fg_color="transparent"
@@ -378,7 +385,8 @@ class HomePage(ctk.CTkFrame):
                 cidades,
                 segmentos,
                 quantidade,
-                output
+                output,
+                bool(self.qualification_switch.get()),
             ),
             daemon=True
         )
@@ -410,7 +418,8 @@ class HomePage(ctk.CTkFrame):
         cidades,
         segmentos,
         quantidade,
-        output
+        output,
+        qualification_enabled=False,
     ):
         try:
             summary = run_scraper(
@@ -420,7 +429,8 @@ class HomePage(ctk.CTkFrame):
                 output=output,
                 log=self.log,
                 on_progress=self.update_progress,
-                should_stop=lambda: self.stop_requested
+                should_stop=lambda: self.stop_requested,
+                qualification_enabled=qualification_enabled,
             )
 
             self.after(
@@ -650,6 +660,7 @@ class HomePage(ctk.CTkFrame):
         self.set_form_state("normal")
 
     def set_form_state(self, state):
+        self.qualification_switch.configure(state=state)
         self.cidades.configure(
             state=state
         )

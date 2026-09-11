@@ -340,6 +340,12 @@ def run_scraper(
 
     if qualification_enabled:
         summary["qualificacoes"] = qualifications
+        summary["qualification_summary"] = {
+            "qualified": sum(item["resultado"].status == "qualified" for item in qualifications),
+            "insufficient_data": sum(item["resultado"].status == "insufficient_data" for item in qualifications),
+            "error": sum(item["resultado"].status == "error" for item in qualifications),
+            "website_opportunities": sum(item["resultado"].opportunity == "website" for item in qualifications),
+        }
 
     log(
         f"🏁 Processo {status}. "

@@ -67,8 +67,8 @@ def test_maximum_supported_score_and_consistent_reasons():
     data = lead(phone="123", address="Rua A", source_url="https://source.example.test")
     data.observations.update(phone="observed", address="observed")
     result = evaluate_rules(data)
-    assert result.score == sum(WEIGHTS.values()) == 80
-    assert codes(result.reasons) == set(WEIGHTS)
+    assert result.score == WEIGHTS["website_not_found"] + WEIGHTS["phone_observed"] + WEIGHTS["address_observed"] == 80
+    assert codes(result.reasons) == {"website_not_found", "phone_observed", "address_observed"}
     assert codes(result.reasons) <= codes(result.evidence)
     assert all(note.source_url == data.source_url for note in result.evidence)
 
@@ -79,7 +79,7 @@ def test_determinism_version_no_mutation_or_shared_results():
     first, second = evaluate_rules(data), evaluate_rules(data)
     assert first == second
     assert data == original
-    assert first.rules_version == RULES_VERSION == "1.0.0"
+    assert first.rules_version == RULES_VERSION == "2.0.0"
     assert first.analyzed_at is None
     first.reasons.clear()
     assert second.reasons
