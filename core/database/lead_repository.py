@@ -1,4 +1,5 @@
 """Small lead repository. Filters use exact matches, no business taxonomy."""
+
 from collections.abc import Mapping
 from contextlib import closing
 from datetime import datetime, timezone
@@ -8,13 +9,34 @@ from typing import Any
 from .connection import DEFAULT_DATABASE_PATH, connect_database
 from .schema import initialize_database
 
+
 FIELDS = (
-    "empresa", "cidade", "segmento", "telefone", "whatsapp", "email", "site",
-    "endereco", "avaliacao", "google_maps", "qualification_status",
-    "qualification_score", "opportunity", "qualification_reasons",
-    "qualification_evidence", "qualification_limitations", "rules_version",
-    "analyzed_at", "responsavel", "status", "observacoes", "provider", "provider_place_id",
+    "empresa",
+    "cidade",
+    "segmento",
+    "telefone",
+    "whatsapp",
+    "email",
+    "site",
+    "endereco",
+    "avaliacao",
+    "quantidade_avaliacoes",
+    "google_maps",
+    "qualification_status",
+    "qualification_score",
+    "opportunity",
+    "qualification_reasons",
+    "qualification_evidence",
+    "qualification_limitations",
+    "rules_version",
+    "analyzed_at",
+    "responsavel",
+    "status",
+    "observacoes",
+    "provider",
+    "provider_place_id",
 )
+
 _UNSET = object()
 
 
@@ -29,6 +51,7 @@ class LeadRepository:
     Updates raise LeadNotFoundError. Omitted filters are unrestricted; explicit
     None matches SQL NULL. Timestamps are managed by the repository.
     """
+
     def __init__(self, path=DEFAULT_DATABASE_PATH):
         self.path = Path(path)
         initialize_database(self.path)
@@ -41,91 +64,322 @@ class LeadRepository:
     @staticmethod
     def _insert(connection, data):
         unknown = set(data) - set(FIELDS)
+
         if unknown:
-            raise ValueError(f"Unknown lead fields: {sorted(unknown)}")
+            raise ValueError(
+                f"Unknown lead fields: {sorted(unknown)}"
+            )
+
         now = datetime.now(timezone.utc).isoformat()
-        values = [data.get(field, "Novo" if field == "status" else None) for field in FIELDS]
-        # Column names and SQL structure are internal constants; all data is bound.
-        columns = ", ".join((*FIELDS, "created_at", "updated_at"))
-        placeholders = ", ".join("?" for _ in range(len(FIELDS) + 2))
-        cursor = connection.execute(f"INSERT INTO leads ({columns}) VALUES ({placeholders})", [*values, now, now])
+
+        values = [
+            data.get(
+                field,
+                "Novo" if field == "status" else None,
+            )
+            for field in FIELDS
+        ]
+
+        # Column names and SQL structure are internal constants;
+        # all user data is bound through parameters.
+        columns = ", ".join(
+            (*FIELDS, "created_at", "updated_at")
+        )
+
+        placeholders = ", ".join(
+            "?"
+            for _ in range(
+                len(FIELDS) + 2
+            )
+        )
+
+        cursor = connection.execute(
+            (
+                f"INSERT INTO leads "
+                f"({columns}) "
+                f"VALUES ({placeholders})"
+            ),
+            [
+                *values,
+                now,
+                now,
+            ],
+        )
+
         return cursor.lastrowid
 
-    def create_lead_if_new(self, data: Mapping[str, Any]) -> int | None:
-        """Atomically skip exact identity matches, without updating existing leads.
+    def create_lead_if_new(
+        self,
+        data: Mapping[str, Any],
+    ) -> int | None:
+        """Atomically skip exact identity matches.
 
-        Ordered criteria: provider/place ID, Maps URI, company/address,
-        company/phone. Blank components never form a deduplication key.
+        Ordered criteria:
+        1. provider + place ID
+        2. Maps URI
+        3. company + address
+        4. company + phone
+
+        Existing records are preserved and not updated.
+        Blank components never form a deduplication key.
         """
-        keys = (("provider", "provider_place_id"), ("google_maps",),
-                ("empresa", "endereco"), ("empresa", "telefone"))
-        with closing(connect_database(self.path)) as connection:
+
+        keys = (
+            (
+                "provider",
+                "provider_place_id",
+            ),
+            ("google_maps",),
+            (
+                "empresa",
+                "endereco",
+            ),
+            (
+                "empresa",
+                "telefone",
+            ),
+        )
+
+        with closing(
+            connect_database(self.path)
+        ) as connection:
             with connection:
-                connection.execute("BEGIN IMMEDIATE")
+                connection.execute(
+                    "BEGIN IMMEDIATE"
+                )
+
                 for fields in keys:
-                    values = [data.get(field) for field in fields]
-                    if not all(isinstance(value, str) and value.strip() for value in values):
+                    values = [
+                        data.get(field)
+                        for field in fields
+                    ]
+
+                    if not all(
+                        isinstance(value, str)
+                        and value.strip()
+                        for value in values
+                    ):
                         continue
-                    clause = " AND ".join(f"{field} = ?" for field in fields)
-                    if connection.execute(f"SELECT id FROM leads WHERE {clause} LIMIT 1", values).fetchone():
+
+                    clause = " AND ".join(
+                        f"{field} = ?"
+                        for field in fields
+                    )
+
+                    existing = connection.execute(
+                        (
+                            "SELECT id "
+                            "FROM leads "
+                            f"WHERE {clause} "
+                            "LIMIT 1"
+                        ),
+                        values,
+                    ).fetchone()
+
+                    if existing:
                         return None
-                return self._insert(connection, data)
+
+                return self._insert(
+                    connection,
+                    data,
+                )
 
     def get_lead(self, lead_id):
-        with closing(connect_database(self.path)) as connection:
-            return connection.execute("SELECT * FROM leads WHERE id = ?", (lead_id,)).fetchone()
+        with closing(
+            connect_database(self.path)
+        ) as connection:
+            return connection.execute(
+                (
+                    "SELECT * "
+                    "FROM leads "
+                    "WHERE id = ?"
+                ),
+                (lead_id,),
+            ).fetchone()
 
-    def list_leads(self, *, status=_UNSET, segmento=_UNSET, responsavel=_UNSET, score_minimo=_UNSET):
-        clauses, values = [], []
-        for field, value in (("status", status), ("segmento", segmento), ("responsavel", responsavel)):
+    def list_leads(
+        self,
+        *,
+        status=_UNSET,
+        segmento=_UNSET,
+        responsavel=_UNSET,
+        score_minimo=_UNSET,
+    ):
+        clauses = []
+        values = []
+
+        for field, value in (
+            ("status", status),
+            ("segmento", segmento),
+            ("responsavel", responsavel),
+        ):
             if value is _UNSET:
                 continue
-            clauses.append(f"{field} IS NULL" if value is None else f"{field} = ?")
+
+            clauses.append(
+                (
+                    f"{field} IS NULL"
+                    if value is None
+                    else f"{field} = ?"
+                )
+            )
+
             if value is not None:
                 values.append(value)
-        if score_minimo is not _UNSET:
-            clauses.append("qualification_score IS NULL" if score_minimo is None else "qualification_score >= ?")
-            if score_minimo is not None:
-                values.append(score_minimo)
-        query = "SELECT * FROM leads"
-        if clauses:
-            query += " WHERE " + " AND ".join(clauses)
-        query += " ORDER BY qualification_score DESC, id ASC"
-        with closing(connect_database(self.path)) as connection:
-            return connection.execute(query, values).fetchall()
 
-    def _update(self, lead_id, field, value):
-        if field not in ("status", "observacoes", "responsavel"):
-            raise ValueError("Unsupported update field")
-        with closing(connect_database(self.path)) as connection:
+        if score_minimo is not _UNSET:
+            clauses.append(
+                (
+                    "qualification_score IS NULL"
+                    if score_minimo is None
+                    else "qualification_score >= ?"
+                )
+            )
+
+            if score_minimo is not None:
+                values.append(
+                    score_minimo
+                )
+
+        query = "SELECT * FROM leads"
+
+        if clauses:
+            query += (
+                " WHERE "
+                + " AND ".join(clauses)
+            )
+
+        query += (
+            " ORDER BY "
+            "qualification_score DESC, "
+            "id ASC"
+        )
+
+        with closing(
+            connect_database(self.path)
+        ) as connection:
+            return connection.execute(
+                query,
+                values,
+            ).fetchall()
+
+    def _update(
+        self,
+        lead_id,
+        field,
+        value,
+    ):
+        if field not in (
+            "status",
+            "observacoes",
+            "responsavel",
+        ):
+            raise ValueError(
+                "Unsupported update field"
+            )
+
+        with closing(
+            connect_database(self.path)
+        ) as connection:
             with connection:
                 cursor = connection.execute(
-                    f"UPDATE leads SET {field} = ?, updated_at = ? WHERE id = ?",
-                    (value, datetime.now(timezone.utc).isoformat(), lead_id),
+                    (
+                        f"UPDATE leads "
+                        f"SET {field} = ?, "
+                        "updated_at = ? "
+                        "WHERE id = ?"
+                    ),
+                    (
+                        value,
+                        datetime.now(
+                            timezone.utc
+                        ).isoformat(),
+                        lead_id,
+                    ),
                 )
+
                 if cursor.rowcount == 0:
-                    raise LeadNotFoundError(f"Lead not found: {lead_id}")
+                    raise LeadNotFoundError(
+                        f"Lead not found: {lead_id}"
+                    )
 
-    def update_status(self, lead_id, status):
-        self._update(lead_id, "status", status)
+    def update_status(
+        self,
+        lead_id,
+        status,
+    ):
+        self._update(
+            lead_id,
+            "status",
+            status,
+        )
 
-    def update_notes(self, lead_id, observacoes):
-        self._update(lead_id, "observacoes", observacoes)
+    def update_notes(
+        self,
+        lead_id,
+        observacoes,
+    ):
+        self._update(
+            lead_id,
+            "observacoes",
+            observacoes,
+        )
 
-    def update_responsible(self, lead_id, responsavel):
-        self._update(lead_id, "responsavel", responsavel)
+    def update_responsible(
+        self,
+        lead_id,
+        responsavel,
+    ):
+        self._update(
+            lead_id,
+            "responsavel",
+            responsavel,
+        )
 
     def count_leads(self) -> int:
-        with closing(connect_database(self.path)) as connection:
-            return connection.execute("SELECT COUNT(*) FROM leads").fetchone()[0]
+        with closing(
+            connect_database(self.path)
+        ) as connection:
+            return connection.execute(
+                "SELECT COUNT(*) FROM leads"
+            ).fetchone()[0]
 
-    def update_details(self, lead_id, *, status, responsavel, observacoes):
+    def update_details(
+        self,
+        lead_id,
+        *,
+        status,
+        responsavel,
+        observacoes,
+    ):
         """Save workspace edits atomically."""
-        with closing(connect_database(self.path)) as connection:
+
+        with closing(
+            connect_database(self.path)
+        ) as connection:
             with connection:
                 cursor = connection.execute(
-                    "UPDATE leads SET status = ?, responsavel = ?, observacoes = ?, updated_at = ? WHERE id = ?",
-                    (status, responsavel, observacoes, datetime.now(timezone.utc).isoformat(), lead_id),
+                    """
+                    UPDATE leads
+                    SET
+                        status = ?,
+                        responsavel = ?,
+                        observacoes = ?,
+                        updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (
+                        status,
+                        responsavel,
+                        observacoes,
+                        datetime.now(
+                            timezone.utc
+                        ).isoformat(),
+                        lead_id,
+                    ),
                 )
+
                 if cursor.rowcount == 0:
-                    raise LeadNotFoundError(f"Lead not found: {lead_id}")
+                    raise LeadNotFoundError(
+                        f"Lead not found: {lead_id}"
+                    )
