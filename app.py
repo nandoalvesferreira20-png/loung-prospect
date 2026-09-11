@@ -4,6 +4,8 @@ from ui.theme import COLORS
 from ui.sidebar import Sidebar
 from ui.home import HomePage
 from ui.dashboard import DashboardPage
+from ui.prototype_studio import PrototypeStudioPage
+from ui.prototype_logic import PrototypeSession
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -17,11 +19,13 @@ class LoungLeadsApp(ctk.CTk):
         self.geometry("1150x720")
         self.minsize(1050, 650)
         self.configure(fg_color=COLORS["bg"])
+        self.prototype_session = PrototypeSession()
 
         self.sidebar = Sidebar(
             self,
             on_dashboard=self.show_dashboard,
-            on_search=self.show_search
+            on_search=self.show_search,
+            on_prototype=self.show_prototype,
         )
         self.sidebar.pack(side="left", fill="y")
 
@@ -43,3 +47,8 @@ class LoungLeadsApp(ctk.CTk):
         self.clear_content()
         self.sidebar.set_active("search")
         HomePage(self.content).pack(fill="both", expand=True)
+
+    def show_prototype(self):
+        self.clear_content()
+        self.sidebar.set_active("prototype")
+        PrototypeStudioPage(self.content, self.prototype_session).pack(fill="both", expand=True)

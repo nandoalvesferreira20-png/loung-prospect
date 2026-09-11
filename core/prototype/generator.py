@@ -1,4 +1,4 @@
-"""Copy a locally selected template; no HTML personalization or preview."""
+"""Copy a locally selected template and render its root index.html; no preview."""
 
 import json
 import re
@@ -9,6 +9,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from .models import PrototypeManifest, PrototypeRequest, PrototypeResult
+from .renderer import render_index
 
 
 def safe_slug(company_name: str) -> str:
@@ -94,6 +95,8 @@ def generate_prototype(request: PrototypeRequest) -> PrototypeResult:
             target = destination / entry.relative_to(source)
             if is_directory:
                 target.mkdir()
+            elif entry == source / "index.html":
+                target.write_text(render_index(entry.read_text(encoding="utf-8"), request.lead), encoding="utf-8")
             else:
                 shutil.copy2(entry, target)
         manifest = PrototypeManifest(

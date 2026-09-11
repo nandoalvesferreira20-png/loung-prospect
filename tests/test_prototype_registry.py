@@ -25,7 +25,7 @@ def test_initial_template_and_default_api():
     assert template.version == "1.0.0"
     assert template.segment == "dentista"
     assert registry.find_templates_for_segment(" DENTISTA ") == [template]
-    assert {p.name for p in Path(template.template_path).iterdir()} == {"template.json"}
+    assert {p.name for p in Path(template.template_path).iterdir()} == {"template.json", "index.html", "css", "js"}
 
 
 def test_discovery_path_order_and_id_lookup(tmp_path):
