@@ -1,9 +1,10 @@
 # core/extractor.py
 
 from playwright.sync_api import Page
+from core.website_inspection import enrich_website_verification
 
 
-def extract_company_data(page: Page, cidade: str, segmento: str) -> dict:
+def extract_company_data(page: Page, cidade: str, segmento: str, *, verify_website: bool = False) -> dict:
     """
     Extrai as informações da empresa na página atual do Google Maps.
     """
@@ -150,4 +151,6 @@ def extract_company_data(page: Page, cidade: str, segmento: str) -> dict:
     except Exception:
         pass
 
+    if verify_website:
+        return enrich_website_verification(page, data)
     return data

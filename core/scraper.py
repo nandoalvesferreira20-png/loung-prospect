@@ -10,6 +10,7 @@ from playwright.sync_api import sync_playwright
 from core.extractor import extract_company_data
 from core.exporter import export_excel
 from core.maps import collect_links
+from core.validator import WEBSITE_VERIFICATION_KEY
 from core.qualification.service import qualify_records
 from core.qualification.serialization import qualification_result_to_columns
 
@@ -199,7 +200,8 @@ def run_scraper(
                         company = extract_company_data(
                             page=page,
                             cidade=cidade,
-                            segmento=segmento
+                            segmento=segmento,
+                            verify_website=True,
                         )
 
                         company_name = company.get(
@@ -274,7 +276,10 @@ def run_scraper(
     # ETAPA 3 — Gerar arquivo
     # =========================================
 
-    df = pd.DataFrame(rows)
+    df = pd.DataFrame([
+        {key: value for key, value in row.items() if key != WEBSITE_VERIFICATION_KEY}
+        for row in rows
+    ])
     qualifications = []
 
     if not df.empty:
@@ -286,6 +291,9 @@ def run_scraper(
         export_df = df
         if qualification_enabled:
             records = df.to_dict(orient="records")
+            for index, record in zip(df.index, records, strict=True):
+                if WEBSITE_VERIFICATION_KEY in rows[index]:
+                    record[WEBSITE_VERIFICATION_KEY] = rows[index][WEBSITE_VERIFICATION_KEY]
             results = qualify_records(records)
             qualifications = [
                 {"registro": record, "resultado": result}

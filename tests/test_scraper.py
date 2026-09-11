@@ -19,7 +19,7 @@ def test_duplicate_links_keep_first_search_context(harness):
     harness.links.return_value *= 2
     summary = harness.run(cidades=["Cidade A", "Cidade B"])
     assert summary["total"] == summary["processados"] == 1
-    harness.extract.assert_called_once_with(page=harness.page, cidade="Cidade A", segmento="clínica")
+    harness.extract.assert_called_once_with(page=harness.page, cidade="Cidade A", segmento="clínica", verify_website=True)
 
 
 @pytest.mark.parametrize("address", ["Rua Fictícia, 1", ""])
