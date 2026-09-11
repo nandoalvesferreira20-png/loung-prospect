@@ -37,3 +37,7 @@ def initialize_database(path=DEFAULT_DATABASE_PATH) -> None:
     with closing(connect_database(path)) as connection:
         with connection:
             connection.execute(LEADS_SCHEMA)
+            columns = {row[1] for row in connection.execute("PRAGMA table_info(leads)")}
+            for column in ("provider", "provider_place_id"):
+                if column not in columns:
+                    connection.execute(f"ALTER TABLE leads ADD COLUMN {column} TEXT")

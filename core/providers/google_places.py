@@ -9,7 +9,7 @@ from .models import LeadCandidate
 ENDPOINT = "https://places.googleapis.com/v1/places:searchText"
 FIELD_MASK = ",".join((
     "places.id", "places.displayName", "places.formattedAddress", "places.nationalPhoneNumber",
-    "places.websiteUri", "places.rating", "places.userRatingCount", "places.googleMapsUri",
+    "places.websiteUri", "places.rating", "places.userRatingCount", "places.googleMapsLinks.placeUri",
     "places.location", "nextPageToken",
 ))
 
@@ -23,8 +23,10 @@ class GooglePlacesConfigurationError(GooglePlacesError):
 
 
 class GooglePlacesHTTPError(GooglePlacesError):
-    def __init__(self, status):
+    def __init__(self, status, *, api_status=None, api_message=None):
         self.status = status
+        self.api_status = api_status
+        self.api_message = api_message
         super().__init__(f"Google Places HTTP error: {status}")
 
 
@@ -40,6 +42,25 @@ def build_query(city: str, segment: str) -> str:
     if not isinstance(city, str) or not city.strip() or not isinstance(segment, str) or not segment.strip():
         raise ValueError("city and segment must be nonempty text")
     return f"{segment.strip()} em {city.strip()}"
+
+
+def _http_400_diagnostic(raw, key):
+    """Allow only two bounded, single-line fields; never retain the raw body."""
+    try:
+        data = json.loads(raw)
+    except (ValueError, TypeError, UnicodeError):
+        return {}
+    error = data.get("error") if isinstance(data, dict) else None
+    if not isinstance(error, dict):
+        return {}
+    diagnostic = {}
+    for field in ("status", "message"):
+        value = error.get(field)
+        if isinstance(value, str):
+            value = value.replace(key, "[REDACTED]")
+            value = " ".join("".join(c if c.isprintable() else " " for c in value).split())
+            diagnostic[f"api_{field}"] = value[:500]
+    return diagnostic
 
 
 def _post(payload, headers, timeout):
@@ -68,13 +89,14 @@ def normalize_place(place, *, city, segment):
         return value
     name = place.get("displayName", {})
     location = place.get("location", {})
-    if not isinstance(name, dict) or not isinstance(location, dict):
+    maps_links = place.get("googleMapsLinks", {})
+    if not isinstance(name, dict) or not isinstance(location, dict) or not isinstance(maps_links, dict):
         raise GooglePlacesResponseError("Unexpected nested place structure")
     return LeadCandidate(
         provider="google_places", provider_place_id=text("id"), empresa=text("text", name),
         cidade=city, segmento=segment, telefone=text("nationalPhoneNumber"),
         site=text("websiteUri"), endereco=text("formattedAddress"), avaliacao=number("rating"),
-        quantidade_avaliacoes=number("userRatingCount", integer=True), google_maps=text("googleMapsUri"),
+        quantidade_avaliacoes=number("userRatingCount", integer=True), google_maps=text("placeUri", maps_links),
         latitude=number("latitude", location), longitude=number("longitude", location),
     )
 
@@ -132,7 +154,8 @@ class GooglePlacesProvider:
             if type(status) is not int:
                 raise GooglePlacesResponseError("Invalid HTTP status")
             if not 200 <= status < 300:
-                raise GooglePlacesHTTPError(status)
+                diagnostic = _http_400_diagnostic(raw, self._key) if status == 400 else {}
+                raise GooglePlacesHTTPError(status, **diagnostic)
             try:
                 data = json.loads(raw)
             except (ValueError, TypeError, UnicodeError):

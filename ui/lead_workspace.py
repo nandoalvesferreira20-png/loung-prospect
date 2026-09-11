@@ -9,6 +9,7 @@ import customtkinter as ctk
 from core.database import LeadRepository
 from ui.lead_workspace_logic import LeadWorkspace, STATUSES, counts, list_values, valid_url
 from ui.theme import COLORS
+from ui.copy_field import add_copy_field
 
 DETAILS = {"empresa": "Empresa", "cidade": "Cidade", "segmento": "Segmento", "telefone": "Telefone",
            "whatsapp": "WhatsApp", "email": "Email", "site": "Site", "endereco": "Endereço",
@@ -140,7 +141,10 @@ class LeadWorkspacePage(ctk.CTkFrame):
         body = ctk.CTkScrollableFrame(dialog)
         body.pack(fill="both", expand=True, padx=16, pady=16)
         for field, label in DETAILS.items():
-            ctk.CTkLabel(body, text=f"{label}: {row[field] if row[field] is not None else '—'}", wraplength=590, justify="left").pack(anchor="w", pady=4)
+            if field in ("telefone", "whatsapp", "email", "site", "endereco", "google_maps"):
+                add_copy_field(body, label, row[field])
+            else:
+                ctk.CTkLabel(body, text=f"{label}: {row[field] if row[field] is not None else '—'}", wraplength=590, justify="left").pack(anchor="w", pady=4)
         for field, label in (("site", "Abrir Site"), ("google_maps", "Abrir Google Maps")):
             if valid_url(row[field]):
                 ctk.CTkButton(body, text=label, command=lambda url=row[field]: self.open_url(url)).pack(anchor="w", pady=6)

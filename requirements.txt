@@ -2,3 +2,4 @@ customtkinter
 playwright
 pandas
 openpyxl
+python-dotenv>=1,<2

@@ -28,7 +28,7 @@ def test_missing_key(monkeypatch):
 def test_normalization_and_nonmutation():
     place = dict(id="place-id", displayName={"text": "Clínica Árvore"}, formattedAddress="Rua A",
                  nationalPhoneNumber="123", websiteUri="https://example.test", rating=4.5,
-                 userRatingCount=20, googleMapsUri="https://maps.example.test", location={"latitude": -23.0, "longitude": -45.0})
+                 userRatingCount=20, googleMapsLinks={"placeUri": "https://maps.example.test"}, location={"latitude": -23.0, "longitude": -45.0})
     before = deepcopy(place)
     lead = normalize_place(place, city="Taubaté", segment="dentista")
     assert (lead.provider, lead.provider_place_id, lead.empresa) == ("google_places", "place-id", "Clínica Árvore")
@@ -49,6 +49,11 @@ def test_query_headers_and_timeout(factory):
     assert headers["X-Goog-Api-Key"] == "synthetic-secret"
     assert headers["X-Goog-FieldMask"] == FIELD_MASK and "*" not in FIELD_MASK
     assert "nextPageToken" in FIELD_MASK and "places.nationalPhoneNumber" in FIELD_MASK
+    assert "places.googleMapsLinks.placeUri" in FIELD_MASK.split(",")
+    assert "places.googleMapsUri" not in FIELD_MASK.split(",")
+    assert "nextPageToken" in FIELD_MASK.split(",")
+    assert "places.nextPageToken" not in FIELD_MASK.split(",")
+    assert "pageToken" not in payload
     assert timeout == 30
 
 
@@ -57,6 +62,8 @@ def test_pagination_stops_at_limit(factory, limit, pages):
     provider, transport = factory([{"places": [{"id": str(i)} for i in range(20)], "nextPageToken": token} for token in ("a", "b", "c")])
     assert len(provider.search(city="C", segment="S", max_results=limit)) == limit
     assert provider.request_count == transport.call_count == pages
+    assert "pageToken" not in transport.call_args_list[0].args[0]
+    assert all(1 <= call.args[0]["pageSize"] <= 20 for call in transport.call_args_list)
     if pages > 1:
         assert transport.call_args_list[1].args[0]["pageToken"] == "a"
 
@@ -109,3 +116,27 @@ def test_budget_and_safe_logs(factory):
         provider.search(city="C", segment="S")
     assert transport.call_count == 1
     assert "synthetic-secret" not in repr(log.call_args_list)
+
+
+@pytest.mark.parametrize("raw", [b"not json", b"[]", b'{"error":null}',
+    b'{"error":{"status":123,"message":[]}}'])
+def test_invalid_http_diagnostic_keeps_http_error(factory, raw):
+    provider, transport = factory([])
+    transport.side_effect = None
+    transport.return_value = 400, raw
+    with pytest.raises(GooglePlacesError) as caught:
+        provider.search(city="C", segment="S")
+    assert caught.value.status == 400
+    assert caught.value.api_status is None
+    assert caught.value.api_message is None
+
+
+@pytest.mark.parametrize("links", [None, [], {"placeUri": 123}])
+def test_invalid_maps_links(links):
+    with pytest.raises(GooglePlacesError):
+        normalize_place({"googleMapsLinks": links}, city="C", segment="S")
+
+
+def test_missing_maps_links():
+    assert normalize_place({}, city="C", segment="S").google_maps is None
+    assert normalize_place({"googleMapsLinks": {}}, city="C", segment="S").google_maps is None

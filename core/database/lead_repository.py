@@ -13,7 +13,7 @@ FIELDS = (
     "endereco", "avaliacao", "google_maps", "qualification_status",
     "qualification_score", "opportunity", "qualification_reasons",
     "qualification_evidence", "qualification_limitations", "rules_version",
-    "analyzed_at", "responsavel", "status", "observacoes",
+    "analyzed_at", "responsavel", "status", "observacoes", "provider", "provider_place_id",
 )
 _UNSET = object()
 
@@ -34,6 +34,12 @@ class LeadRepository:
         initialize_database(self.path)
 
     def create_lead(self, data: Mapping[str, Any]) -> int:
+        with closing(connect_database(self.path)) as connection:
+            with connection:
+                return self._insert(connection, data)
+
+    @staticmethod
+    def _insert(connection, data):
         unknown = set(data) - set(FIELDS)
         if unknown:
             raise ValueError(f"Unknown lead fields: {sorted(unknown)}")
@@ -42,10 +48,28 @@ class LeadRepository:
         # Column names and SQL structure are internal constants; all data is bound.
         columns = ", ".join((*FIELDS, "created_at", "updated_at"))
         placeholders = ", ".join("?" for _ in range(len(FIELDS) + 2))
+        cursor = connection.execute(f"INSERT INTO leads ({columns}) VALUES ({placeholders})", [*values, now, now])
+        return cursor.lastrowid
+
+    def create_lead_if_new(self, data: Mapping[str, Any]) -> int | None:
+        """Atomically skip exact identity matches, without updating existing leads.
+
+        Ordered criteria: provider/place ID, Maps URI, company/address,
+        company/phone. Blank components never form a deduplication key.
+        """
+        keys = (("provider", "provider_place_id"), ("google_maps",),
+                ("empresa", "endereco"), ("empresa", "telefone"))
         with closing(connect_database(self.path)) as connection:
             with connection:
-                cursor = connection.execute(f"INSERT INTO leads ({columns}) VALUES ({placeholders})", [*values, now, now])
-                return cursor.lastrowid
+                connection.execute("BEGIN IMMEDIATE")
+                for fields in keys:
+                    values = [data.get(field) for field in fields]
+                    if not all(isinstance(value, str) and value.strip() for value in values):
+                        continue
+                    clause = " AND ".join(f"{field} = ?" for field in fields)
+                    if connection.execute(f"SELECT id FROM leads WHERE {clause} LIMIT 1", values).fetchone():
+                        return None
+                return self._insert(connection, data)
 
     def get_lead(self, lead_id):
         with closing(connect_database(self.path)) as connection:

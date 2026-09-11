@@ -3,13 +3,14 @@ from ui.theme import COLORS, FONT
 
 
 class Sidebar(ctk.CTkFrame):
-    def __init__(self, master, on_dashboard, on_search, on_prototype=None, on_workspace=None):
+    def __init__(self, master, on_dashboard, on_search, on_prototype=None, on_workspace=None, on_places=None):
         super().__init__(master, width=250, fg_color=COLORS["sidebar"], corner_radius=0)
 
         self.on_dashboard = on_dashboard
         self.on_search = on_search
         self.on_prototype = on_prototype
         self.on_workspace = on_workspace
+        self.on_places = on_places
 
         self.build_ui()
 
@@ -51,6 +52,9 @@ class Sidebar(ctk.CTkFrame):
             command=self.on_search
         )
         self.search_btn.pack(fill="x", padx=18, pady=6)
+        self.places_btn = ctk.CTkButton(self, text="📍 Google Places API", height=42, anchor="w",
+            fg_color="transparent", hover_color=COLORS["card_light"], command=self.on_places)
+        self.places_btn.pack(fill="x", padx=18, pady=6)
         self.prototype_btn = ctk.CTkButton(
             self, text="🎨 Prototype Studio", height=42, anchor="w",
             fg_color="transparent", hover_color=COLORS["card_light"],
@@ -113,6 +117,10 @@ class Sidebar(ctk.CTkFrame):
         ).pack(anchor="w", pady=(6, 0))
 
     def set_active(self, page):
+        self.places_btn.configure(fg_color=COLORS["primary"] if page == "places" else "transparent")
+        if page == "places":
+            self.dashboard_btn.configure(fg_color="transparent")
+            self.search_btn.configure(fg_color="transparent")
         self.workspace_btn.configure(fg_color=COLORS["primary"] if page == "workspace" else "transparent")
         if page == "workspace":
             self.dashboard_btn.configure(fg_color="transparent")
