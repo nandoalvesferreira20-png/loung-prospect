@@ -11,6 +11,7 @@ from core.extractor import extract_company_data
 from core.exporter import export_excel
 from core.maps import collect_links
 from core.qualification.service import qualify_records
+from core.qualification.serialization import qualification_result_to_columns
 
 
 def run_scraper(
@@ -37,7 +38,8 @@ def run_scraper(
 
     Quando habilitada, a qualificação acrescenta apenas a chave "qualificacoes":
     lista de {"registro": dict, "resultado": QualificationResult}, na ordem
-    deduplicada. Não altera o Excel nem os campos comerciais. Leads já coletados
+    deduplicada. Acrescenta colunas derivadas ao Excel sem alterar campos originais.
+    Leads já coletados
     também são qualificados após cancelamento; lote vazio não chama o serviço.
     Falhas individuais ficam no resultado, sem alterar os contadores de coleta.
     """
@@ -281,6 +283,7 @@ def run_scraper(
             keep="first"
         )
 
+        export_df = df
         if qualification_enabled:
             records = df.to_dict(orient="records")
             results = qualify_records(records)
@@ -288,9 +291,16 @@ def run_scraper(
                 {"registro": record, "resultado": result}
                 for record, result in zip(records, results, strict=True)
             ]
+            derived = pd.DataFrame(
+                [qualification_result_to_columns(result) for result in results],
+                index=df.index,
+            )
+            if set(df.columns) & set(derived.columns):
+                raise ValueError("Qualification columns conflict with original columns")
+            export_df = pd.concat([df, derived], axis=1)
 
         exported_path = export_excel(
-            df=df,
+            df=export_df,
             output=str(output_path),
             log=log
         )

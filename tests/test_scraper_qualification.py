@@ -56,7 +56,7 @@ def test_single_qualification_error_does_not_block_export_or_other_leads(harness
     assert len(pd.read_excel(harness.output)) == 3
 
 
-def test_operational_fields_and_excel_unchanged_when_enabled(harness, lead_factory, columns):
+def test_operational_fields_and_original_excel_columns_unchanged_when_enabled(harness, lead_factory, columns):
     record = lead_factory(**{"Status Comercial": "Em análise", "Próxima Ação": "Revisar manualmente", "Potencial (1-5)": 3})
     original = deepcopy(record)
     harness.extract.side_effect = [record]
@@ -64,8 +64,8 @@ def test_operational_fields_and_excel_unchanged_when_enabled(harness, lead_facto
     assert record == original
     assert summary["qualificacoes"][0]["registro"] == original
     exported = pd.read_excel(harness.output, keep_default_na=False)
-    assert list(exported.columns) == columns
-    assert exported.to_dict("records") == [original]
+    assert list(exported.columns[:len(columns)]) == columns
+    assert exported[columns].to_dict("records") == [original]
 
 
 def test_enabled_empty_batch_skips_service(harness, monkeypatch):
