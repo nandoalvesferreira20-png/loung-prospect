@@ -1,6 +1,7 @@
 """Inspect only the already-open Maps panel; never navigate to company sites."""
 
 from urllib.parse import urlsplit
+from core.diagnostics import trace, enabled
 
 from core.validator import WebsiteVerification, with_website_verification
 
@@ -30,17 +31,40 @@ def inspect_explicit_website(page, record):
     """
     source = record["Google Maps"]
     try:
+        if enabled():
+            try:
+                inventory = page.evaluate(r"""() => ({url: location.href,
+                    panels: [...document.querySelectorAll('[role="main"]')].map(p => ({
+                        visible: p.getClientRects().length > 0,
+                        name: p.querySelector('h1')?.textContent,
+                        address: !!p.querySelector('[data-item-id="address"]'),
+                        controls: [...p.querySelectorAll('a, button')].map(e => ({
+                            label: e.getAttribute('aria-label'), item: e.getAttribute('data-item-id'),
+                            href: e.getAttribute('href'), visible: e.getClientRects().length > 0
+                        }))
+                    }))})""")
+                trace("DOM_INVENTORY", company=record["Empresa"], inventory=inventory)
+            except Exception as diagnostic_error:
+                trace("DOM_DIAGNOSTIC_ERROR", message=str(diagnostic_error))
         snapshot = page.evaluate(EXPLICIT_WEBSITE)
+        trace("EXPLICIT_SNAPSHOT", company=record["Empresa"], input_site=record.get("Site"), snapshot=snapshot,
+              criterion="visible main with h1; visible authority or anchored Site:/Website:; exactly one distinct href")
         if snapshot and snapshot.get("explicit_href"):
             href = snapshot["explicit_href"]
             parsed = urlsplit(href)
             if (snapshot["name"] == record["Empresa"] and snapshot["url"] == source
                     and parsed.scheme in ("http", "https") and parsed.hostname):
+                trace("VERIFICATION", company=record["Empresa"], reason="explicit control accepted",
+                      verification=WebsiteVerification(source, True, True, website_source="explicit_website_control"))
                 return with_website_verification(
                     {**record, "Site": href},
                     WebsiteVerification(source, True, True, website_source="explicit_website_control"),
                 )
-    except Exception:
+            trace("EXPLICIT_REJECTED", name_matches=snapshot["name"] == record["Empresa"],
+                  url_matches=snapshot["url"] == source, scheme=parsed.scheme, hostname=parsed.hostname)
+    except Exception as error:
+        trace("VERIFICATION", reason="explicit inspection exception", message=str(error),
+              verification=WebsiteVerification(source, error=True))
         return with_website_verification(record, WebsiteVerification(source, error=True))
     return None
 
@@ -76,9 +100,13 @@ def enrich_website_verification(page, record):
     check = WebsiteVerification(source)
     try:
         first = page.evaluate(PANEL_SNAPSHOT)
+        trace("PANEL_FIRST", company=record["Empresa"], available=first is not None,
+              site_used=record.get("Site"), reason="null means panel count/name/address/loading gate failed")
         if first is not None:
             page.wait_for_timeout(500)
             second = page.evaluate(PANEL_SNAPSHOT)
+            trace("PANEL_COMPARISON", stable=first == second, name_matches=first["name"] == record["Empresa"],
+                  url_matches=first["url"] == source, website_controls=first["websites"], site_used=record.get("Site"))
             if (first == second and first["url"] == source
                     and first["name"] == record["Empresa"]):
                 links = first["websites"]
@@ -89,6 +117,9 @@ def enrich_website_verification(page, record):
                         check = WebsiteVerification(source, True, True, website_source="explicit_website_control")
                 elif not site and not links:
                     check = WebsiteVerification(source, True, False)
-    except Exception:
+    except Exception as error:
+        trace("PANEL_ERROR", message=str(error))
         check = WebsiteVerification(source, error=True)
+    trace("VERIFICATION", company=record["Empresa"], verification=check,
+          reason="completed: matching explicit URL or empty Site with no website controls; incomplete: readiness/stability/identity/URL match failed; see preceding diagnostics")
     return with_website_verification(record, check)

@@ -8,6 +8,7 @@ No timestamp is generated, keeping evaluation deterministic.
 """
 
 from types import MappingProxyType
+from core.diagnostics import trace
 from .digital_presence import DigitalPresenceType, classify_digital_presence
 
 from .models import (
@@ -49,6 +50,7 @@ def evaluate_rules(lead: QualificationInput) -> QualificationResult:
 
     website_state = lead.observation_status("website")
     presence = classify_digital_presence(lead.website, website_state)
+    trace("DIGITAL_PRESENCE", company=lead.company_name, presence=presence)
     website_missing = presence.presence_type == DigitalPresenceType.NOT_FOUND
     website_present = presence.presence_type == DigitalPresenceType.OWN_WEBSITE
     external_presence = presence.presence_type in (

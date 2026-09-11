@@ -1,6 +1,8 @@
 # core/scraper.py
 
 import time
+import os
+from core.diagnostics import diagnostic_logging, trace
 from pathlib import Path
 from typing import Callable
 
@@ -52,6 +54,7 @@ def run_scraper(
     should_stop = should_stop or (lambda: False)
 
     started_at = time.monotonic()
+    diagnostic_log = log if os.environ.get("LOUNG_WEBSITE_DEBUG") == "1" else None
 
     rows: list[dict] = []
     tasks: list[dict] = []
@@ -197,12 +200,14 @@ def run_scraper(
 
                         page.wait_for_timeout(3000)
 
-                        company = extract_company_data(
-                            page=page,
-                            cidade=cidade,
-                            segmento=segmento,
-                            verify_website=True,
-                        )
+                        with diagnostic_logging(diagnostic_log):
+                            trace("SCRAPER_EXTRACT", url=link, verify_website=True)
+                            company = extract_company_data(
+                                page=page, cidade=cidade, segmento=segmento,
+                                verify_website=True,
+                            )
+                            trace("EXTRACTED", company=company.get("Empresa"), site=company.get("Site"),
+                                  verification=company.get(WEBSITE_VERIFICATION_KEY))
 
                         company_name = company.get(
                             "Empresa",
@@ -294,7 +299,13 @@ def run_scraper(
             for index, record in zip(df.index, records, strict=True):
                 if WEBSITE_VERIFICATION_KEY in rows[index]:
                     record[WEBSITE_VERIFICATION_KEY] = rows[index][WEBSITE_VERIFICATION_KEY]
-            results = qualify_records(records)
+            with diagnostic_logging(diagnostic_log):
+                for index, record in zip(df.index, records, strict=True):
+                    trace("PRE_QUALIFY", row_index=int(index), company=record.get("Empresa"),
+                          site=record.get("Site"), extracted_site=rows[index].get("Site"),
+                          metadata_present=WEBSITE_VERIFICATION_KEY in record,
+                          verification=record.get(WEBSITE_VERIFICATION_KEY))
+                results = qualify_records(records)
             qualifications = [
                 {"registro": record, "resultado": result}
                 for record, result in zip(records, results, strict=True)

@@ -4,6 +4,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import replace
 from datetime import datetime, timezone
 from typing import Any
+from core.diagnostics import trace
 
 from .adapter import adapt_record_to_qualification_input
 from .models import QualificationNote, QualificationResult, QualificationStatus
@@ -20,9 +21,13 @@ def qualify_record(record: Mapping[str, Any]) -> QualificationResult:
     stage = "adapter"
     try:
         lead = adapt_record_to_qualification_input(record)
+        trace("ADAPTER", company=lead.company_name, received_website=record.get("Site"),
+              website=lead.website, observation=lead.observation_status("website"),
+              metadata_present="_website_verification" in record)
         stage = "rules"
         result = evaluate_rules(lead)
     except Exception as error:
+        trace("PIPELINE_ERROR", stage_failed=stage, error_type=type(error).__name__, message=str(error))
         result = QualificationResult(
             status=QualificationStatus.ERROR,
             limitations=[QualificationNote(
@@ -30,6 +35,7 @@ def qualify_record(record: Mapping[str, Any]) -> QualificationResult:
                 description=f"Falha na etapa {stage} ({type(error).__name__}); registro não qualificado.",
             )],
         )
+    trace("RULES", company=record.get("Empresa"), result=result)
     return replace(result, analyzed_at=datetime.now(timezone.utc))
 
 

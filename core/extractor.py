@@ -1,6 +1,7 @@
 # core/extractor.py
 
 from playwright.sync_api import Page
+from core.diagnostics import trace
 from core.website_inspection import enrich_website_verification, inspect_explicit_website
 
 
@@ -24,6 +25,7 @@ def extract_company_data(page: Page, cidade: str, segmento: str, *, verify_websi
         "Potencial (1-5)": "",
         "Observações": ""
     }
+    site_origin = "unknown"
 
     # ==========================
     # Nome da empresa
@@ -98,6 +100,8 @@ def extract_company_data(page: Page, cidade: str, segmento: str, *, verify_websi
 
                 if href:
                     data["Site"] = href
+                    site_origin = "aria_label_website_unscoped"
+                    trace("EXTRACTION_CONTROL", company=data["Empresa"], criterion="website:/site: in aria-label", label=label, href=href)
 
     except Exception:
         pass
@@ -128,6 +132,7 @@ def extract_company_data(page: Page, cidade: str, segmento: str, *, verify_websi
                     continue
 
                 data["Site"] = href
+                site_origin = "generic_external_link"
                 break
 
         except Exception:
@@ -151,6 +156,7 @@ def extract_company_data(page: Page, cidade: str, segmento: str, *, verify_websi
     except Exception:
         pass
 
+    trace("EXTRACTION_RAW", company=data["Empresa"], site=data["Site"], origin=site_origin)
     if verify_website:
         explicit = inspect_explicit_website(page, data)
         if explicit is not None:
