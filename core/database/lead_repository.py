@@ -8,6 +8,7 @@ from typing import Any
 
 from .connection import DEFAULT_DATABASE_PATH, connect_database
 from .schema import initialize_database
+from core.commercial.values import commercial_values
 
 
 FIELDS = (
@@ -35,6 +36,7 @@ FIELDS = (
     "observacoes",
     "provider",
     "provider_place_id",
+    "ultimo_contato", "proximo_contato", "proxima_acao", "canal_preferencial",
 )
 
 _UNSET = object()
@@ -63,6 +65,8 @@ class LeadRepository:
 
     @staticmethod
     def _insert(connection, data):
+        followup = {key: data[key] for key in ("ultimo_contato", "proximo_contato", "proxima_acao", "canal_preferencial") if key in data}
+        data = {**data, **commercial_values(followup)}
         unknown = set(data) - set(FIELDS)
 
         if unknown:
@@ -383,3 +387,27 @@ class LeadRepository:
                     raise LeadNotFoundError(
                         f"Lead not found: {lead_id}"
                     )
+
+    @staticmethod
+    def _update_commercial(connection, lead_id, values, *, timestamp=None):
+        values = commercial_values(values)
+        values["updated_at"] = timestamp or datetime.now(timezone.utc).isoformat()
+        assignments = ", ".join(f"{name} = ?" for name in values)
+        cursor = connection.execute(f"UPDATE leads SET {assignments} WHERE id = ?",
+                                    [*values.values(), lead_id])
+        if cursor.rowcount == 0:
+            raise LeadNotFoundError(f"Lead not found: {lead_id}")
+
+    def update_commercial_followup(self, lead_id, *, status, responsavel, observacoes,
+                                   proxima_acao, proximo_contato, canal_preferencial):
+        values = dict(status=status, responsavel=responsavel, observacoes=observacoes,
+                      proxima_acao=proxima_acao, proximo_contato=proximo_contato,
+                      canal_preferencial=canal_preferencial)
+        with closing(connect_database(self.path)) as connection:
+            with connection:
+                self._update_commercial(connection, lead_id, values)
+
+    def mark_last_contact(self, lead_id, datetime_value):
+        with closing(connect_database(self.path)) as connection:
+            with connection:
+                self._update_commercial(connection, lead_id, {"ultimo_contato": datetime_value})

@@ -8,11 +8,13 @@ import customtkinter as ctk
 
 from core.scraper import run_scraper
 from ui.dialogs import show_finish_dialog
+from ui.theme import COLORS, TYPOGRAPHY, SIZES
+from ui.components import heading, field, button
 
 
 class HomePage(ctk.CTkFrame):
     def __init__(self, master):
-        super().__init__(master, fg_color="#020617")
+        super().__init__(master, fg_color=COLORS["bg"])
 
         self.running = False
         self.stop_requested = False
@@ -22,242 +24,38 @@ class HomePage(ctk.CTkFrame):
         self.build_ui()
 
     def build_ui(self):
-        # =========================
-        # Título
-        # =========================
-
-        title = ctk.CTkLabel(
-            self,
-            text="Buscar novos leads",
-            font=("Arial", 30, "bold"),
-            text_color="#f8fafc"
-        )
-        title.pack(
-            anchor="w",
-            padx=40,
-            pady=(35, 5)
-        )
-
-        desc = ctk.CTkLabel(
-            self,
-            text=(
-                "Encontre clínicas e consultórios automaticamente "
-                "e exporte para Excel."
-            ),
-            font=("Arial", 15),
-            text_color="#94a3b8"
-        )
-        desc.pack(
-            anchor="w",
-            padx=40,
-            pady=(0, 25)
-        )
-
-        # =========================
-        # Formulário
-        # =========================
-
-        card = ctk.CTkFrame(
-            self,
-            fg_color="#0f172a",
-            corner_radius=18
-        )
-        card.pack(
-            fill="x",
-            padx=40,
-            pady=10
-        )
-
-        self.cidades = ctk.CTkEntry(
-            card,
-            placeholder_text=(
-                "Cidades: Praia Grande, Santos, São Vicente"
-            ),
-            height=44
-        )
-        self.cidades.pack(
-            fill="x",
-            padx=25,
-            pady=(25, 12)
-        )
-        self.cidades.insert(
-            0,
-            "Praia Grande"
-        )
-
-        self.segmentos = ctk.CTkEntry(
-            card,
-            placeholder_text=(
-                "Segmentos: clínica odontológica, clínica médica"
-            ),
-            height=44
-        )
-        self.segmentos.pack(
-            fill="x",
-            padx=25,
-            pady=12
-        )
-        self.segmentos.insert(
-            0,
-            "clínica odontológica"
-        )
-
-        self.quantidade = ctk.CTkEntry(
-            card,
-            placeholder_text="Máximo por busca",
-            height=44
-        )
-        self.quantidade.pack(
-            fill="x",
-            padx=25,
-            pady=12
-        )
-        self.quantidade.insert(
-            0,
-            "5"
-        )
-
-        self.output = ctk.CTkEntry(
-            card,
-            placeholder_text="Arquivo de saída",
-            height=44
-        )
-        self.output.pack(
-            fill="x",
-            padx=25,
-            pady=12
-        )
-        self.output.insert(
-            0,
-            "exports/leads_loungtech.xlsx"
-        )
-
-        # =========================
-        # Botões
-        # =========================
-
-        self.qualification_switch = ctk.CTkSwitch(
-            card,
-            text="Qualificar leads automaticamente",
-        )
+        heading(self, "Busca legada", "Prospecção pelo navegador, com exportação para Excel.")
+        form = ctk.CTkFrame(self, fg_color="transparent")
+        form.pack(fill="x", padx=28, pady=(0, 12))
+        for col in range(2):
+            form.grid_columnconfigure(col, weight=1, uniform="fields")
+        for index, (name, label, value) in enumerate((("cidades", "Cidades · separadas por vírgula", "Praia Grande"),
+                ("segmentos", "Segmentos · separados por vírgula", "clínica odontológica"),
+                ("quantidade", "Máximo por busca", "5"), ("output", "Arquivo de saída", "exports/leads_loungtech.xlsx"))):
+            cell = ctk.CTkFrame(form, fg_color="transparent")
+            cell.grid(row=index // 2, column=index % 2, sticky="ew", padx=(0, 12), pady=(0, 12))
+            setattr(self, name, field(cell, label, value=value))
+        self.qualification_switch = ctk.CTkSwitch(form, text="Qualificar leads automaticamente")
         self.qualification_switch.deselect()
-        self.qualification_switch.pack(anchor="w", padx=25, pady=(12, 0))
-
-        buttons = ctk.CTkFrame(
-            card,
-            fg_color="transparent"
-        )
-        buttons.pack(
-            fill="x",
-            padx=25,
-            pady=(18, 25)
-        )
-
-        self.start_btn = ctk.CTkButton(
-            buttons,
-            text="🚀 Iniciar busca",
-            height=48,
-            font=("Arial", 16, "bold"),
-            fg_color="#2563eb",
-            hover_color="#1d4ed8",
-            command=self.start_search
-        )
-        self.start_btn.pack(
-            side="left",
-            fill="x",
-            expand=True
-        )
-
-        self.stop_btn = ctk.CTkButton(
-            buttons,
-            text="⛔ Parar",
-            width=130,
-            height=48,
-            font=("Arial", 14, "bold"),
-            fg_color="#dc2626",
-            hover_color="#b91c1c",
-            state="disabled",
-            command=self.stop_search
-        )
-        self.stop_btn.pack(
-            side="left",
-            padx=(10, 0)
-        )
-
-        # =========================
-        # Progresso
-        # =========================
-
-        progress_container = ctk.CTkFrame(
-            self,
-            fg_color="transparent"
-        )
-        progress_container.pack(
-            fill="x",
-            padx=40,
-            pady=(12, 0)
-        )
-
-        self.progress_label = ctk.CTkLabel(
-            progress_container,
-            text="0 / 0 empresas",
-            font=("Arial", 13),
-            text_color="#94a3b8"
-        )
-        self.progress_label.pack(
-            side="left"
-        )
-
-        self.timer_label = ctk.CTkLabel(
-            progress_container,
-            text="Tempo: 00:00",
-            font=("Arial", 13),
-            text_color="#94a3b8"
-        )
-        self.timer_label.pack(
-            side="right"
-        )
-
-        self.progress = ctk.CTkProgressBar(
-            self,
-            height=12,
-            progress_color="#2563eb",
-            fg_color="#1e293b"
-        )
-        self.progress.pack(
-            fill="x",
-            padx=40,
-            pady=(6, 15)
-        )
+        self.qualification_switch.grid(row=2, column=0, columnspan=2, sticky="w", pady=(0, 12))
+        actions = ctk.CTkFrame(self, fg_color="transparent")
+        actions.pack(fill="x", padx=28, pady=(0, 16))
+        self.start_btn = button(actions, "Iniciar busca", self.start_search, kind="primary")
+        self.start_btn.pack(side="left", padx=(0, 8))
+        self.stop_btn = button(actions, "Parar", self.stop_search, kind="danger", state="disabled", width=100)
+        self.stop_btn.pack(side="left")
+        progress_row = ctk.CTkFrame(self, fg_color="transparent")
+        progress_row.pack(fill="x", padx=28)
+        self.progress_label = ctk.CTkLabel(progress_row, text="0 / 0 empresas", text_color=COLORS["muted"])
+        self.progress_label.pack(side="left")
+        self.timer_label = ctk.CTkLabel(progress_row, text="Tempo: 00:00", text_color=COLORS["muted"])
+        self.timer_label.pack(side="right")
+        self.progress = ctk.CTkProgressBar(self, height=SIZES["progress"])
+        self.progress.pack(fill="x", padx=28, pady=(8, 20))
         self.progress.set(0)
-
-        # =========================
-        # Logs
-        # =========================
-
-        self.logs = ctk.CTkTextbox(
-            self,
-            fg_color="#020617",
-            border_color="#1e293b",
-            border_width=1,
-            text_color="#e5e7eb",
-            font=("Consolas", 12)
-        )
-        self.logs.pack(
-            fill="both",
-            expand=True,
-            padx=40,
-            pady=(5, 35)
-        )
-
+        self.logs = ctk.CTkTextbox(self, fg_color=COLORS["sidebar"], font=TYPOGRAPHY["console"], height=140)
+        self.logs.pack(fill="both", expand=True, padx=28, pady=(0, 24))
         self.log("Pronto para iniciar.")
-        self.log(
-            "Dica: comece com quantidade 5 para testar."
-        )
-
-    # ==================================================
-    # Logs
-    # ==================================================
 
     def log(self, text):
         """
@@ -649,12 +447,12 @@ class HomePage(ctk.CTkFrame):
     def restore_interface(self):
         self.start_btn.configure(
             state="normal",
-            text="🚀 Iniciar busca"
+            text="Iniciar busca"
         )
 
         self.stop_btn.configure(
             state="disabled",
-            text="⛔ Parar"
+            text="Parar"
         )
 
         self.set_form_state("normal")

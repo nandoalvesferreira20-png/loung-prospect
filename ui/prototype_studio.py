@@ -6,7 +6,8 @@ import customtkinter as ctk
 
 from core.prototype.preview import get_preview_path, open_preview
 from ui.prototype_logic import PrototypeSession
-from ui.theme import COLORS, FONT
+from ui.theme import COLORS, FONT, TYPOGRAPHY
+from ui.components import heading, field, button, section_label
 
 
 class PrototypeStudioPage(ctk.CTkScrollableFrame):
@@ -15,31 +16,39 @@ class PrototypeStudioPage(ctk.CTkScrollableFrame):
         self.session = session if session is not None else PrototypeSession()
         self.template_ids = {}
         self.entries = {}
-        ctk.CTkLabel(self, text="Prototype Studio", font=(FONT, 30, "bold")).pack(anchor="w", padx=28, pady=(25, 8))
-        ctk.CTkLabel(self, text="Preencha um lead e escolha um template para gerar um protótipo local.", wraplength=680).pack(anchor="w", padx=28, pady=(0, 20))
-        for key, label in (("company_name", "Nome da empresa *"), ("segment", "Segmento *"),
-                           ("city", "Cidade"), ("phone", "Telefone"), ("whatsapp", "WhatsApp (com DDI informado)"),
-                           ("address", "Endereço"), ("current_website", "Website atual"),
-                           ("qualification_score", "Score de qualificação (opcional, 0–100)"),
-                           ("output_directory", "Pasta de saída *")):
-            ctk.CTkLabel(self, text=label).pack(anchor="w", padx=28)
-            entry = ctk.CTkEntry(self, height=36)
-            entry.pack(fill="x", padx=28, pady=(0, 10))
-            self.entries[key] = entry
-        self.entries["output_directory"].insert(0, "prototypes")
-        ctk.CTkButton(self, text="Escolher pasta", command=self.choose_directory).pack(anchor="w", padx=28, pady=6)
-        ctk.CTkButton(self, text="Carregar templates", command=self.load_templates).pack(anchor="w", padx=28, pady=6)
-        self.templates = ctk.CTkComboBox(self, values=["Carregue os templates"], state="disabled", width=400)
+        heading(self, "Prototype Studio", "Crie uma apresentação local a partir dos dados do lead.")
+        form = ctk.CTkFrame(self, fg_color="transparent")
+        form.pack(fill="x", padx=28)
+        for column in (0, 1):
+            form.grid_columnconfigure(column, weight=1, uniform="prototype")
+        for index, (key, label) in enumerate((("company_name", "Nome da empresa *"), ("segment", "Segmento *"),
+                ("city", "Cidade"), ("phone", "Telefone"), ("whatsapp", "WhatsApp · com DDI informado"),
+                ("address", "Endereço"), ("current_website", "Site atual"),
+                ("qualification_score", "Score · opcional, 0–100"))):
+            cell = ctk.CTkFrame(form, fg_color="transparent")
+            cell.grid(row=index // 2, column=index % 2, sticky="ew", padx=(0, 12), pady=(0, 12))
+            self.entries[key] = field(cell, label)
+        output = ctk.CTkFrame(self, fg_color="transparent")
+        output.pack(fill="x", padx=28, pady=(8, 16))
+        self.entries["output_directory"] = field(output, "Pasta de saída *", value="prototypes")
+        button(output, "Escolher pasta", self.choose_directory, kind="ghost").pack(anchor="w", pady=(8, 0))
+        templates = ctk.CTkFrame(self, fg_color="transparent")
+        templates.pack(fill="x", padx=28, pady=(0, 16))
+        section_label(templates, "Template")
+        button(templates, "Carregar templates", self.load_templates).pack(anchor="w", pady=(0, 8))
+        self.templates = ctk.CTkComboBox(templates, values=["Carregue os templates"], state="disabled", height=36)
         self.templates.set("Carregue os templates")
-        self.templates.pack(fill="x", padx=28, pady=10)
-        self.generate_button = ctk.CTkButton(self, text="Gerar protótipo", command=self.generate)
-        self.generate_button.pack(anchor="w", padx=28, pady=8)
-        self.preview_button = ctk.CTkButton(self, text="Abrir protótipo", command=self.preview)
-        self.preview_button.pack(anchor="w", padx=28, pady=6)
-        self.folder_button = ctk.CTkButton(self, text="Abrir pasta", command=self.open_directory)
-        self.folder_button.pack(anchor="w", padx=28, pady=6)
-        self.result_label = ctk.CTkLabel(self, text="Nenhuma geração solicitada.", wraplength=650, justify="left")
-        self.result_label.pack(anchor="w", padx=28, pady=20)
+        self.templates.pack(fill="x")
+        actions = ctk.CTkFrame(self, fg_color="transparent")
+        actions.pack(fill="x", padx=28, pady=(0, 12))
+        self.generate_button = button(actions, "Gerar protótipo", self.generate, kind="primary")
+        self.generate_button.pack(side="left", padx=(0, 8))
+        self.preview_button = button(actions, "Abrir protótipo", self.preview)
+        self.preview_button.pack(side="left", padx=(0, 8))
+        self.folder_button = button(actions, "Abrir pasta", self.open_directory)
+        self.folder_button.pack(side="left")
+        self.result_label = ctk.CTkLabel(self, text="Nenhuma geração solicitada.", wraplength=750, justify="left", text_color=COLORS["muted"])
+        self.result_label.pack(anchor="w", padx=28, pady=(0, 24))
         self.refresh_result()
 
     def choose_directory(self):
@@ -56,7 +65,7 @@ class PrototypeStudioPage(ctk.CTkScrollableFrame):
             available = self.session.templates(self.entries["segment"].get())
             self.template_ids = {f"{t.name} · {t.version} ({t.template_id})": t.template_id for t in available}
             if not available:
-                messagebox.showinfo("Templates", "Nenhum template compatível com o segmento informado.", parent=self)
+                self.result_label.configure(text="Nenhum template compatível com o segmento informado.")
                 return
             labels = list(self.template_ids)
             self.templates.configure(values=labels, state="readonly")

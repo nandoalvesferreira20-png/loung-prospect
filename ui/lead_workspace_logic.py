@@ -2,8 +2,8 @@
 from urllib.parse import urlsplit
 
 from core.importers import import_leads_from_excel
+from core.commercial.values import STATUSES
 
-STATUSES = ("Novo", "Em análise", "Contatado", "Respondeu", "Reunião", "Proposta", "Fechado", "Perdido")
 LIST_FIELDS = ("qualification_score", "empresa", "cidade", "segmento", "opportunity", "responsavel", "status")
 
 
@@ -33,8 +33,10 @@ def valid_url(value):
 
 def counts(rows):
     statuses = [row["status"] for row in rows]
-    return dict(total=len(rows), novos=statuses.count("Novo"), contatados=statuses.count("Contatado"),
-                responderam=statuses.count("Respondeu"), reuniao=statuses.count("Reunião"))
+    return dict(total=len(rows), novos=statuses.count("Novo"),
+                contatados=statuses.count("Contatado") + statuses.count("Contato realizado"),
+                responderam=statuses.count("Respondeu") + statuses.count("Em conversa"),
+                reuniao=statuses.count("Reunião") + statuses.count("Reunião agendada"))
 
 
 def list_values(row):

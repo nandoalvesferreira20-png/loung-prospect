@@ -21,240 +21,55 @@ from ui.places_logic import (
     parse_search,
     summary_text,
 )
-from ui.theme import COLORS
+from ui.theme import COLORS, TYPOGRAPHY, SIZES
+from ui.components import heading, field, button, MetricStrip
 
 
 class PlacesSearchPage(ctk.CTkFrame):
-    def __init__(self, master):
-        super().__init__(
-            master,
-            fg_color=COLORS["bg"],
-        )
-
+    def __init__(self, master, on_workspace=None):
+        super().__init__(master, fg_color=COLORS["bg"])
         self.running = False
         self.pending = queue.Queue()
         self.cancel_event = threading.Event()
         self.poll_job = None
-
         self.last_exported_file = None
-
-        ctk.CTkLabel(
-            self,
-            text="Google Places API",
-            font=("Arial", 28, "bold"),
-        ).pack(
-            anchor="w",
-            padx=24,
-            pady=24,
-        )
-
-        ctk.CTkLabel(
-            self,
-            text=(
-                "Buscar, qualificar, salvar na Carteira de Leads "
-                "e exportar Excel. A consulta consome quota da API."
-            ),
-        ).pack(
-            anchor="w",
-            padx=24,
-        )
-
-        form = ctk.CTkFrame(
-            self
-        )
-
-        form.pack(
-            fill="x",
-            padx=24,
-            pady=16,
-        )
-
+        heading(self, "Prospecção", "Encontre e qualifique novos leads para sua carteira.")
+        form = ctk.CTkFrame(self, fg_color="transparent")
+        form.pack(fill="x", padx=28, pady=(0, 16))
         self.entries = {}
-
-        fields = (
-            (
-                "city",
-                "Cidade",
-                "",
-            ),
-            (
-                "segment",
-                "Segmento",
-                "",
-            ),
-            (
-                "quantity",
-                "Quantidade (1–100)",
-                "5",
-            ),
-        )
-
-        for column, (
-            name,
-            label,
-            default,
-        ) in enumerate(fields):
-
-            form.grid_columnconfigure(
-                column,
-                weight=1,
-            )
-
-            ctk.CTkLabel(
-                form,
-                text=label,
-            ).grid(
-                row=0,
-                column=column,
-                padx=12,
-                sticky="w",
-            )
-
-            entry = ctk.CTkEntry(
-                form
-            )
-
-            entry.insert(
-                0,
-                default,
-            )
-
-            entry.grid(
-                row=1,
-                column=column,
-                padx=12,
-                pady=12,
-                sticky="ew",
-            )
-
-            self.entries[name] = entry
-
-        # --------------------------------------------------
-        # Export option
-        # --------------------------------------------------
-
-        export_frame = ctk.CTkFrame(
-            self
-        )
-
-        export_frame.pack(
-            fill="x",
-            padx=24,
-            pady=(0, 8),
-        )
-
-        self.export_var = ctk.BooleanVar(
-            value=True
-        )
-
-        self.export_checkbox = ctk.CTkCheckBox(
-            export_frame,
-            text="Exportar Excel ao finalizar",
-            variable=self.export_var,
-        )
-
-        self.export_checkbox.pack(
-            side="left",
-            padx=12,
-            pady=12,
-        )
-
-        self.open_excel_button = ctk.CTkButton(
-            export_frame,
-            text="Abrir Excel",
-            command=self.open_last_excel,
-            state="disabled",
-            width=120,
-        )
-
-        self.open_excel_button.pack(
-            side="right",
-            padx=(6, 12),
-            pady=12,
-        )
-
-        self.open_folder_button = ctk.CTkButton(
-            export_frame,
-            text="Abrir pasta",
-            command=self.open_last_folder,
-            state="disabled",
-            width=120,
-        )
-
-        self.open_folder_button.pack(
-            side="right",
-            padx=6,
-            pady=12,
-        )
-
-        # --------------------------------------------------
-        # Actions
-        # --------------------------------------------------
-
-        self.start_button = ctk.CTkButton(
-            self,
-            text="Buscar e qualificar",
-            command=self.start,
-        )
-
-        self.start_button.pack(
-            anchor="w",
-            padx=24,
-            pady=8,
-        )
-
-        self.cancel_button = ctk.CTkButton(
-            self,
-            text="Cancelar",
-            command=self.cancel,
-            state="disabled",
-        )
-
-        self.cancel_button.pack(
-            anchor="w",
-            padx=24,
-        )
-
-        # --------------------------------------------------
-        # Progress
-        # --------------------------------------------------
-
-        self.progress = ctk.CTkProgressBar(
-            self
-        )
-
-        self.progress.pack(
-            fill="x",
-            padx=24,
-            pady=12,
-        )
-
-        self.progress.set(
-            0
-        )
-
-        # --------------------------------------------------
-        # Output
-        # --------------------------------------------------
-
-        self.output = ctk.CTkTextbox(
-            self
-        )
-
-        self.output.pack(
-            fill="both",
-            expand=True,
-            padx=24,
-            pady=(0, 24),
-        )
-
-        self.output.configure(
-            state="disabled"
-        )
-
-    # ------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------
+        for column, (name, label, default) in enumerate((("city", "Cidade", ""), ("segment", "Segmento", ""), ("quantity", "Quantidade · até 100", "5"))):
+            form.grid_columnconfigure(column, weight=1, uniform="inputs")
+            cell = ctk.CTkFrame(form, fg_color="transparent")
+            cell.grid(row=0, column=column, sticky="ew", padx=(0 if column == 0 else 12, 0))
+            self.entries[name] = field(cell, label, value=default)
+        actions = ctk.CTkFrame(self, fg_color="transparent")
+        actions.pack(fill="x", padx=28, pady=(0, 16))
+        self.start_button = button(actions, "Buscar leads", self.start, kind="primary")
+        self.start_button.pack(side="left", padx=(0, 8))
+        self.cancel_button = button(actions, "Cancelar", self.cancel, kind="danger", state="disabled", width=100)
+        self.cancel_button.pack(side="left", padx=(0, 16))
+        self.export_var = ctk.BooleanVar(value=True)
+        self.export_checkbox = ctk.CTkCheckBox(actions, text="Exportar Excel ao finalizar", variable=self.export_var)
+        self.export_checkbox.pack(side="left")
+        self.run_status = ctk.CTkLabel(self, text="Pronto para buscar · Google Places utiliza a quota da sua API.", text_color=COLORS["muted"], font=TYPOGRAPHY["caption"])
+        self.run_status.pack(anchor="w", padx=28)
+        self.progress = ctk.CTkProgressBar(self, height=SIZES["progress"])
+        self.progress.pack(fill="x", padx=28, pady=(8, 20))
+        self.progress.set(0)
+        self.metrics = MetricStrip(self, (("received", "ENCONTRADOS", "text"), ("inserted", "INSERIDOS", "accent"), ("duplicates", "DUPLICADOS", "text")))
+        self.metrics.pack(fill="x", padx=28)
+        self.priority_summary = ctk.CTkLabel(self, text="Os resultados aparecerão aqui após a busca.", text_color=COLORS["text_secondary"])
+        self.priority_summary.pack(anchor="w", padx=28, pady=12)
+        links = ctk.CTkFrame(self, fg_color="transparent")
+        links.pack(fill="x", padx=28, pady=(0, 12))
+        if on_workspace:
+            button(links, "Ir para Carteira", on_workspace, kind="secondary").pack(side="left", padx=(0, 8))
+        self.open_excel_button = button(links, "Abrir Excel", self.open_last_excel, state="disabled", width=110)
+        self.open_folder_button = button(links, "Abrir pasta", self.open_last_folder, state="disabled", width=110)
+        ctk.CTkLabel(self, text="ATIVIDADE DA BUSCA", font=TYPOGRAPHY["caption"], text_color=COLORS["muted"]).pack(anchor="w", padx=28, pady=(4, 8))
+        self.output = ctk.CTkTextbox(self, font=TYPOGRAPHY["console"], fg_color=COLORS["sidebar"], height=130)
+        self.output.pack(fill="both", expand=True, padx=28, pady=(0, 24))
+        self.output.configure(state="disabled")
 
     def append(self, text):
         self.output.configure(
@@ -276,6 +91,7 @@ class PlacesSearchPage(ctk.CTkFrame):
 
     def set_running(self, running):
         self.running = running
+        self.run_status.configure(text="Busca em andamento…" if running else "Busca encerrada.")
 
         self.start_button.configure(
             state=(
@@ -570,12 +386,17 @@ class PlacesSearchPage(ctk.CTkFrame):
                 )
 
                 if kind == "done":
+                    self.metrics.set(dict(received=value.received, inserted=value.inserted, duplicates=value.duplicates))
+                    self.priority_summary.configure(text=f"PRIORIDADE   Alta {value.high_priority}   ·   Boa {value.good_priority}   ·   Média {value.medium_priority}   ·   Baixa {value.low_priority}")
+                    self.run_status.configure(text="Busca interrompida. Resultados parciais preservados." if value.cancelled else "Busca finalizada.")
                     for message in value.errors[:10]:
                         self.append(
                             message
                         )
 
                     if value.exported_file:
+                        self.open_excel_button.pack(side="left", padx=(0, 8))
+                        self.open_folder_button.pack(side="left")
                         self.last_exported_file = Path(
                             value.exported_file
                         )

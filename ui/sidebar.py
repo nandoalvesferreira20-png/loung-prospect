@@ -1,138 +1,38 @@
+"""Grouped navigation with one explicit active item."""
 import customtkinter as ctk
-from ui.theme import COLORS, FONT
+from ui.theme import COLORS, TYPOGRAPHY, SIZES, FONT
+from ui.components import button
 
 
 class Sidebar(ctk.CTkFrame):
-    def __init__(self, master, on_dashboard, on_search, on_prototype=None, on_workspace=None, on_places=None):
-        super().__init__(master, width=250, fg_color=COLORS["sidebar"], corner_radius=0)
-
-        self.on_dashboard = on_dashboard
-        self.on_search = on_search
-        self.on_prototype = on_prototype
-        self.on_workspace = on_workspace
-        self.on_places = on_places
-
-        self.build_ui()
-
-    def build_ui(self):
-        ctk.CTkLabel(
-            self,
-            text="Loung Leads",
-            font=(FONT, 25, "bold"),
-            text_color=COLORS["accent"]
-        ).pack(anchor="w", padx=24, pady=(32, 4))
-
-        ctk.CTkLabel(
-            self,
-            text="Prospecção inteligente",
-            font=(FONT, 13),
-            text_color=COLORS["muted"]
-        ).pack(anchor="w", padx=24, pady=(0, 35))
-
-        self.dashboard_btn = ctk.CTkButton(
-            self,
-            text="🏠  Dashboard",
-            height=42,
-            anchor="w",
-            fg_color="transparent",
-            hover_color=COLORS["card_light"],
-            text_color=COLORS["text"],
-            command=self.on_dashboard
-        )
-        self.dashboard_btn.pack(fill="x", padx=18, pady=6)
-
-        self.search_btn = ctk.CTkButton(
-            self,
-            text="🔍  Buscar Leads",
-            height=42,
-            anchor="w",
-            fg_color=COLORS["primary"],
-            hover_color=COLORS["primary_hover"],
-            text_color=COLORS["text"],
-            command=self.on_search
-        )
-        self.search_btn.pack(fill="x", padx=18, pady=6)
-        self.places_btn = ctk.CTkButton(self, text="📍 Google Places API", height=42, anchor="w",
-            fg_color="transparent", hover_color=COLORS["card_light"], command=self.on_places)
-        self.places_btn.pack(fill="x", padx=18, pady=6)
-        self.prototype_btn = ctk.CTkButton(
-            self, text="🎨 Prototype Studio", height=42, anchor="w",
-            fg_color="transparent", hover_color=COLORS["card_light"],
-            text_color=COLORS["text"], command=self.on_prototype,
-        )
-        self.prototype_btn.pack(fill="x", padx=18, pady=6)
-        self.workspace_btn = ctk.CTkButton(self, text="📋 Carteira de Leads", height=42, anchor="w",
-                                         fg_color="transparent", hover_color=COLORS["card_light"],
-                                         command=self.on_workspace)
-        self.workspace_btn.pack(fill="x", padx=18, pady=6)
-
-        ctk.CTkButton(
-            self,
-            text="🤖  Qualificador IA",
-            height=42,
-            anchor="w",
-            fg_color="transparent",
-            hover_color=COLORS["card_light"],
-            text_color=COLORS["muted"],
-            state="disabled"
-        ).pack(fill="x", padx=18, pady=6)
-
-        ctk.CTkButton(
-            self,
-            text="📊  CRM",
-            height=42,
-            anchor="w",
-            fg_color="transparent",
-            hover_color=COLORS["card_light"],
-            text_color=COLORS["muted"],
-            state="disabled"
-        ).pack(fill="x", padx=18, pady=6)
-
-        ctk.CTkButton(
-            self,
-            text="⚙️  Configurações",
-            height=42,
-            anchor="w",
-            fg_color="transparent",
-            hover_color=COLORS["card_light"],
-            text_color=COLORS["muted"],
-            state="disabled"
-        ).pack(fill="x", padx=18, pady=6)
-
-        bottom = ctk.CTkFrame(self, fg_color="transparent")
-        bottom.pack(side="bottom", fill="x", padx=22, pady=25)
-
-        ctk.CTkLabel(
-            bottom,
-            text="v1.0.0",
-            font=(FONT, 12),
-            text_color=COLORS["muted"]
-        ).pack(anchor="w")
-
-        ctk.CTkLabel(
-            bottom,
-            text="● Playwright ativo",
-            font=(FONT, 12),
-            text_color=COLORS["success"]
-        ).pack(anchor="w", pady=(6, 0))
+    def __init__(self, master, on_dashboard, on_search, on_prototype=None, on_workspace=None, on_places=None, on_day=None):
+        super().__init__(master, width=SIZES["sidebar"], fg_color=COLORS["sidebar"], corner_radius=0)
+        self.pack_propagate(False)
+        brand = ctk.CTkFrame(self, fg_color="transparent")
+        brand.pack(fill="x", padx=24, pady=(28, 24))
+        ctk.CTkLabel(brand, text="LOUNG", font=(FONT, 25, "bold"), text_color=COLORS["text"]).pack(anchor="w")
+        ctk.CTkLabel(brand, text="PROSPECT", font=(FONT, 12, "bold"), text_color=COLORS["accent"]).pack(anchor="w")
+        footer = ctk.CTkFrame(self, fg_color="transparent")
+        footer.pack(side="bottom", fill="x", padx=24, pady=18)
+        ctk.CTkLabel(footer, text="Loung Tech  /  v1.0.0", font=TYPOGRAPHY["caption"], text_color=COLORS["muted"]).pack(anchor="w")
+        nav = ctk.CTkScrollableFrame(self, fg_color="transparent", corner_radius=0)
+        nav.pack(fill="both", expand=True, padx=10)
+        self.buttons = {}
+        groups = ((None, (("dashboard", "Visão Geral", on_dashboard),)),
+            ("PROSPECÇÃO", (("places", "Buscar leads", on_places), ("workspace", "Carteira", on_workspace),
+                            ("search", "Busca legada", on_search))),
+            ("COMERCIAL", (("day", "Meu Dia", on_day),)),
+            ("FERRAMENTAS", (("prototype", "Prototype Studio", on_prototype),)))
+        for title, items in groups:
+            if title:
+                ctk.CTkLabel(nav, text=title, font=TYPOGRAPHY["caption"], text_color=COLORS["muted"]).pack(anchor="w", padx=12, pady=(20, 6))
+            for key, label, command in items:
+                widget = button(nav, label, command, kind="ghost", anchor="w", height=38)
+                widget.pack(fill="x", pady=2)
+                self.buttons[key] = widget
+        self.set_active("dashboard")
 
     def set_active(self, page):
-        self.places_btn.configure(fg_color=COLORS["primary"] if page == "places" else "transparent")
-        if page == "places":
-            self.dashboard_btn.configure(fg_color="transparent")
-            self.search_btn.configure(fg_color="transparent")
-        self.workspace_btn.configure(fg_color=COLORS["primary"] if page == "workspace" else "transparent")
-        if page == "workspace":
-            self.dashboard_btn.configure(fg_color="transparent")
-            self.search_btn.configure(fg_color="transparent")
-        self.prototype_btn.configure(fg_color=COLORS["primary"] if page == "prototype" else "transparent")
-        if page == "prototype":
-            self.dashboard_btn.configure(fg_color="transparent")
-            self.search_btn.configure(fg_color="transparent")
-        if page == "dashboard":
-            self.dashboard_btn.configure(fg_color=COLORS["primary"], text_color=COLORS["text"])
-            self.search_btn.configure(fg_color="transparent", text_color=COLORS["text"])
-
-        if page == "search":
-            self.search_btn.configure(fg_color=COLORS["primary"], text_color=COLORS["text"])
-            self.dashboard_btn.configure(fg_color="transparent", text_color=COLORS["text"])
+        for key, widget in self.buttons.items():
+            widget.configure(fg_color=COLORS["selected"] if key == page else "transparent",
+                             text_color=COLORS["text"] if key == page else COLORS["text_secondary"])

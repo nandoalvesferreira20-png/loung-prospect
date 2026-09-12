@@ -1048,22 +1048,22 @@ def test_ui_presentation():
     )
 
     assert (
-        "🔥 Alta: 1"
+        "Alta: 1"
         in text
     )
 
     assert (
-        "✓ Boa: 1"
+        "Boa: 1"
         in text
     )
 
     assert (
-        "• Média: 1"
+        "Média: 1"
         in text
     )
 
     assert (
-        "○ Baixa: 1"
+        "Baixa: 1"
         in text
     )
 

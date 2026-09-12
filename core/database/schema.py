@@ -54,7 +54,22 @@ MIGRATION_COLUMNS = {
     "provider": "TEXT",
     "provider_place_id": "TEXT",
     "quantidade_avaliacoes": "INTEGER",
+    "ultimo_contato": "TEXT",
+    "proximo_contato": "TEXT",
+    "proxima_acao": "TEXT",
+    "canal_preferencial": "TEXT",
 }
+
+INTERACTIONS_SCHEMA = """
+CREATE TABLE IF NOT EXISTS lead_interactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lead_id INTEGER NOT NULL,
+    tipo TEXT NOT NULL,
+    canal TEXT,
+    descricao TEXT,
+    created_at TEXT NOT NULL
+)
+"""
 
 
 def initialize_database(
@@ -70,6 +85,7 @@ def initialize_database(
         connect_database(path)
     ) as connection:
         with connection:
+            connection.execute("BEGIN IMMEDIATE")
             connection.execute(
                 LEADS_SCHEMA
             )
@@ -93,3 +109,6 @@ def initialize_database(
                     f"ALTER TABLE leads "
                     f"ADD COLUMN {column} {column_type}"
                 )
+            connection.execute(INTERACTIONS_SCHEMA)
+            connection.execute("CREATE INDEX IF NOT EXISTS idx_interactions_lead_time "
+                               "ON lead_interactions(lead_id, created_at DESC, id DESC)")

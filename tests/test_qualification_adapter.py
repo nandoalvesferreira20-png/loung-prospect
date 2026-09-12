@@ -54,7 +54,10 @@ def test_empty_values_are_unverified(record, empty):
 
 def test_missing_fields():
     result = adapt_record_to_qualification_input({})
-    assert len(result.observations) == 10
+    assert set(result.observations) == {
+        "company_name", "city", "segment", "source_url", "phone", "whatsapp",
+        "website", "address", "rating", "user_rating_count", "lead_id",
+    }
     for name in result.observations:
         assert getattr(result, name) is None
         assert result.observation_status(name) is ObservationStatus.UNVERIFIED

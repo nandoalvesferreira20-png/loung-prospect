@@ -29,6 +29,9 @@ def page():
                 ("quantity", "5"),
             )
         },
+        run_status=Mock(),
+        metrics=Mock(),
+        priority_summary=Mock(),
         start_button=Mock(),
         cancel_button=Mock(),
         export_checkbox=Mock(),

@@ -1,6 +1,8 @@
 import customtkinter as ctk
 
 from core.exporter import open_excel, open_folder
+from ui.theme import COLORS, TYPOGRAPHY
+from ui.components import button
 
 
 def format_finish_summary(summary):
@@ -37,8 +39,8 @@ def show_finish_dialog(parent, summary):
 
     ctk.CTkLabel(
         dialog,
-        text="✅ Busca finalizada",
-        font=("Arial", 24, "bold")
+        text="Busca finalizada",
+        font=TYPOGRAPHY["section"]
     ).pack(pady=(20, 10))
 
     info = format_finish_summary(summary)
@@ -47,27 +49,27 @@ def show_finish_dialog(parent, summary):
         dialog,
         text=info,
         justify="left",
-        font=("Arial", 15)
+        font=TYPOGRAPHY["body"]
     ).pack(pady=10)
 
     if arquivo:
 
         ctk.CTkButton(
             dialog,
-            text="📄 Abrir Excel",
+            text="Abrir Excel",
             command=lambda: open_excel(arquivo)
         ).pack(fill="x", padx=35, pady=(15, 8))
 
         ctk.CTkButton(
             dialog,
-            text="📂 Abrir Pasta",
+            text="Abrir pasta",
             command=lambda: open_folder(arquivo)
         ).pack(fill="x", padx=35)
 
     ctk.CTkButton(
         dialog,
         text="Fechar",
-        fg_color="#374151",
-        hover_color="#4B5563",
+        fg_color=COLORS["surface_secondary"],
+        hover_color=COLORS["surface_hover"],
         command=dialog.destroy
     ).pack(fill="x", padx=35, pady=(20, 0))
