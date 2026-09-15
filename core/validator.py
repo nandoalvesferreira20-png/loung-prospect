@@ -15,6 +15,12 @@ WEBSITE_VERIFICATION_KEY = "_website_verification"
 
 
 @dataclass(frozen=True)
+class PlacesWebsiteVerification:
+    """Snapshot of websiteUri requested by Text Search's explicit FieldMask."""
+    site: str | None
+
+
+@dataclass(frozen=True)
 class WebsiteVerification:
     """Explicit report about the source, not the existence of a business website.
 
@@ -42,6 +48,10 @@ def website_observation(record: Mapping[str, Any]) -> ObservationStatus:
     if WEBSITE_VERIFICATION_KEY not in record:
         return ObservationStatus.OBSERVED if present else ObservationStatus.UNVERIFIED
     check = record[WEBSITE_VERIFICATION_KEY]
+    if isinstance(check, PlacesWebsiteVerification):
+        if record.get("provider") != "google_places" or check.site != value:
+            return ObservationStatus.ERROR
+        return ObservationStatus.OBSERVED if present else ObservationStatus.NOT_FOUND
     if not isinstance(check, WebsiteVerification):
         return ObservationStatus.ERROR
     if (not isinstance(check.source_url, str) or not check.source_url.strip()

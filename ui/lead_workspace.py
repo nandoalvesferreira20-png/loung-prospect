@@ -156,7 +156,7 @@ class LeadWorkspacePage(ctk.CTkFrame):
         badge(chips, row["status"], status_tone(row["status"])).pack(side="left")
         tabs = ctk.CTkTabview(dialog)
         tabs.pack(fill="both", expand=True, padx=16, pady=16)
-        for name in ("Dados", "Comercial", "Histórico"):
+        for name in ("Dados", "Comercial", "Histórico", "Abordagem"):
             tabs.add(name)
         body = ctk.CTkScrollableFrame(tabs.tab("Dados"))
         body.pack(fill="both", expand=True)
@@ -172,6 +172,9 @@ class LeadWorkspacePage(ctk.CTkFrame):
         commercial.pack(fill="both", expand=True)
         dialog.commercial_panel = CommercialPanel(commercial, tabs.tab("Histórico"),
             self.logic.repository, row["id"], self.refresh)
+        from ui.outreach_panel import OutreachPanel
+        dialog.outreach_panel = OutreachPanel(tabs.tab("Abordagem"),
+            lambda: self.logic.repository.get_lead(lead_id))
         tabs.set("Comercial")
 
     def open_url(self, url):

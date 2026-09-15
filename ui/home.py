@@ -7,6 +7,7 @@ from tkinter import messagebox
 import customtkinter as ctk
 
 from core.scraper import run_scraper
+from core.lead_filter import DEFAULT_MIN_SCORE
 from ui.dialogs import show_finish_dialog
 from ui.theme import COLORS, TYPOGRAPHY, SIZES
 from ui.components import heading, field, button
@@ -31,10 +32,16 @@ class HomePage(ctk.CTkFrame):
             form.grid_columnconfigure(col, weight=1, uniform="fields")
         for index, (name, label, value) in enumerate((("cidades", "Cidades · separadas por vírgula", "Praia Grande"),
                 ("segmentos", "Segmentos · separados por vírgula", "clínica odontológica"),
-                ("quantidade", "Máximo por busca", "5"), ("output", "Arquivo de saída", "exports/leads_loungtech.xlsx"))):
+                ("quantidade", "Quantidade · meta total no modo sem site", "5"), ("output", "Arquivo de saída", "exports/leads_loungtech.xlsx"))):
             cell = ctk.CTkFrame(form, fg_color="transparent")
             cell.grid(row=index // 2, column=index % 2, sticky="ew", padx=(0, 12), pady=(0, 12))
             setattr(self, name, field(cell, label, value=value))
+        self.no_website_switch = ctk.CTkSwitch(form, text="Sem site próprio · exige qualificação")
+        self.no_website_switch.select()
+        self.no_website_switch.grid(row=3, column=0, columnspan=2, sticky="w", pady=(0, 12))
+        score_cell = ctk.CTkFrame(form, fg_color="transparent")
+        score_cell.grid(row=4, column=0, sticky="ew", padx=(0, 12), pady=(0, 12))
+        self.min_score = field(score_cell, "Score mínimo · modo sem site", value=str(DEFAULT_MIN_SCORE))
         self.qualification_switch = ctk.CTkSwitch(form, text="Qualificar leads automaticamente")
         self.qualification_switch.deselect()
         self.qualification_switch.grid(row=2, column=0, columnspan=2, sticky="w", pady=(0, 12))
@@ -109,6 +116,17 @@ class HomePage(ctk.CTkFrame):
                 "A quantidade precisa ser um número inteiro."
             )
             return
+
+        only_without_website = bool(self.no_website_switch.get())
+        min_score = DEFAULT_MIN_SCORE
+        if only_without_website:
+            try:
+                min_score = int(self.min_score.get().strip())
+                if not 0 <= min_score <= 100:
+                    raise ValueError
+            except ValueError:
+                messagebox.showerror("Score mínimo", "Informe um inteiro entre 0 e 100.")
+                return
 
         if not cidades:
             messagebox.showwarning(
@@ -185,6 +203,8 @@ class HomePage(ctk.CTkFrame):
                 quantidade,
                 output,
                 bool(self.qualification_switch.get()),
+                only_without_website,
+                min_score,
             ),
             daemon=True
         )
@@ -218,6 +238,8 @@ class HomePage(ctk.CTkFrame):
         quantidade,
         output,
         qualification_enabled=False,
+        only_without_website=False,
+        min_score=DEFAULT_MIN_SCORE,
     ):
         try:
             summary = run_scraper(
@@ -229,6 +251,8 @@ class HomePage(ctk.CTkFrame):
                 on_progress=self.update_progress,
                 should_stop=lambda: self.stop_requested,
                 qualification_enabled=qualification_enabled,
+                only_without_website=only_without_website,
+                min_score=min_score,
             )
 
             self.after(
@@ -291,8 +315,10 @@ class HomePage(ctk.CTkFrame):
         )
 
         self.progress_label.configure(
-            text=f"{processed} / {total} empresas"
+            text=f"{processed} / {total} leads aceitos" if message.startswith("[") else f"{processed} / {total} empresas"
         )
+        if message.startswith("["):
+            self._append_log(message)
 
     # ==================================================
     # Cronômetro
@@ -383,6 +409,9 @@ class HomePage(ctk.CTkFrame):
         self.progress_label.configure(
             text=f"{processados} / {total} empresas"
         )
+        if "meta" in summary:
+            self.progress.set(min(leads / summary["meta"], 1))
+            self.progress_label.configure(text=f"{leads} / {summary['meta']} leads aceitos · {processados} analisadas")
 
         self.timer_label.configure(
             text=f"Tempo: {minutes:02d}:{seconds:02d}"
@@ -458,6 +487,8 @@ class HomePage(ctk.CTkFrame):
         self.set_form_state("normal")
 
     def set_form_state(self, state):
+        self.no_website_switch.configure(state=state)
+        self.min_score.configure(state=state)
         self.qualification_switch.configure(state=state)
         self.cidades.configure(
             state=state

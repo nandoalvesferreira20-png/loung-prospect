@@ -21,6 +21,7 @@ SOCIAL_PROVIDERS = MappingProxyType({
     "instagram.com": "Instagram", "facebook.com": "Facebook", "fb.com": "Facebook",
     "tiktok.com": "TikTok", "linkedin.com": "LinkedIn", "youtube.com": "YouTube",
     "youtu.be": "YouTube",
+    "x.com": "X", "twitter.com": "X", "threads.net": "Threads",
 })
 THIRD_PARTY_PROVIDERS = MappingProxyType({
     "linktr.ee": "Linktree", "booksy.com": "Booksy", "calendly.com": "Calendly",
@@ -28,7 +29,16 @@ THIRD_PARTY_PROVIDERS = MappingProxyType({
     "wixsite.com": "Wix", "wordpress.com": "WordPress.com",
     "canva.site": "Canva Sites", "api.whatsapp.com": "WhatsApp",
     "trinks.com": "Trinks",
+    "beacons.ai": "Beacons", "bio.site": "Bio Site", "sites.google.com": "Google Sites",
+    "carrd.co": "Carrd", "ifood.com.br": "iFood", "rappi.com.br": "Rappi",
+    "tripadvisor.com": "Tripadvisor", "tripadvisor.com.br": "Tripadvisor",
+    "restaurantguru.com": "Restaurant Guru", "restaurantguru.com.br": "Restaurant Guru",
 })
+
+
+def matches_domain(hostname, domain):
+    """Exact hostname or dot-delimited subdomain only."""
+    return hostname == domain or hostname.endswith("." + domain)
 
 
 @dataclass(frozen=True)
@@ -95,7 +105,7 @@ def classify_digital_presence(
         (THIRD_PARTY_PROVIDERS, DigitalPresenceType.THIRD_PARTY_PLATFORM),
     ):
         for domain, provider in providers.items():
-            if hostname == domain or hostname.endswith("." + domain):
+            if matches_domain(hostname, domain):
                 return result(kind, f"Hostname corresponde ao provedor conhecido {provider} ({domain}).", provider)
     return result(DigitalPresenceType.OWN_WEBSITE,
                   "URL com aparência de website independente; titularidade e vínculo com a empresa não verificados.")

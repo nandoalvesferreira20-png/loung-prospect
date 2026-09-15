@@ -13,6 +13,13 @@ def format_finish_summary(summary):
         f"Tempo: {summary['tempo_segundos']:.1f}s"
     )
     qualification = summary.get("qualification_summary")
+    if "meta" in summary:
+        stats = summary["stats"]
+        info += (f"\nMeta: {summary['meta']} · Aceitos: {summary['leads']}"
+                 f"\nAnalisadas: {stats['analisadas']} · Com site: {stats['com_site']}"
+                 f"\nSem site: {stats['sem_site']} · Duplicadas: {stats['duplicadas']}"
+                 f"\nDescartadas: {stats['descartadas']}"
+                 f"\n{summary['motivo_parada']}")
     if qualification is not None:
         info += (
             f"\n\nQualificados: {qualification['qualified']}"
@@ -30,7 +37,7 @@ def show_finish_dialog(parent, summary):
 
     dialog = ctk.CTkToplevel(parent)
     dialog.title("Busca finalizada")
-    dialog.geometry("480x440" if "qualification_summary" in summary else "430x320")
+    dialog.geometry("680x580" if "meta" in summary else "480x440" if "qualification_summary" in summary else "430x320")
     dialog.resizable(False, False)
 
     dialog.grab_set()

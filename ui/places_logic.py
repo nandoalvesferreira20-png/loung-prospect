@@ -1,7 +1,8 @@
 """Presentation helpers without GUI or provider dependencies."""
+from core.providers.search_query import normalize_neighborhood
 
 
-def parse_search(city, segment, quantity):
+def parse_search(city, segment, quantity, neighborhood=None):
     if not city.strip() or not segment.strip():
         raise ValueError(
             "Informe cidade e segmento."
@@ -23,6 +24,7 @@ def parse_search(city, segment, quantity):
         "city": city.strip(),
         "segment": segment.strip(),
         "limit": limit,
+        "neighborhood": normalize_neighborhood(neighborhood),
     }
 
 
@@ -72,5 +74,14 @@ def summary_text(summary):
                 "foram preservadas."
             ),
         ])
+
+    if summary.stats is not None:
+        lines.extend(["", f"Meta: {summary.requested} · Aceitos: {summary.inserted}"])
+        lines.extend([f"Candidatos analisados: {summary.candidates_scanned}",
+                      f"Com site: {summary.rejected_with_website}",
+                      f"Abaixo do score: {summary.rejected_score}",
+                      f"Inválidos/inconclusivos: {summary.rejected_unverified}",
+                      f"Páginas recebidas: {summary.pages_fetched}"])
+        lines.append(summary.stop_reason or "")
 
     return "\n".join(lines)

@@ -1,6 +1,7 @@
 """Explicit, pure mappings; commercial decisions belong to qualification."""
 
 from core.providers.models import LeadCandidate
+from core.validator import WEBSITE_VERIFICATION_KEY, PlacesWebsiteVerification
 from core.qualification.models import QualificationResult
 from core.qualification.rules import classify_priority
 from core.qualification.serialization import (
@@ -36,6 +37,7 @@ QUALIFICATION_FIELDS = {
 
 def candidate_to_record(
     candidate: LeadCandidate,
+    *, website_evidence=False,
 ) -> dict:
     """Convert a provider LeadCandidate into the legacy qualification record."""
 
@@ -60,6 +62,8 @@ def candidate_to_record(
         provider_place_id=candidate.provider_place_id,
     )
 
+    if website_evidence and candidate.provider == "google_places":
+        record[WEBSITE_VERIFICATION_KEY] = PlacesWebsiteVerification(candidate.site)
     return record
 
 

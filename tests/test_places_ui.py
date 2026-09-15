@@ -25,6 +25,7 @@ def page():
             )
             for key, value in (
                 ("city", "Taubaté"),
+                ("neighborhood", ""),
                 ("segment", "dentista"),
                 ("quantity", "5"),
             )
@@ -35,6 +36,8 @@ def page():
         start_button=Mock(),
         cancel_button=Mock(),
         export_checkbox=Mock(),
+        no_website_switch=Mock(get=Mock(return_value=0)),
+        min_score=Mock(get=Mock(return_value="60")),
         open_excel_button=Mock(),
         open_folder_button=Mock(),
         export_var=Mock(),

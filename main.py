@@ -201,18 +201,43 @@ def run(cidades, segmentos, max_results, output, headless=False):
 
 def cli_main(argv=None):
     """Executa a CLI legada sem abrir a interface gráfica."""
+    from core.lead_filter import DEFAULT_MIN_SCORE
     parser = argparse.ArgumentParser(description="Loung Leads - coletor inicial sem API")
     parser.add_argument("--cidades", nargs="+", required=True, help="Ex: Santos Praia_Grande")
     parser.add_argument("--segmentos", nargs="+", required=True, help="Ex: clinica_odontologica clinica_medica")
     parser.add_argument("--max", type=int, default=10, help="Máximo por busca")
     parser.add_argument("--output", default="leads_loungtech.xlsx", help="Arquivo .xlsx ou .csv")
     parser.add_argument("--headless", action="store_true", help="Rodar sem abrir navegador")
+    parser.add_argument("--sem-site", action="store_true", help="Usar scraper modular com meta total de leads sem site no Google")
+    parser.add_argument("--fonte", choices=("playwright", "google_places"), default="playwright")
+    parser.add_argument("--bairro", default=None, help="Bairro opcional na consulta Google Places")
+    parser.add_argument("--min-score", type=int, default=DEFAULT_MIN_SCORE, help="Score mínimo no modo --sem-site (0 a 100)")
 
     args = parser.parse_args(argv)
 
     cidades = [c.replace("_", " ") for c in args.cidades]
     segmentos = [s.replace("_", " ") for s in args.segmentos]
 
+    if args.fonte == "google_places":
+        if len(cidades) != 1 or len(segmentos) != 1:
+            parser.error("Google Places aceita uma cidade e um segmento por execução.")
+        if not 1 <= args.max <= 100 or not 0 <= args.min_score <= 100:
+            parser.error("Quantidade deve ser de 1 a 100 e score de 0 a 100.")
+        if not args.output.lower().endswith(".xlsx"):
+            parser.error("Google Places exporta somente .xlsx")
+        from core.prospecting.service import prospect
+        return prospect(city=cidades[0], segment=segmentos[0], limit=args.max,
+                        only_without_website=args.sem_site, min_score=args.min_score,
+                        export_path=args.output, log=print, neighborhood=args.bairro)
+
+    if args.sem_site:
+        if args.max < 1 or not 0 <= args.min_score <= 100:
+            parser.error("--max deve ser positivo e --min-score deve estar entre 0 e 100")
+        if not args.output.lower().endswith(".xlsx"):
+            parser.error("O modo --sem-site exporta somente .xlsx")
+        from core.scraper import run_scraper
+        return run_scraper(cidades, segmentos, args.max, args.output, headless=args.headless,
+                           only_without_website=True, min_score=args.min_score)
     run(cidades, segmentos, args.max, args.output, headless=args.headless)
 
 
@@ -222,6 +247,8 @@ def gui_main():
 
     app = LoungLeadsApp()
     app.mainloop()
+    
+    
 
 
 def main(argv=None):

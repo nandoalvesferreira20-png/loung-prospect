@@ -5,6 +5,9 @@ import math
 import os
 
 from .models import LeadCandidate
+from .search_query import normalize_neighborhood
+from core.lead_filter import possui_site
+from core.prospecting.limits import DEFAULT_MAX_REQUESTS
 
 ENDPOINT = "https://places.googleapis.com/v1/places:searchText"
 FIELD_MASK = ",".join((
@@ -15,6 +18,10 @@ FIELD_MASK = ",".join((
 
 
 class GooglePlacesError(RuntimeError):
+    pass
+
+
+class GooglePlacesSafetyLimitError(GooglePlacesError):
     pass
 
 
@@ -38,10 +45,12 @@ class GooglePlacesTransportError(GooglePlacesError):
     pass
 
 
-def build_query(city: str, segment: str) -> str:
+def build_query(city: str, segment: str, neighborhood: str | None = None) -> str:
     if not isinstance(city, str) or not city.strip() or not isinstance(segment, str) or not segment.strip():
         raise ValueError("city and segment must be nonempty text")
-    return f"{segment.strip()} em {city.strip()}"
+    neighborhood = normalize_neighborhood(neighborhood)
+    location = f"{neighborhood}, {city.strip()}" if neighborhood else city.strip()
+    return f"{segment.strip()} em {location}"
 
 
 def _http_400_diagnostic(raw, key):
@@ -92,10 +101,12 @@ def normalize_place(place, *, city, segment):
     maps_links = place.get("googleMapsLinks", {})
     if not isinstance(name, dict) or not isinstance(location, dict) or not isinstance(maps_links, dict):
         raise GooglePlacesResponseError("Unexpected nested place structure")
+    website = text("websiteUri")
+    website = website.strip() if possui_site({"site": website}) else None
     return LeadCandidate(
         provider="google_places", provider_place_id=text("id"), empresa=text("text", name),
         cidade=city, segmento=segment, telefone=text("nationalPhoneNumber"),
-        site=text("websiteUri"), endereco=text("formattedAddress"), avaliacao=number("rating"),
+        site=website, endereco=text("formattedAddress"), avaliacao=number("rating"),
         quantidade_avaliacoes=number("userRatingCount", integer=True), google_maps=text("placeUri", maps_links),
         latitude=number("latitude", location), longitude=number("longitude", location),
     )
@@ -108,7 +119,7 @@ class GooglePlacesProvider:
     API keys are read only from the environment; raw transport errors/responses
     never become public error text. Instances are not intended for concurrent use.
     """
-    def __init__(self, *, timeout=30, max_requests=10, transport=None, log=None):
+    def __init__(self, *, timeout=30, max_requests=DEFAULT_MAX_REQUESTS, transport=None, log=None):
         key = os.environ.get("GOOGLE_PLACES_API_KEY", "").strip()
         if not key:
             raise GooglePlacesConfigurationError("Set GOOGLE_PLACES_API_KEY before searching")
@@ -122,25 +133,37 @@ class GooglePlacesProvider:
         self._transport = transport or _post
         self._log = log
         self.request_count = 0
+        self.pages_fetched = 0
 
     def _emit(self, message):
         if self._log:
             self._log(message.replace(self._key, "[REDACTED]"))
 
-    def search(self, *, city, segment, max_results=50):
+    def search(self, *, city, segment, max_results=50, neighborhood=None):
+        return list(self.iter_search(city=city, segment=segment, max_results=max_results, neighborhood=neighborhood))
+
+    def iter_search(self, *, city, segment, max_results=50, should_stop=lambda: False, neighborhood=None):
+        """Same pagination, consumed lazily; None uses the existing request budget.
+
+        Callers can stop after enough accepted leads without another HTTP call.
+        Cancellation is checked before requests and between candidates.
+        """
         self.request_count = 0
-        query = build_query(city, segment)
-        if type(max_results) is not int or max_results < 0:
+        self.pages_fetched = 0
+        query = build_query(city, segment, neighborhood)
+        if max_results is not None and (type(max_results) is not int or max_results < 0):
             raise ValueError("max_results must be a nonnegative integer")
         if max_results == 0:
-            return []
-        results, tokens = [], set()
+            return
+        received, tokens = 0, set()
         token = None
         self._emit("Google Places: search started")
-        while len(results) < max_results:
+        while max_results is None or received < max_results:
+            if should_stop():
+                return
             if self.request_count >= self.max_requests:
-                raise GooglePlacesError("Google Places request budget exhausted")
-            payload = {"textQuery": query, "languageCode": "pt-BR", "pageSize": min(20, max_results - len(results))}
+                raise GooglePlacesSafetyLimitError("Google Places request budget exhausted")
+            payload = {"textQuery": query, "languageCode": "pt-BR", "pageSize": 20 if max_results is None else min(20, max_results - received)}
             if token:
                 payload["pageToken"] = token
             headers = {"Content-Type": "application/json", "X-Goog-Api-Key": self._key, "X-Goog-FieldMask": FIELD_MASK}
@@ -169,13 +192,19 @@ class GooglePlacesProvider:
             if not isinstance(places, list) or (next_token is not None and not isinstance(next_token, str)):
                 raise GooglePlacesResponseError("Unexpected places or pagination structure")
             candidates = [normalize_place(place, city=city, segment=segment) for place in places]
-            results.extend(candidates[:max_results - len(results)])
+            self.pages_fetched += 1
             self._emit(f"Google Places: page {self.request_count}, {len(candidates)} results")
-            if len(results) >= max_results or not next_token:
+            for candidate in candidates:
+                if should_stop():
+                    return
+                if max_results is not None and received >= max_results:
+                    break
+                received += 1
+                yield candidate
+            if (max_results is not None and received >= max_results) or not next_token:
                 break
             if next_token in tokens:
                 raise GooglePlacesResponseError("Repeated pagination token")
             tokens.add(next_token)
             token = next_token
-        self._emit(f"Google Places: completed, {len(results)} results, {self.request_count} requests")
-        return results
+        self._emit(f"Google Places: completed, {received} results, {self.request_count} requests")

@@ -14,6 +14,8 @@ from core.providers.google_places import (
     GooglePlacesConfigurationError,
     GooglePlacesHTTPError,
     GooglePlacesProvider,
+    GooglePlacesSafetyLimitError,
+    build_query,
 )
 from core.qualification.models import (
     QualificationNote,
@@ -21,6 +23,11 @@ from core.qualification.models import (
 )
 from core.qualification.rules import classify_priority
 from core.qualification.service import qualify_record
+from core.lead_filter import DEFAULT_MIN_SCORE, WebsiteStatus, classificar_status_site, accepted_columns, new_search_stats, meets_min_score
+from .limits import MAX_CANDIDATES_SCANNED, ProspectingStopReason, STOP_MESSAGES
+from core.providers.search_query import normalize_neighborhood
+from core.lead_filter import record_presence, is_without_own_website
+from core.qualification.digital_presence import DigitalPresenceType
 
 from .adapter import (
     candidate_to_record,
@@ -62,6 +69,28 @@ class ProspectingSummary:
     requests_made: int = 0
     duration_seconds: float = 0.0
     cancelled: bool = False
+    stats: dict | None = None
+    stop_reason: str | None = None
+    stop_code: ProspectingStopReason | None = None
+    pages_fetched: int = 0
+    rejected_score: int = 0
+    rejected_unverified: int = 0
+
+    @property
+    def target(self):
+        return self.requested
+
+    @property
+    def accepted(self):
+        return self.inserted
+
+    @property
+    def candidates_scanned(self):
+        return self.stats["analisadas"] if self.stats is not None else self.received
+
+    @property
+    def rejected_with_website(self):
+        return self.stats["com_site"] if self.stats is not None else 0
 
     errors: list[str] = field(
         default_factory=list
@@ -94,6 +123,10 @@ def prospect(
     progress=None,
     cancel_event=None,
     export_path=None,
+    only_without_website=False,
+    min_score=DEFAULT_MIN_SCORE,
+    max_candidates_scanned=MAX_CANDIDATES_SCANNED,
+    neighborhood=None,
 ):
     """
     Search, qualify and persist Google Places leads.
@@ -123,9 +156,17 @@ def prospect(
             "Quantidade deve ser um inteiro de 1 a 100."
         )
 
+    neighborhood = normalize_neighborhood(neighborhood)
+    search_context = {"neighborhood": neighborhood} if neighborhood else {}
+    if only_without_website and (type(min_score) is not int or not 0 <= min_score <= 100):
+        raise ValueError("Score mínimo deve ser inteiro entre 0 e 100.")
+    if only_without_website and (type(max_candidates_scanned) is not int or max_candidates_scanned < 1):
+        raise ValueError("Limite de candidatos deve ser inteiro positivo.")
     summary = ProspectingSummary(
         requested=limit
     )
+    if only_without_website:
+        summary.stats = new_search_stats()
 
     started = monotonic()
 
@@ -160,16 +201,17 @@ def prospect(
 
             if log:
                 log(
-                    "Consultando Google Places…"
+                    f"Consultando Google Places: {build_query(city, segment, neighborhood)}…"
                 )
 
-            candidates = provider.search(
-                city=city,
-                segment=segment,
-                max_results=limit,
-            )
+            if only_without_website:
+                candidates = provider.iter_search(city=city, segment=segment, max_results=None, should_stop=cancelled, **search_context)
+            else:
+                candidates = provider.search(city=city, segment=segment, max_results=limit, **search_context)
 
         except Exception as error:
+            if only_without_website:
+                summary.stop_code = ProspectingStopReason.PROVIDER_ERROR
             if isinstance(
                 error,
                 GooglePlacesConfigurationError,
@@ -212,9 +254,8 @@ def prospect(
                 else 0
             )
 
-        summary.received = len(
-            candidates
-        )
+        if not only_without_website:
+            summary.received = len(candidates)
 
         if log:
             log(
@@ -263,8 +304,39 @@ def prospect(
         # Lead processing
         # --------------------------------------------------
 
+        seen_ids, seen_companies = set(), set()
+        def safe_candidates():
+            count = 0
+            page_number = 0
+            def page_log():
+                if log and page_number:
+                    log(f"Página {page_number} | Analisados {summary.received} | Aceitos {summary.inserted}/{limit} | Com site {summary.rejected_with_website} | Duplicados {summary.duplicates}")
+            try:
+                iterator = iter(candidates)
+                while not cancelled():
+                    if count >= max_candidates_scanned:
+                        summary.stop_code = ProspectingStopReason.SAFETY_LIMIT_REACHED
+                        return
+                    try:
+                        candidate = next(iterator)
+                    except StopIteration:
+                        return
+                    current_page = getattr(provider, "pages_fetched", 0)
+                    if current_page != page_number:
+                        page_log()
+                        page_number = current_page
+                    count += 1
+                    yield candidate
+            except GooglePlacesSafetyLimitError:
+                summary.stop_code = ProspectingStopReason.SAFETY_LIMIT_REACHED
+            except Exception:
+                summary.stop_code = ProspectingStopReason.PROVIDER_ERROR
+                summary.errors.append(STOP_MESSAGES[summary.stop_code])
+            finally:
+                page_log()
+
         for index, candidate in enumerate(
-            candidates,
+            safe_candidates() if only_without_website else candidates,
             1,
         ):
             if cancelled():
@@ -272,14 +344,40 @@ def prospect(
                 break
 
             record = candidate_to_record(
-                candidate
+                candidate, website_evidence=only_without_website,
             )
+            if only_without_website:
+                summary.received += 1
+                stats = summary.stats
+                stats["analisadas"] += 1
+                identity = (candidate.empresa, candidate.endereco) if candidate.empresa and candidate.endereco else None
+                if (candidate.provider_place_id and candidate.provider_place_id in seen_ids) or (identity is not None and identity in seen_companies):
+                    stats["duplicadas"] += 1
+                    stats["descartadas"] += 1
+                    summary.duplicates += 1
+                    continue
+                if candidate.provider_place_id:
+                    seen_ids.add(candidate.provider_place_id)
+                if identity is not None:
+                    seen_companies.add(identity)
+                presence = record_presence(record)
+                if not is_without_own_website(presence):
+                    if presence.presence_type == DigitalPresenceType.OWN_WEBSITE:
+                        stats["com_site"] += 1
+                    else:
+                        summary.rejected_unverified += 1
+                    stats["descartadas"] += 1
+                    continue
+                stats["sem_site"] += 1
 
             # ----------------------------------------------
             # Qualification
             # ----------------------------------------------
 
             try:
+                if cancelled():
+                    summary.cancelled = True
+                    break
                 result = qualify_record(
                     record
                 )
@@ -302,6 +400,15 @@ def prospect(
                 )
 
             status = result.status.value
+            if only_without_website and not meets_min_score(result, min_score):
+                summary.stats["descartadas"] += 1
+                if status == "qualified" and result.score is not None:
+                    summary.rejected_score += 1
+                else:
+                    summary.rejected_unverified += 1
+                if status == "error":
+                    summary.qualification_errors += 1
+                continue
 
             if status == "error":
                 summary.qualification_errors += 1
@@ -370,12 +477,18 @@ def prospect(
                     result,
                 )
             )
+            if only_without_website:
+                export_rows[-1].update(accepted_columns(result, presence))
 
             # ----------------------------------------------
             # SQLite persistence
             # ----------------------------------------------
 
             try:
+                if cancelled():
+                    summary.cancelled = True
+                    export_rows.pop()
+                    break
                 inserted_id = (
                     repository.create_lead_if_new(
                         record_to_database(
@@ -387,6 +500,11 @@ def prospect(
 
                 if inserted_id is None:
                     summary.duplicates += 1
+                    if only_without_website:
+                        summary.stats["duplicadas"] += 1
+                        summary.stats["descartadas"] += 1
+                        export_rows.pop()
+                        continue
 
                 else:
                     summary.inserted += 1
@@ -398,12 +516,21 @@ def prospect(
                     f"Lead {index}: "
                     "falha de persistência."
                 )
+                if only_without_website:
+                    summary.stats["descartadas"] += 1
+                    export_rows.pop()
+                    continue
+
+            if only_without_website:
+                summary.stats["qualificadas"] += 1
 
             if progress:
                 progress(
-                    index,
-                    summary.received,
+                    summary.inserted if only_without_website else index,
+                    limit if only_without_website else summary.received,
                 )
+            if only_without_website and summary.inserted >= limit:
+                break
 
         # --------------------------------------------------
         # Excel export
@@ -468,6 +595,16 @@ def prospect(
         return summary
 
     finally:
+        if only_without_website:
+            summary.requests_made = provider.request_count if provider is not None else 0
+            summary.pages_fetched = getattr(provider, "pages_fetched", 0) if provider is not None else 0
+            summary.cancelled = summary.cancelled or cancelled()
+            summary.stop_code = (ProspectingStopReason.CANCELLED if summary.cancelled else
+                ProspectingStopReason.TARGET_REACHED if summary.inserted >= limit else summary.stop_code or
+                ProspectingStopReason.SOURCE_EXHAUSTED)
+            summary.stop_reason = STOP_MESSAGES[summary.stop_code]
+            if log:
+                log(f"Meta {limit} | Aceitos {summary.inserted} | {summary.stats} | {summary.stop_reason}")
         summary.duration_seconds = (
             monotonic()
             - started

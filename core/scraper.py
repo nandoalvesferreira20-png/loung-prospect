@@ -11,7 +11,10 @@ from playwright.sync_api import sync_playwright
 
 from core.extractor import extract_company_data
 from core.exporter import export_excel
-from core.maps import collect_links
+from core.maps import collect_links, iter_links
+from core.lead_filter import DEFAULT_MIN_SCORE, WebsiteStatus, classificar_status_site, accepted_columns, new_search_stats, meets_min_score
+from core.lead_filter import record_presence, is_without_own_website
+from core.qualification.digital_presence import DigitalPresenceType
 from core.validator import WEBSITE_VERIFICATION_KEY
 from core.qualification.service import qualify_records
 from core.qualification.serialization import qualification_result_to_columns
@@ -27,6 +30,8 @@ def run_scraper(
     on_progress: Callable[[int, int, str], None] | None = None,
     should_stop: Callable[[], bool] | None = None,
     qualification_enabled: bool = False,
+    only_without_website: bool = False,
+    min_score: int = DEFAULT_MIN_SCORE,
 ) -> dict:
     """
     Executa o processo completo de prospecção.
@@ -45,7 +50,20 @@ def run_scraper(
     Leads já coletados
     também são qualificados após cancelamento; lote vazio não chama o serviço.
     Falhas individuais ficam no resultado, sem alterar os contadores de coleta.
+
+    only_without_website habilita uma meta TOTAL de max_results aceitos entre
+    todas as cidades/segmentos. Exige ausência explicitamente inspecionada e score
+    mínimo; qualifica durante a coleta, preservando V3 e o registro original.
+    False mantém integralmente o contrato legado. A interface liga esse modo
+    por padrão; chamadas Python antigas continuam com o comportamento anterior.
     """
+
+    if only_without_website:
+        if type(max_results) is not int or max_results < 1:
+            raise ValueError("A meta deve ser um inteiro positivo.")
+        if type(min_score) is not int or not 0 <= min_score <= 100:
+            raise ValueError("Score mínimo deve ser inteiro entre 0 e 100.")
+        qualification_enabled = True
 
     on_progress = on_progress or (
         lambda processados, total, mensagem: None
@@ -62,6 +80,9 @@ def run_scraper(
 
     processed = 0
     stopped = False
+    stats = new_search_stats()
+    accepted_results = []
+    seen_companies = set()
     output_path = Path(output)
 
     output_path.parent.mkdir(
@@ -89,7 +110,7 @@ def run_scraper(
                 # ETAPA 1 — Localizar empresas
                 # =========================================
 
-                for cidade in cidades:
+                for cidade in ([] if only_without_website else cidades):
                     if should_stop():
                         stopped = True
                         break
@@ -151,22 +172,30 @@ def run_scraper(
 
                 tasks = unique_tasks
                 total = len(tasks)
+                processing_tasks = tasks
+                if only_without_website:
+                    search_page = context.new_page()
+                    processing_tasks = _target_tasks(search_page, cidades, segmentos, tasks,
+                                                     errors, stats, log, should_stop)
+                    total = max_results
 
                 log(
-                    f"📋 Total de empresas na fila: {total}"
+                    f"Meta: {max_results} leads sem site, score mínimo {min_score}"
+                    if only_without_website else f"📋 Total de empresas na fila: {total}"
                 )
 
                 on_progress(
                     0,
                     total,
-                    "Empresas encontradas. Iniciando coleta..."
+                    "Iniciando descoberta incremental de candidatos..." if only_without_website
+                    else "Empresas encontradas. Iniciando coleta..."
                 )
 
                 # =========================================
                 # ETAPA 2 — Processar cada empresa
                 # =========================================
 
-                for task in tasks:
+                for task in processing_tasks:
                     if should_stop():
                         stopped = True
                         log("⏹ Busca interrompida pelo usuário.")
@@ -179,14 +208,14 @@ def run_scraper(
                     current_position = processed + 1
 
                     message = (
-                        f"Processando empresa "
-                        f"{current_position} de {total}"
+                        f"[{len(rows)}/{max_results}] Analisando empresa {current_position}"
+                        if only_without_website else f"Processando empresa {current_position} de {total}"
                     )
 
                     log(f"🔄 {message}")
 
                     on_progress(
-                        processed,
+                        len(rows) if only_without_website else processed,
                         total,
                         message
                     )
@@ -215,10 +244,39 @@ def run_scraper(
                         ).strip()
 
                         if company_name:
+                            if only_without_website:
+                                identity = (company.get("Empresa"), company.get("Endereço"))
+                                if identity in seen_companies:
+                                    stats["duplicadas"] += 1
+                                    stats["descartadas"] += 1
+                                    log(f"Ignorando {company_name}: duplicada")
+                                    continue
+                                seen_companies.add(identity)
+                                presence = record_presence(company)
+                                if presence.presence_type == DigitalPresenceType.OWN_WEBSITE:
+                                    stats["com_site"] += 1
+                                    stats["descartadas"] += 1
+                                    log(f"Ignorando {company_name}: possui site")
+                                    continue
+                                if not is_without_own_website(presence):
+                                    stats["descartadas"] += 1
+                                    log(f"Ignorando {company_name}: inspeção de site inconclusiva ou com erro")
+                                    continue
+                                stats["sem_site"] += 1
+                                with diagnostic_logging(diagnostic_log):
+                                    result = qualify_records([company])[0]
+                                if not meets_min_score(result, min_score):
+                                    stats["descartadas"] += 1
+                                    log(f"Ignorando {company_name}: score insuficiente ou qualificação {result.status}")
+                                    continue
+                                accepted_results.append(result)
+                                stats["qualificadas"] += 1
                             rows.append(company)
                             log(f"✔ Lead salvo: {company_name}")
 
                         else:
+                            if only_without_website:
+                                stats["descartadas"] += 1
                             errors.append({
                                 "etapa": "extração",
                                 "link": link,
@@ -231,6 +289,8 @@ def run_scraper(
                             )
 
                     except Exception as error:
+                        if only_without_website:
+                            stats["descartadas"] += 1
                         errors.append({
                             "etapa": "processamento",
                             "link": link,
@@ -246,12 +306,19 @@ def run_scraper(
 
                     finally:
                         processed += 1
+                        stats["analisadas"] = processed
 
                         on_progress(
-                            processed,
+                            len(rows) if only_without_website else processed,
                             total,
-                            f"{processed} de {total} processadas"
+                            (f"[{len(rows)}/{max_results}] Leads aceitos | Analisadas: {processed} | "
+                             f"Com site: {stats['com_site']} | Sem site: {stats['sem_site']} | "
+                             f"Duplicadas: {stats['duplicadas']} | Descartadas: {stats['descartadas']}"
+                             if only_without_website else f"{processed} de {total} processadas")
                         )
+
+                    if only_without_website and len(rows) >= max_results:
+                        break
 
                     # Pequena pausa entre empresas
                     for _ in range(10):
@@ -276,6 +343,9 @@ def run_scraper(
         })
 
         log(f"❌ Erro geral no navegador: {error}")
+
+    if only_without_website and should_stop():
+        stopped = True
 
     # =========================================
     # ETAPA 3 — Gerar arquivo
@@ -305,7 +375,7 @@ def run_scraper(
                           site=record.get("Site"), extracted_site=rows[index].get("Site"),
                           metadata_present=WEBSITE_VERIFICATION_KEY in record,
                           verification=record.get(WEBSITE_VERIFICATION_KEY))
-                results = qualify_records(records)
+                results = accepted_results if only_without_website else qualify_records(records)
             qualifications = [
                 {"registro": record, "resultado": result}
                 for record, result in zip(records, results, strict=True)
@@ -317,6 +387,9 @@ def run_scraper(
             if set(df.columns) & set(derived.columns):
                 raise ValueError("Qualification columns conflict with original columns")
             export_df = pd.concat([df, derived], axis=1)
+            if only_without_website:
+                extra = pd.DataFrame([accepted_columns(result, record_presence(record)) for record, result in zip(records, results, strict=True)], index=df.index)
+                export_df = pd.concat([export_df, extra], axis=1)
 
         exported_path = export_excel(
             df=export_df,
@@ -358,6 +431,16 @@ def run_scraper(
             "website_opportunities": sum(item["resultado"].opportunity == "website" for item in qualifications),
         }
 
+    if only_without_website:
+        summary["stats"] = stats
+        summary["meta"] = max_results
+        summary["min_score"] = min_score
+        summary["motivo_parada"] = ("Cancelado pelo usuário" if stopped else
+            "Meta atingida" if len(df) >= max_results else
+            "Busca encerrada com falhas; consulte os erros" if errors else
+            "Nenhum novo resultado disponível dentro dos limites de rolagem da busca")
+        log(f"Meta: {max_results} | Encontrados: {len(df)} | Analisadas: {processed}. {summary['motivo_parada']}")
+
     log(
         f"🏁 Processo {status}. "
         f"Leads: {summary['leads']} | "
@@ -366,4 +449,29 @@ def run_scraper(
     )
 
     return summary
+
+
+def _target_tasks(page, cidades, segmentos, tasks, errors, stats, log, should_stop):
+    """Lazy queue: keep search DOM separate from company inspection DOM."""
+    seen = set()
+    for cidade in cidades:
+        for segmento in segmentos:
+            if should_stop():
+                return
+            log(f"Buscando candidatos: {segmento} em {cidade}")
+            try:
+                for link in iter_links(page, f"{segmento} em {cidade}", log=log, should_stop=should_stop):
+                    if should_stop():
+                        return
+                    if link in seen:
+                        stats["duplicadas"] += 1
+                        stats["descartadas"] += 1
+                        continue
+                    seen.add(link)
+                    task = dict(link=link, cidade=cidade, segmento=segmento)
+                    tasks.append(task)
+                    yield task
+            except Exception as error:
+                errors.append(dict(etapa="busca", cidade=cidade, segmento=segmento, erro=str(error)))
+                log(f"Erro na descoberta de links: {error}")
 

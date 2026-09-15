@@ -9,6 +9,7 @@ from tkinter import messagebox
 import customtkinter as ctk
 
 from core.exporter import open_excel, open_folder
+from core.lead_filter import DEFAULT_MIN_SCORE
 from core.prospecting.service import (
     ProspectingError,
     create_provider,
@@ -37,12 +38,27 @@ class PlacesSearchPage(ctk.CTkFrame):
         form = ctk.CTkFrame(self, fg_color="transparent")
         form.pack(fill="x", padx=28, pady=(0, 16))
         self.entries = {}
-        for column, (name, label, default) in enumerate((("city", "Cidade", ""), ("segment", "Segmento", ""), ("quantity", "Quantidade · até 100", "5"))):
+        for column, (name, label, default) in enumerate((("city", "Cidade", ""), ("neighborhood", "Bairro (opcional)", ""), ("segment", "Segmento", ""), ("quantity", "Quantidade · até 100", "5"))):
             form.grid_columnconfigure(column, weight=1, uniform="inputs")
             cell = ctk.CTkFrame(form, fg_color="transparent")
             cell.grid(row=0, column=column, sticky="ew", padx=(0 if column == 0 else 12, 0))
-            self.entries[name] = field(cell, label, value=default)
+            if name == "quantity":
+                self.quantity_label = ctk.CTkLabel(cell, text="Meta de leads sem site próprio · até 100", font=TYPOGRAPHY["secondary"])
+                self.quantity_label.pack(anchor="w", pady=(0, 5))
+                self.entries[name] = ctk.CTkEntry(cell, height=SIZES["control"])
+                self.entries[name].insert(0, default)
+                self.entries[name].pack(fill="x")
+            else:
+                self.entries[name] = field(cell, label, value=default)
         actions = ctk.CTkFrame(self, fg_color="transparent")
+        self.no_website_switch = ctk.CTkSwitch(form, text="Sem site próprio", command=self.update_target_label)
+        self.no_website_switch.select()
+        self.no_website_switch.grid(row=1, column=0, columnspan=3, sticky="w", pady=12)
+        score_cell = ctk.CTkFrame(form, fg_color="transparent")
+        score_cell.grid(row=1, column=3, sticky="ew", padx=(12, 0), pady=12)
+        self.min_score = field(score_cell, "Score mínimo · modo sem site", value=str(DEFAULT_MIN_SCORE))
+        self.target_hint = ctk.CTkLabel(form, text="Inclui redes sociais e plataformas externas. Busca até a meta, fim dos resultados ou limite de segurança.", text_color=COLORS["muted"], wraplength=850)
+        self.target_hint.grid(row=2, column=0, columnspan=4, sticky="w")
         actions.pack(fill="x", padx=28, pady=(0, 16))
         self.start_button = button(actions, "Buscar leads", self.start, kind="primary")
         self.start_button.pack(side="left", padx=(0, 8))
@@ -71,6 +87,11 @@ class PlacesSearchPage(ctk.CTkFrame):
         self.output.pack(fill="both", expand=True, padx=28, pady=(0, 24))
         self.output.configure(state="disabled")
 
+    def update_target_label(self):
+        enabled = bool(self.no_website_switch.get())
+        self.quantity_label.configure(text="Meta de leads sem site próprio · até 100" if enabled else "Quantidade · até 100")
+        self.target_hint.configure(text="Inclui redes sociais e plataformas externas. Busca até a meta, fim dos resultados ou limite de segurança." if enabled else "")
+
     def append(self, text):
         self.output.configure(
             state="normal"
@@ -91,6 +112,8 @@ class PlacesSearchPage(ctk.CTkFrame):
 
     def set_running(self, running):
         self.running = running
+        for control in (self.no_website_switch, self.min_score):
+            control.configure(state="disabled" if running else "normal")
         self.run_status.configure(text="Busca em andamento…" if running else "Busca encerrada.")
 
         self.start_button.configure(
@@ -197,6 +220,15 @@ class PlacesSearchPage(ctk.CTkFrame):
             )
 
             # Validate key locally before thread.
+            only_without_website = bool(self.no_website_switch.get())
+            if only_without_website:
+                try:
+                    min_score = int(self.min_score.get().strip())
+                    if not 0 <= min_score <= 100:
+                        raise ValueError
+                except ValueError:
+                    raise ValueError("Score mínimo deve ser inteiro entre 0 e 100.") from None
+                params.update(only_without_website=True, min_score=min_score)
             # No HTTP request here.
             provider = create_provider()
 
@@ -364,7 +396,7 @@ class PlacesSearchPage(ctk.CTkFrame):
 
                 self.progress.set(
                     (
-                        1
+                        value.inserted / value.requested if kind == "done" and value.stats is not None else 1
                         if (
                             kind == "done"
                             and not value.cancelled
@@ -386,6 +418,8 @@ class PlacesSearchPage(ctk.CTkFrame):
                 )
 
                 if kind == "done":
+                    if value.stats is not None:
+                        self.progress.set(value.inserted / value.requested)
                     self.metrics.set(dict(received=value.received, inserted=value.inserted, duplicates=value.duplicates))
                     self.priority_summary.configure(text=f"PRIORIDADE   Alta {value.high_priority}   ·   Boa {value.good_priority}   ·   Média {value.medium_priority}   ·   Baixa {value.low_priority}")
                     self.run_status.configure(text="Busca interrompida. Resultados parciais preservados." if value.cancelled else "Busca finalizada.")

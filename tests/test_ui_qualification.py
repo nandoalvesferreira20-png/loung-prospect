@@ -11,7 +11,7 @@ from core.qualification.models import QualificationResult
 
 def fake_home():
     page = SimpleNamespace(running=False, stop_requested=False)
-    for name in ("cidades", "segmentos", "quantidade", "output", "qualification_switch",
+    for name in ("cidades", "segmentos", "quantidade", "output", "qualification_switch", "no_website_switch", "min_score",
                  "progress", "progress_label", "timer_label", "start_btn", "stop_btn"):
         setattr(page, name, Mock())
     for name in ("log", "update_timer", "stop_timer", "worker", "after",
@@ -21,6 +21,8 @@ def fake_home():
     page.segmentos.get.return_value = "Clínica"
     page.quantidade.get.return_value = "5"
     page.output.get.return_value = "leads.xlsx"
+    page.no_website_switch.get.return_value = 0
+    page.min_score.get.return_value = "60"
     page.set_form_state = lambda state: home.HomePage.set_form_state(page, state)
     page.restore_interface = lambda: home.HomePage.restore_interface(page)
     return page
@@ -44,7 +46,7 @@ def test_switch_snapshot_forwarded_and_locked(monkeypatch, enabled):
     thread = Mock()
     monkeypatch.setattr(home.threading, "Thread", thread)
     home.HomePage.start_search(page)
-    assert thread.call_args.kwargs["args"][-1] is enabled
+    assert thread.call_args.kwargs["args"][4] is enabled
     page.qualification_switch.configure.assert_called_with(state="disabled")
     thread.return_value.start.assert_called_once()
     run = Mock(return_value={})
