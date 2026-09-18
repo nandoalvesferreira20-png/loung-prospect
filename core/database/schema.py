@@ -71,6 +71,23 @@ CREATE TABLE IF NOT EXISTS lead_interactions (
 )
 """
 
+OUTREACH_SCHEMA = """
+CREATE TABLE IF NOT EXISTS outreach (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lead_id INTEGER NOT NULL,
+    canal TEXT NOT NULL DEFAULT 'whatsapp',
+    mensagem TEXT NOT NULL,
+    angulo TEXT,
+    confianca REAL,
+    status TEXT NOT NULL CHECK(status IN ('GERADA','EDITADA','APROVADA','ENVIADA','RESPONDEU','CANCELADA')),
+    criado_em TEXT NOT NULL,
+    atualizado_em TEXT NOT NULL,
+    aprovado_em TEXT,
+    enviado_em TEXT,
+    respondeu_em TEXT
+)
+"""
+
 
 def initialize_database(
     path=DEFAULT_DATABASE_PATH,
@@ -110,5 +127,11 @@ def initialize_database(
                     f"ADD COLUMN {column} {column_type}"
                 )
             connection.execute(INTERACTIONS_SCHEMA)
+            connection.execute(OUTREACH_SCHEMA)
+            outreach_columns = {row[1] for row in connection.execute("PRAGMA table_info(outreach)")}
+            for column in ("provider", "model"):
+                if column not in outreach_columns:
+                    connection.execute(f"ALTER TABLE outreach ADD COLUMN {column} TEXT")
+            connection.execute("CREATE INDEX IF NOT EXISTS idx_outreach_lead_time ON outreach(lead_id, criado_em DESC, id DESC)")
             connection.execute("CREATE INDEX IF NOT EXISTS idx_interactions_lead_time "
                                "ON lead_interactions(lead_id, created_at DESC, id DESC)")

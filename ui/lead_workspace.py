@@ -38,6 +38,7 @@ class LeadWorkspacePage(ctk.CTkFrame):
         self.import_button = button(actions, "Importar planilha", self.import_file, kind="primary")
         self.import_button.pack(side="left", padx=(0, 8))
         button(actions, "Atualizar lista", self.refresh).pack(side="left")
+        button(actions, "Gerar abordagem com IA", self.generate_sales).pack(side="left", padx=8)
         form = ctk.CTkFrame(self, fg_color="transparent")
         form.pack(fill="x", padx=28, pady=(0, 4))
         self.filters = {}
@@ -132,7 +133,14 @@ class LeadWorkspacePage(ctk.CTkFrame):
             return
         self.open_detail(int(selection[0]))
 
-    def open_detail(self, lead_id):
+    def generate_sales(self):
+        selection = self.table.selection()
+        if not selection:
+            self.notice.configure(text="Selecione um lead para gerar a abordagem.")
+            return
+        self.open_detail(int(selection[0]), generate_ai=True)
+
+    def open_detail(self, lead_id, generate_ai=False):
         try:
             row = self.logic.repository.get_lead(lead_id)
             if row is None:
@@ -156,7 +164,7 @@ class LeadWorkspacePage(ctk.CTkFrame):
         badge(chips, row["status"], status_tone(row["status"])).pack(side="left")
         tabs = ctk.CTkTabview(dialog)
         tabs.pack(fill="both", expand=True, padx=16, pady=16)
-        for name in ("Dados", "Comercial", "Histórico", "Abordagem"):
+        for name in ("Dados", "Comercial", "Histórico", "Abordagem", "SDR IA"):
             tabs.add(name)
         body = ctk.CTkScrollableFrame(tabs.tab("Dados"))
         body.pack(fill="both", expand=True)
@@ -176,6 +184,11 @@ class LeadWorkspacePage(ctk.CTkFrame):
         dialog.outreach_panel = OutreachPanel(tabs.tab("Abordagem"),
             lambda: self.logic.repository.get_lead(lead_id))
         tabs.set("Comercial")
+        from ui.sales_panel import SalesPanel
+        dialog.sales_panel = SalesPanel(tabs.tab("SDR IA"), self.logic.repository, lead_id)
+        if generate_ai:
+            tabs.set("SDR IA")
+            dialog.sales_panel.generate()
 
     def open_url(self, url):
         if not valid_url(url):
