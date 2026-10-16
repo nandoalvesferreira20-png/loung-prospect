@@ -10,9 +10,10 @@ from core.sales.models import OutreachStatus, SalesGeneration, validate_message
 
 
 class OutreachRepository:
-    def __init__(self, path=DEFAULT_DATABASE_PATH):
+    def __init__(self, path=DEFAULT_DATABASE_PATH, *, initialize=True):
         self.path = Path(path)
-        initialize_database(self.path)
+        if initialize:
+            initialize_database(self.path)
 
     def create(self, lead_id, result: SalesGeneration, *, provider=None, model=None):
         if not isinstance(result, SalesGeneration):
@@ -21,6 +22,9 @@ class OutreachRepository:
         with closing(connect_database(self.path)) as connection, connection:
             connection.execute("BEGIN IMMEDIATE")
             self._require_lead(connection, lead_id)
+            from core.sales.contact import blocked
+            if blocked(connection.execute("SELECT * FROM leads WHERE id = ?", (lead_id,)).fetchone()):
+                raise ValueError("Lead bloqueado para novas abordagens.")
             cursor = connection.execute(
                 "INSERT INTO outreach (lead_id, canal, mensagem, angulo, confianca, status, criado_em, atualizado_em, provider, model) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (lead_id, "whatsapp", result.mensagem, result.angulo, result.confianca, OutreachStatus.GENERATED.value, now, now, provider, model))
@@ -34,6 +38,10 @@ class OutreachRepository:
     def history(self, lead_id):
         with closing(connect_database(self.path)) as connection:
             return connection.execute("SELECT * FROM outreach WHERE lead_id = ? ORDER BY criado_em DESC, id DESC", (lead_id,)).fetchall()
+
+    def revisions(self, lead_id):
+        with closing(connect_database(self.path)) as connection:
+            return connection.execute("SELECT * FROM outreach_revisions WHERE lead_id = ? ORDER BY id DESC", (lead_id,)).fetchall()
 
     def update(self, lead_id, outreach_id, *, status, message=None):
         status = OutreachStatus(status)
@@ -50,6 +58,9 @@ class OutreachRepository:
                 raise ValueError("Abordagem não encontrada para este lead.")
             if row["status"] not in (OutreachStatus.GENERATED.value, OutreachStatus.EDITED.value):
                 raise ValueError("Versão encerrada. Gere outra abordagem para preservar o histórico.")
-            connection.execute("UPDATE outreach SET mensagem = ?, status = ?, atualizado_em = ?, aprovado_em = ? WHERE id = ? AND lead_id = ?",
+            connection.execute("INSERT INTO outreach_revisions (outreach_id, lead_id, mensagem, status, recorded_at) VALUES (?, ?, ?, ?, ?)",
+                (outreach_id, lead_id, row["mensagem"], row["status"], now))
+            connection.execute("UPDATE outreach SET mensagem = ?, status = ?, atualizado_em = ?, aprovado_em = ?, revisado_em = ? WHERE id = ? AND lead_id = ?",
                 (row["mensagem"] if status == OutreachStatus.CANCELLED else message, status.value, now,
-                 now if status == OutreachStatus.APPROVED else None, outreach_id, lead_id))
+                 now if status == OutreachStatus.APPROVED else None,
+                 row["revisado_em"] if status == OutreachStatus.CANCELLED else now, outreach_id, lead_id))

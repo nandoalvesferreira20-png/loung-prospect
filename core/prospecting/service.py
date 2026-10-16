@@ -127,6 +127,7 @@ def prospect(
     min_score=DEFAULT_MIN_SCORE,
     max_candidates_scanned=MAX_CANDIDATES_SCANNED,
     neighborhood=None,
+    stream_results=False,
 ):
     """
     Search, qualify and persist Google Places leads.
@@ -136,6 +137,10 @@ def prospect(
 
     The Excel export represents the current search result, while SQLite
     remains the persistent lead workspace.
+
+    stream_results is opt-in: consumers may supply an in-memory repository
+    and consume cancellable pages without collecting the entire search first.
+    The default desktop behavior is unchanged.
     """
 
     if (
@@ -204,8 +209,8 @@ def prospect(
                     f"Consultando Google Places: {build_query(city, segment, neighborhood)}…"
                 )
 
-            if only_without_website:
-                candidates = provider.iter_search(city=city, segment=segment, max_results=None, should_stop=cancelled, **search_context)
+            if only_without_website or stream_results:
+                candidates = provider.iter_search(city=city, segment=segment, max_results=None if only_without_website else limit, should_stop=cancelled, **search_context)
             else:
                 candidates = provider.search(city=city, segment=segment, max_results=limit, **search_context)
 
@@ -254,7 +259,7 @@ def prospect(
                 else 0
             )
 
-        if not only_without_website:
+        if not only_without_website and not stream_results:
             summary.received = len(candidates)
 
         if log:
@@ -336,7 +341,7 @@ def prospect(
                 page_log()
 
         for index, candidate in enumerate(
-            safe_candidates() if only_without_website else candidates,
+            safe_candidates() if only_without_website or stream_results else candidates,
             1,
         ):
             if cancelled():
@@ -346,6 +351,8 @@ def prospect(
             record = candidate_to_record(
                 candidate, website_evidence=only_without_website,
             )
+            if stream_results and not only_without_website:
+                summary.received += 1
             if only_without_website:
                 summary.received += 1
                 stats = summary.stats
@@ -527,7 +534,7 @@ def prospect(
             if progress:
                 progress(
                     summary.inserted if only_without_website else index,
-                    limit if only_without_website else summary.received,
+                    limit if only_without_website or stream_results else summary.received,
                 )
             if only_without_website and summary.inserted >= limit:
                 break
@@ -595,6 +602,15 @@ def prospect(
         return summary
 
     finally:
+        if stream_results:
+            summary.requests_made = provider.request_count if provider is not None else 0
+            summary.pages_fetched = getattr(provider, "pages_fetched", 0) if provider is not None else 0
+            summary.cancelled = summary.cancelled or cancelled()
+            if not only_without_website:
+                summary.stop_code = (ProspectingStopReason.CANCELLED if summary.cancelled else
+                    summary.stop_code or (ProspectingStopReason.TARGET_REACHED if summary.received >= limit else
+                                          ProspectingStopReason.SOURCE_EXHAUSTED))
+                summary.stop_reason = STOP_MESSAGES[summary.stop_code]
         if only_without_website:
             summary.requests_made = provider.request_count if provider is not None else 0
             summary.pages_fetched = getattr(provider, "pages_fetched", 0) if provider is not None else 0

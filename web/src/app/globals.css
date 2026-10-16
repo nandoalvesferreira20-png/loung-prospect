@@ -1,0 +1,80 @@
+@import "tailwindcss";
+@theme inline {
+  --color-background: #f6f8fc;
+  --color-foreground: #17243b;
+  --color-primary: #2563eb;
+  --color-primary-foreground: #ffffff;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-border: #e2e8f0;
+  --color-ring: #2563eb;
+}
+* {
+  border-color: var(--color-border);
+}
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button:not(:disabled),
+select:not(:disabled) {
+  cursor: pointer;
+}
+:focus-visible {
+  outline: 3px solid #93b4ff;
+  outline-offset: 3px;
+}
+::selection {
+  background: #dbeafe;
+}
+.field {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+input.field,
+select.field {
+  min-height: 42px;
+}
+textarea.field {
+  min-height: 256px;
+}
+.field:disabled {
+  background: #f8fafc;
+  color: #64748b;
+  cursor: not-allowed;
+}
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+}
+label.check-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+}
+label.check-label input {
+  width: 16px;
+  height: 16px;
+  accent-color: #2563eb;
+  flex-shrink: 0;
+}
+.label-help {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 400;
+  margin-top: 6px;
+}

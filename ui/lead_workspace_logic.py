@@ -2,7 +2,7 @@
 from urllib.parse import urlsplit
 
 from core.importers import import_leads_from_excel
-from core.commercial.values import STATUSES
+from core.commercial.values import STATUSES, commercial_status
 
 LIST_FIELDS = ("qualification_score", "empresa", "cidade", "segmento", "opportunity", "responsavel", "status")
 
@@ -32,7 +32,7 @@ def valid_url(value):
 
 
 def counts(rows):
-    statuses = [row["status"] for row in rows]
+    statuses = [commercial_status(row["status"]) for row in rows]
     return dict(total=len(rows), novos=statuses.count("Novo"),
                 contatados=statuses.count("Contatado") + statuses.count("Contato realizado"),
                 responderam=statuses.count("Respondeu") + statuses.count("Em conversa"),
@@ -48,11 +48,13 @@ class LeadWorkspace:
         self.repository = repository
 
     def list(self, *, status="", segmento="", responsavel="", score="", search=""):
-        filters = {key: value for key, value in (("status", status), ("segmento", segmento), ("responsavel", responsavel)) if value}
+        filters = {key: value for key, value in (("segmento", segmento), ("responsavel", responsavel)) if value}
         minimum = parse_min_score(score)
         if minimum is not None:
             filters["score_minimo"] = minimum
         rows = self.repository.list_leads(**filters)
+        if status:
+            rows = [row for row in rows if commercial_status(row["status"]) == commercial_status(status)]
         term = search.strip().casefold()
         return [row for row in rows if not term or any(term in str(row[field] or "").casefold() for field in ("empresa", "cidade"))]
 

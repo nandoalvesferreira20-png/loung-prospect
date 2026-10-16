@@ -123,6 +123,7 @@ def test_editable_copy_uses_current_text_and_inline_feedback():
 def test_generation_callback_only_reads_and_updates_text():
     row = {"empresa": "Restaurante Teste", "status": "Novo", "observacoes": "Manter"}
     panel = SimpleNamespace(load_lead=Mock(return_value=row), session=OutreachSession(),
+        has_pending_edits=Mock(return_value=False),
         selectors=[(Mock(get=Mock(return_value=x)), {x: x}) for x in ("whatsapp", "first_contact", "direct")],
         message=Mock(), another=Mock(), feedback=Mock())
     original = deepcopy(row)
@@ -133,7 +134,7 @@ def test_generation_callback_only_reads_and_updates_text():
 
 
 def test_missing_lead_preserves_edited_text():
-    panel = SimpleNamespace(load_lead=lambda: None, message=Mock(), feedback=Mock())
+    panel = SimpleNamespace(load_lead=lambda: None, message=Mock(), feedback=Mock(), has_pending_edits=Mock(return_value=False))
     OutreachPanel.generate(panel)
     panel.message.delete.assert_not_called()
     assert "não encontrado" in panel.feedback.configure.call_args.kwargs["text"]

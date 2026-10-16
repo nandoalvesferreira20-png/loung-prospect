@@ -9,11 +9,13 @@ import customtkinter as ctk
 from core.database import LeadRepository
 from ui.lead_workspace_logic import LeadWorkspace, STATUSES, counts, list_values, valid_url
 from ui.theme import COLORS, TYPOGRAPHY, SPACING
-from ui.components import heading, button, field, table, badge
+from ui.components import panel, heading, button, field, table, badge
 from ui.presentation import portfolio_values, priority_tone, status_tone, empty_copy
 from ui.commercial_logic import priority_label
 from ui.copy_field import add_copy_field
 from ui.commercial_panel import CommercialPanel
+from core.commercial.values import commercial_status
+from core.database.template_draft_repository import TemplateDraftRepository
 
 DETAILS = {"empresa": "Empresa", "cidade": "Cidade", "segmento": "Segmento", "telefone": "Telefone",
            "whatsapp": "WhatsApp", "email": "Email", "site": "Site", "endereco": "Endereço",
@@ -30,6 +32,7 @@ class LeadWorkspacePage(ctk.CTkFrame):
         self.pending = queue.Queue()
         self.importing = False
         self.poll_job = None
+        self.detail_dialog = None
         heading(self, "Carteira de Leads", "Gerencie e acompanhe sua operação comercial.")
         self.summary = ctk.CTkLabel(self, text="", font=TYPOGRAPHY["secondary"], text_color=COLORS["text_secondary"])
         self.summary.pack(anchor="w", padx=28, pady=(0, 12))
@@ -38,12 +41,13 @@ class LeadWorkspacePage(ctk.CTkFrame):
         self.import_button = button(actions, "Importar planilha", self.import_file, kind="primary")
         self.import_button.pack(side="left", padx=(0, 8))
         button(actions, "Atualizar lista", self.refresh).pack(side="left")
-        button(actions, "Gerar abordagem com IA", self.generate_sales).pack(side="left", padx=8)
-        form = ctk.CTkFrame(self, fg_color="transparent")
+        button(actions, "Abrir abordagem com IA", self.generate_sales).pack(side="left", padx=8)
+        button(actions, "Abrir lead", self.detail, kind="primary", width=100).pack(side="left")
+        form = panel(self)
         form.pack(fill="x", padx=28, pady=(0, 4))
         self.filters = {}
         search_cell = ctk.CTkFrame(form, fg_color="transparent")
-        search_cell.grid(row=0, column=0, columnspan=3, sticky="ew", padx=(0, 12), pady=(0, 12))
+        search_cell.grid(row=0, column=0, columnspan=3, sticky="ew", padx=12, pady=12)
         self.filters["search"] = field(search_cell, "Buscar empresa ou cidade", placeholder_text="Digite para filtrar")
         button(form, "Aplicar filtros", self.refresh, width=120).grid(row=0, column=3, sticky="sew", pady=(0, 12), padx=(0, 8))
         button(form, "Limpar", self.clear_filters, kind="ghost", width=80).grid(row=0, column=4, sticky="sew", pady=(0, 12))
@@ -53,13 +57,14 @@ class LeadWorkspacePage(ctk.CTkFrame):
             cell.grid(row=1, column=col, columnspan=2 if col == 3 else 1, sticky="ew", padx=(0, 12 if col < 3 else 0), pady=(0, 8))
             self.filters[key] = field(cell, label, options=["", *STATUSES] if key == "status" else None, width=110)
         self.filters["search"].bind("<Return>", lambda event: self.refresh())
-        self.notice = ctk.CTkLabel(self, text="Selecione um lead para abrir os detalhes.", text_color=COLORS["muted"], font=TYPOGRAPHY["caption"])
+        self.notice = ctk.CTkLabel(self, text="Selecione um lead e use Abrir lead, duplo clique ou Enter. Arraste a barra horizontal para outras colunas.", text_color=COLORS["muted"], font=TYPOGRAPHY["caption"])
         self.notice.pack(anchor="w", padx=28, pady=(0, 8))
         table_frame = ctk.CTkFrame(self, fg_color="transparent")
         table_frame.pack(fill="both", expand=True, padx=28, pady=(0, 24))
-        columns = ("Empresa", "Score", "Prioridade", "Cidade", "Segmento", "Responsável", "Status", "Próximo contato")
-        self.table = table(table_frame, columns, {"Empresa": 230, "Score": 65, "Prioridade": 85, "Status": 150, "Próximo contato": 150})
-        self.table.bind("<<TreeviewSelect>>", self.detail)
+        columns = ("Empresa", "Etapa", "Próximo contato", "Prioridade", "Score", "Cidade", "Segmento", "Responsável")
+        self.table = table(table_frame, columns, {"Empresa": 220, "Etapa": 150, "Próximo contato": 155, "Prioridade": 85, "Score": 65})
+        self.table.bind("<Double-1>", self.detail)
+        self.table.bind("<Return>", self.detail)
         self.refresh()
 
     def refresh(self):
@@ -68,7 +73,7 @@ class LeadWorkspacePage(ctk.CTkFrame):
             stats = counts(self.logic.repository.list_leads())
             self.summary.configure(text=f"Total: {stats['total']} · Novos: {stats['novos']} · Contatados: {stats['contatados']} · Responderam: {stats['responderam']} · Reunião: {stats['reuniao']}")
             self.table.delete(*self.table.get_children())
-            self.notice.configure(text=empty_copy("portfolio", bool(rows)) or f"{len(rows)} leads nesta seleção · selecione para abrir")
+            self.notice.configure(text=empty_copy("portfolio", bool(rows)) or f"{len(rows)} leads · selecione e use Abrir lead, duplo clique ou Enter · outras colunas na barra horizontal")
             for index, row in enumerate(rows):
                 self.table.insert("", "end", iid=str(row["id"]), values=portfolio_values(row), tags=("alternate",) if index % 2 else ())
         except Exception as error:
@@ -133,14 +138,23 @@ class LeadWorkspacePage(ctk.CTkFrame):
             return
         self.open_detail(int(selection[0]))
 
+    def can_leave(self):
+        dialog = self.detail_dialog
+        if dialog is not None and dialog.winfo_exists():
+            return dialog.close_detail()
+        return True
+
     def generate_sales(self):
         selection = self.table.selection()
         if not selection:
-            self.notice.configure(text="Selecione um lead para gerar a abordagem.")
+            self.notice.configure(text="Selecione um lead para abrir a abordagem com IA.")
             return
         self.open_detail(int(selection[0]), generate_ai=True)
 
     def open_detail(self, lead_id, generate_ai=False):
+        if self.detail_dialog is not None and self.detail_dialog.winfo_exists():
+            if not self.detail_dialog.close_detail():
+                return
         try:
             row = self.logic.repository.get_lead(lead_id)
             if row is None:
@@ -149,6 +163,7 @@ class LeadWorkspacePage(ctk.CTkFrame):
             messagebox.showerror("Lead", str(error), parent=self)
             return
         dialog = ctk.CTkToplevel(self)
+        self.detail_dialog = dialog
         dialog.title("Detalhes do lead")
         dialog.geometry(f"780x{min(730, dialog.winfo_screenheight() - 120)}")
         dialog.transient(self.winfo_toplevel())
@@ -161,10 +176,10 @@ class LeadWorkspacePage(ctk.CTkFrame):
         chips.pack(fill="x", pady=(8, 0))
         badge(chips, f"Score {row['qualification_score'] if row['qualification_score'] is not None else '—'}").pack(side="left", padx=(0, 8))
         badge(chips, priority_label(row["qualification_score"]), priority_tone(row["qualification_score"])).pack(side="left", padx=(0, 8))
-        badge(chips, row["status"], status_tone(row["status"])).pack(side="left")
+        badge(chips, commercial_status(row["status"]), status_tone(row["status"])).pack(side="left")
         tabs = ctk.CTkTabview(dialog)
         tabs.pack(fill="both", expand=True, padx=16, pady=16)
-        for name in ("Dados", "Comercial", "Histórico", "Abordagem", "SDR IA"):
+        for name in ("Dados", "Comercial", "Histórico", "Por modelo", "Com IA"):
             tabs.add(name)
         body = ctk.CTkScrollableFrame(tabs.tab("Dados"))
         body.pack(fill="both", expand=True)
@@ -181,14 +196,27 @@ class LeadWorkspacePage(ctk.CTkFrame):
         dialog.commercial_panel = CommercialPanel(commercial, tabs.tab("Histórico"),
             self.logic.repository, row["id"], self.refresh)
         from ui.outreach_panel import OutreachPanel
-        dialog.outreach_panel = OutreachPanel(tabs.tab("Abordagem"),
-            lambda: self.logic.repository.get_lead(lead_id))
+        dialog.outreach_panel = OutreachPanel(tabs.tab("Por modelo"),
+            lambda: self.logic.repository.get_lead(lead_id),
+            TemplateDraftRepository(self.logic.repository.path), lead_id)
         tabs.set("Comercial")
         from ui.sales_panel import SalesPanel
-        dialog.sales_panel = SalesPanel(tabs.tab("SDR IA"), self.logic.repository, lead_id)
+        dialog.sales_panel = SalesPanel(tabs.tab("Com IA"), self.logic.repository, lead_id)
+        def close_detail():
+            for tab, confirm in (("Comercial", dialog.commercial_panel.confirm_pending),
+                                  ("Por modelo", dialog.outreach_panel.confirm_pending),
+                                  ("Com IA", dialog.sales_panel.confirm_discard)):
+                tabs.set(tab)
+                if not confirm():
+                    return False
+            dialog.destroy()
+            self.detail_dialog = None
+            return True
+        dialog.close_detail = close_detail
+        dialog.protocol("WM_DELETE_WINDOW", close_detail)
         if generate_ai:
-            tabs.set("SDR IA")
-            dialog.sales_panel.generate()
+            tabs.set("Com IA")
+            # Opening an editor is separate from explicitly requesting generation.
 
     def open_url(self, url):
         if not valid_url(url):

@@ -51,6 +51,11 @@ CREATE TABLE IF NOT EXISTS leads (
 
 
 MIGRATION_COLUMNS = {
+    "whatsapp_consent": "TEXT NOT NULL DEFAULT 'Desconhecido'",
+    "consent_source": "TEXT",
+    "consent_at": "TEXT",
+    "consent_number": "TEXT",
+    "do_not_contact": "INTEGER NOT NULL DEFAULT 0",
     "provider": "TEXT",
     "provider_place_id": "TEXT",
     "quantidade_avaliacoes": "INTEGER",
@@ -128,8 +133,19 @@ def initialize_database(
                 )
             connection.execute(INTERACTIONS_SCHEMA)
             connection.execute(OUTREACH_SCHEMA)
+            connection.execute("""CREATE TABLE IF NOT EXISTS lead_contact_preferences (
+                lead_id INTEGER PRIMARY KEY, contact_type TEXT NOT NULL CHECK
+                (contact_type IN ('recepcao_equipe', 'contato_direto', 'indefinido')),
+                updated_at TEXT NOT NULL)""")
+            connection.execute("""CREATE TABLE IF NOT EXISTS template_drafts (
+                lead_id INTEGER PRIMARY KEY, message TEXT NOT NULL, channel TEXT NOT NULL,
+                objective TEXT NOT NULL, tone TEXT NOT NULL, updated_at TEXT NOT NULL)""")
+            connection.execute("""CREATE TABLE IF NOT EXISTS outreach_revisions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, outreach_id INTEGER NOT NULL,
+                lead_id INTEGER NOT NULL, mensagem TEXT NOT NULL, status TEXT NOT NULL,
+                recorded_at TEXT NOT NULL)""")
             outreach_columns = {row[1] for row in connection.execute("PRAGMA table_info(outreach)")}
-            for column in ("provider", "model"):
+            for column in ("provider", "model", "revisado_em"):
                 if column not in outreach_columns:
                     connection.execute(f"ALTER TABLE outreach ADD COLUMN {column} TEXT")
             connection.execute("CREATE INDEX IF NOT EXISTS idx_outreach_lead_time ON outreach(lead_id, criado_em DESC, id DESC)")

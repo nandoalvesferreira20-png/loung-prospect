@@ -1,22 +1,25 @@
 """Loung Prospect desktop design tokens. No external assets or fonts."""
 COLORS = {
-    "background": "#080B12", "surface": "#0F1420", "surface_secondary": "#131A27",
-    "surface_hover": "#1C2839", "sidebar": "#0B1019", "border": "#263247",
-    "primary": "#2864DC", "primary_hover": "#3375ED", "accent": "#85B5FF",
-    "text_primary": "#F8FAFC", "text_secondary": "#B0BDCF", "text_muted": "#94A3B8",
+    "background": "#090E18", "surface": "#151F30", "surface_secondary": "#19263A",
+    "surface_hover": "#1C2839", "sidebar": "#0B1220", "border": "#263246",
+    "primary": "#2563EB", "primary_hover": "#1D4ED8", "accent": "#85B5FF",
+    "text_primary": "#F8FAFC", "text_secondary": "#94A3B8", "text_muted": "#94A3B8",
     "success": "#7CCDA6", "warning": "#E6BD73", "danger": "#F0969D",
     "danger_surface": "#362028", "danger_hover": "#4C2932", "selected": "#1D3558",
     "disabled": "#8C99AC", "success_surface": "#183029", "warning_surface": "#30291E",
+    "info": "#85B5FF", "draft": "#C4B5FD", "draft_surface": "#302640",
 }
+COLORS.update(bg_base=COLORS["background"], bg_surface=COLORS["surface"], bg_elevated=COLORS["surface_secondary"])
 COLORS.update(bg=COLORS["background"], card=COLORS["surface"], card_light=COLORS["surface_secondary"],
               text=COLORS["text_primary"], muted=COLORS["text_muted"])
-SPACING = dict(xs=4, sm=8, md=12, lg=16, xl=24, page=28, section=20)
-RADIUS = dict(control=6, surface=8, badge=4)
+SPACING = dict(xs=4, sm=8, md=12, lg=16, xl=24, xxl=32, page=28, section=20)
+RADIUS = dict(control=8, surface=12, badge=6)
 FONT = "Segoe UI"
 TYPOGRAPHY = {"title": (FONT, 28, "bold"), "section": (FONT, 17, "bold"),
               "value": (FONT, 28, "bold"), "body": (FONT, 14), "secondary": (FONT, 13),
-              "caption": (FONT, 12), "button": (FONT, 13, "bold"), "console": ("Consolas", 12)}
-SIZES = dict(sidebar=216, control=36, row=36, progress=5, page_min=1050)
+              "caption": (FONT, 12), "button": (FONT, 13, "bold"), "console": ("Consolas", 12), "kpi": (FONT, 24, "bold"),
+              "lead_title": (FONT, 22, "bold"), "list_title": (FONT, 14, "bold"), "message": (FONT, 15)}
+SIZES = dict(sidebar=216, control=40, row=44, progress=5, page_min=1100)
 
 
 def install_theme():

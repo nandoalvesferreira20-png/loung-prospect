@@ -442,7 +442,7 @@ def test_environment_loader_is_shared_and_does_not_override(
     environment.load_environment()
 
     loader.assert_called_once_with(
-        tmp_path / ".env",
+        dotenv_path=tmp_path / ".env",
         override=False,
         interpolate=False,
     )

@@ -8,7 +8,7 @@ from core.database import LeadRepository
 from core.commercial.day import get_my_day
 from ui.commercial_logic import parse_reference_date, day_values
 from ui.theme import COLORS, TYPOGRAPHY
-from ui.components import heading, field, button, MetricStrip, table
+from ui.components import panel, heading, field, button, MetricStrip, table
 from ui.presentation import empty_copy
 
 
@@ -17,11 +17,11 @@ class MyDayPage(ctk.CTkFrame):
         super().__init__(master, fg_color=COLORS["bg"])
         self.repository = repository if repository is not None else LeadRepository()
         self.on_open = on_open
-        heading(self, "Meu Dia", "Organize seus contatos e mantenha o pipeline em movimento.")
+        heading(self, "Meu Dia", "Sua central de atividades: retornos, reuniões e próximos passos registrados.")
         self.metrics = MetricStrip(self, (("atrasados", "ATRASADOS", "warning"), ("hoje", "HOJE", "accent"),
             ("novos", "NOVOS", "text"), ("reunioes", "REUNIÕES", "text"), ("propostas", "PROPOSTAS", "text")))
         self.metrics.pack(fill="x", padx=28, pady=(0, 20))
-        form = ctk.CTkFrame(self, fg_color="transparent")
+        form = panel(self)
         form.pack(fill="x", padx=28, pady=(0, 8))
         for col in (0, 1):
             form.grid_columnconfigure(col, weight=1)
@@ -40,8 +40,8 @@ class MyDayPage(ctk.CTkFrame):
         ctk.CTkLabel(actions, text="ou dê um duplo clique na linha", text_color=COLORS["muted"], font=TYPOGRAPHY["caption"]).pack(side="left", padx=12)
         frame = ctk.CTkFrame(self, fg_color="transparent")
         frame.pack(fill="both", expand=True, padx=28, pady=(0, 24))
-        columns = ("Empresa", "Responsável", "Status", "Score", "Prioridade", "Próxima ação", "Próximo contato")
-        self.table = table(frame, columns, {"Empresa": 230, "Score": 65, "Prioridade": 85, "Próxima ação": 230, "Próximo contato": 160})
+        columns = ("Empresa", "Responsável", "Etapa", "Score", "Prioridade", "Próxima ação", "Próximo contato")
+        self.table = table(frame, columns, {"Empresa": 230, "Score": 65, "Prioridade": 85, "Próxima ação": 230, "Próximo contato": 160}, compact_columns=("Empresa", "Etapa", "Próxima ação", "Próximo contato"))
         self.table.bind("<Double-1>", self.open_selected)
         self.table.bind("<Return>", self.open_selected)
         self.refresh()

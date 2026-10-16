@@ -23,10 +23,10 @@ from ui.places_logic import (
     summary_text,
 )
 from ui.theme import COLORS, TYPOGRAPHY, SIZES
-from ui.components import heading, field, button, MetricStrip
+from ui.components import panel, heading, field, button, MetricStrip
 
 
-class PlacesSearchPage(ctk.CTkFrame):
+class PlacesSearchPage(ctk.CTkScrollableFrame):
     def __init__(self, master, on_workspace=None):
         super().__init__(master, fg_color=COLORS["bg"])
         self.running = False
@@ -35,13 +35,13 @@ class PlacesSearchPage(ctk.CTkFrame):
         self.poll_job = None
         self.last_exported_file = None
         heading(self, "Prospecção", "Encontre e qualifique novos leads para sua carteira.")
-        form = ctk.CTkFrame(self, fg_color="transparent")
+        form = panel(self)
         form.pack(fill="x", padx=28, pady=(0, 16))
         self.entries = {}
         for column, (name, label, default) in enumerate((("city", "Cidade", ""), ("neighborhood", "Bairro (opcional)", ""), ("segment", "Segmento", ""), ("quantity", "Quantidade · até 100", "5"))):
-            form.grid_columnconfigure(column, weight=1, uniform="inputs")
+            form.grid_columnconfigure(column % 2, weight=1, uniform="inputs")
             cell = ctk.CTkFrame(form, fg_color="transparent")
-            cell.grid(row=0, column=column, sticky="ew", padx=(0 if column == 0 else 12, 0))
+            cell.grid(row=column // 2, column=column % 2, sticky="ew", padx=12, pady=12)
             if name == "quantity":
                 self.quantity_label = ctk.CTkLabel(cell, text="Meta de leads sem site próprio · até 100", font=TYPOGRAPHY["secondary"])
                 self.quantity_label.pack(anchor="w", pady=(0, 5))
@@ -53,16 +53,16 @@ class PlacesSearchPage(ctk.CTkFrame):
         actions = ctk.CTkFrame(self, fg_color="transparent")
         self.no_website_switch = ctk.CTkSwitch(form, text="Sem site próprio", command=self.update_target_label)
         self.no_website_switch.select()
-        self.no_website_switch.grid(row=1, column=0, columnspan=3, sticky="w", pady=12)
+        self.no_website_switch.grid(row=2, column=0, sticky="w", padx=12, pady=12)
         score_cell = ctk.CTkFrame(form, fg_color="transparent")
-        score_cell.grid(row=1, column=3, sticky="ew", padx=(12, 0), pady=12)
+        score_cell.grid(row=2, column=1, sticky="ew", padx=(12, 0), pady=12)
         self.min_score = field(score_cell, "Score mínimo · modo sem site", value=str(DEFAULT_MIN_SCORE))
         self.target_hint = ctk.CTkLabel(form, text="Inclui redes sociais e plataformas externas. Busca até a meta, fim dos resultados ou limite de segurança.", text_color=COLORS["muted"], wraplength=850)
-        self.target_hint.grid(row=2, column=0, columnspan=4, sticky="w")
+        self.target_hint.grid(row=3, column=0, columnspan=2, sticky="ew", padx=12, pady=(0, 12))
         actions.pack(fill="x", padx=28, pady=(0, 16))
         self.start_button = button(actions, "Buscar leads", self.start, kind="primary")
         self.start_button.pack(side="left", padx=(0, 8))
-        self.cancel_button = button(actions, "Cancelar", self.cancel, kind="danger", state="disabled", width=100)
+        self.cancel_button = button(actions, "Cancelar", self.cancel, kind="secondary", state="disabled", width=100)
         self.cancel_button.pack(side="left", padx=(0, 16))
         self.export_var = ctk.BooleanVar(value=True)
         self.export_checkbox = ctk.CTkCheckBox(actions, text="Exportar Excel ao finalizar", variable=self.export_var)
@@ -83,7 +83,7 @@ class PlacesSearchPage(ctk.CTkFrame):
         self.open_excel_button = button(links, "Abrir Excel", self.open_last_excel, state="disabled", width=110)
         self.open_folder_button = button(links, "Abrir pasta", self.open_last_folder, state="disabled", width=110)
         ctk.CTkLabel(self, text="ATIVIDADE DA BUSCA", font=TYPOGRAPHY["caption"], text_color=COLORS["muted"]).pack(anchor="w", padx=28, pady=(4, 8))
-        self.output = ctk.CTkTextbox(self, font=TYPOGRAPHY["console"], fg_color=COLORS["sidebar"], height=130)
+        self.output = ctk.CTkTextbox(self, font=TYPOGRAPHY["console"], fg_color=COLORS["sidebar"], height=90)
         self.output.pack(fill="both", expand=True, padx=28, pady=(0, 24))
         self.output.configure(state="disabled")
 
@@ -548,6 +548,12 @@ class PlacesSearchPage(ctk.CTkFrame):
                 "atual terminar."
             )
         )
+
+    def can_leave(self):
+        if self.running:
+            messagebox.showinfo("Busca em andamento", "Cancele a busca e aguarde a conclusão antes de sair.", parent=self)
+            return False
+        return True
 
     def destroy(self):
         self.cancel_event.set()

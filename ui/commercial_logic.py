@@ -2,7 +2,7 @@
 from datetime import datetime, timezone
 
 from core.commercial.service import CommercialService
-from core.commercial.values import required_text
+from core.commercial.values import required_text, commercial_status
 from core.qualification.rules import classify_priority
 
 
@@ -44,7 +44,7 @@ def priority_label(score):
 
 
 def day_values(row):
-    return (row["empresa"], row["responsavel"] or "", row["status"],
+    return (row["empresa"], row["responsavel"] or "", commercial_status(row["status"]),
             row["qualification_score"] if row["qualification_score"] is not None else "",
             priority_label(row["qualification_score"]), row["proxima_acao"] or "",
             format_date(row["proximo_contato"]))

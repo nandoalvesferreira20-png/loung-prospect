@@ -2,7 +2,8 @@
 from tkinter import messagebox
 import customtkinter as ctk
 
-from core.commercial.values import STATUSES, CHANNELS, INTERACTION_TYPES
+from core.commercial.values import STATUSES, CHANNELS, INTERACTION_TYPES, commercial_status, status_options
+from ui.pending_edits import resolve_pending
 from ui.commercial_logic import CommercialLead, format_date, history_text
 from ui.theme import COLORS, TYPOGRAPHY
 from ui.components import field, button, section_label
@@ -20,7 +21,7 @@ class CommercialPanel:
         form.pack(fill="x")
         for column in (0, 1):
             form.grid_columnconfigure(column, weight=1, uniform="commercial")
-        for index, (key, label, options) in enumerate((("status", "Status", STATUSES), ("responsavel", "Responsável", None),
+        for index, (key, label, options) in enumerate((("status", "Etapa comercial", STATUSES), ("responsavel", "Responsável", None),
                 ("canal_preferencial", "Canal preferencial", ("", *CHANNELS)),
                 ("proximo_contato", "Próximo contato · dd/mm/aaaa HH:MM", None))):
             cell = ctk.CTkFrame(form, fg_color="transparent")
@@ -53,7 +54,20 @@ class CommercialPanel:
                 widget.insert(0, text)
         self.notes.delete("1.0", "end")
         self.notes.insert("1.0", row["observacoes"] or "")
+        self.entries["status"].configure(values=status_options(row["status"]))
+        self.entries["status"].set(commercial_status(row["status"]))
+        self.saved_values = self.values()
         self.refresh_history()
+
+    def values(self):
+        return dict(**{key: widget.get() for key, widget in self.entries.items()},
+                    observacoes=self.notes.get("1.0", "end-1c"))
+
+    def has_pending_edits(self):
+        return self.values() != self.saved_values
+
+    def confirm_pending(self):
+        return not self.has_pending_edits() or resolve_pending(self.parent, "Dados comerciais", self.save)
 
     def refresh_history(self):
         row = self.logic.load()
@@ -67,10 +81,14 @@ class CommercialPanel:
         try:
             self.logic.save(**{key: widget.get() for key, widget in self.entries.items()},
                             observacoes=self.notes.get("1.0", "end-1c"))
+            self.saved_values = dict(**{key: widget.get() for key, widget in self.entries.items()},
+                                     observacoes=self.notes.get("1.0", "end-1c"))
             self.feedback.configure(text="Alterações salvas.")
             self.on_change()
+            return True
         except Exception as error:
             messagebox.showerror("Salvar lead", str(error), parent=self.parent)
+            return False
 
     def new_interaction(self):
         row = self.logic.load()
@@ -126,10 +144,12 @@ class CommercialPanel:
                         widget = self.entries[key]
                         text = format_date(saved[key]) if key == "proximo_contato" else saved[key] or ""
                         if key == "status":
+                            text = commercial_status(text)
                             widget.set(text)
                         else:
                             widget.delete(0, "end")
                             widget.insert(0, text)
+                        self.saved_values[key] = text
                 self.feedback.configure(text="Interação registrada.")
                 self.on_change()
             except Exception as error:

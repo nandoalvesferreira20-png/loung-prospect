@@ -7,7 +7,7 @@ import customtkinter as ctk
 from core.prototype.preview import get_preview_path, open_preview
 from ui.prototype_logic import PrototypeSession
 from ui.theme import COLORS, FONT, TYPOGRAPHY
-from ui.components import heading, field, button, section_label
+from ui.components import panel, heading, field, button, section_label
 
 
 class PrototypeStudioPage(ctk.CTkScrollableFrame):
@@ -16,8 +16,9 @@ class PrototypeStudioPage(ctk.CTkScrollableFrame):
         self.session = session if session is not None else PrototypeSession()
         self.template_ids = {}
         self.entries = {}
-        heading(self, "Prototype Studio", "Crie uma apresentação local a partir dos dados do lead.")
-        form = ctk.CTkFrame(self, fg_color="transparent")
+        heading(self, "Prototype Studio", "Dados do lead → template → protótipo local. Você decide quando gerar.")
+        section_label(self, "01  Dados do projeto")
+        form = panel(self)
         form.pack(fill="x", padx=28)
         for column in (0, 1):
             form.grid_columnconfigure(column, weight=1, uniform="prototype")
@@ -26,7 +27,7 @@ class PrototypeStudioPage(ctk.CTkScrollableFrame):
                 ("address", "Endereço"), ("current_website", "Site atual"),
                 ("qualification_score", "Score · opcional, 0–100"))):
             cell = ctk.CTkFrame(form, fg_color="transparent")
-            cell.grid(row=index // 2, column=index % 2, sticky="ew", padx=(0, 12), pady=(0, 12))
+            cell.grid(row=index // 2, column=index % 2, sticky="ew", padx=12, pady=12)
             self.entries[key] = field(cell, label)
         output = ctk.CTkFrame(self, fg_color="transparent")
         output.pack(fill="x", padx=28, pady=(8, 16))
@@ -34,7 +35,7 @@ class PrototypeStudioPage(ctk.CTkScrollableFrame):
         button(output, "Escolher pasta", self.choose_directory, kind="ghost").pack(anchor="w", pady=(8, 0))
         templates = ctk.CTkFrame(self, fg_color="transparent")
         templates.pack(fill="x", padx=28, pady=(0, 16))
-        section_label(templates, "Template")
+        section_label(templates, "02  Escolha o template")
         button(templates, "Carregar templates", self.load_templates).pack(anchor="w", pady=(0, 8))
         self.templates = ctk.CTkComboBox(templates, values=["Carregue os templates"], state="disabled", height=36)
         self.templates.set("Carregue os templates")

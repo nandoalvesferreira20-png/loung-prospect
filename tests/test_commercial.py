@@ -229,7 +229,7 @@ def test_modal_controller_history_and_partial_followup(repo, lead):
 
 
 def test_constants_and_validation():
-    assert len(STATUSES) == 10 and "Contato realizado" in STATUSES
+    assert "Contato realizado" in STATUSES and "Não contatar" in STATUSES
     with pytest.raises(ValueError):
         interaction_values(tipo="", canal="", descricao="")
     assert interaction_values(tipo="Outro", canal="", descricao="")["canal"] is None

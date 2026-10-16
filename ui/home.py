@@ -1,5 +1,6 @@
 # ui/home.py
 
+import queue
 import threading
 import time
 from tkinter import messagebox
@@ -10,10 +11,10 @@ from core.scraper import run_scraper
 from core.lead_filter import DEFAULT_MIN_SCORE
 from ui.dialogs import show_finish_dialog
 from ui.theme import COLORS, TYPOGRAPHY, SIZES
-from ui.components import heading, field, button
+from ui.components import panel, heading, field, button
 
 
-class HomePage(ctk.CTkFrame):
+class HomePage(ctk.CTkScrollableFrame):
     def __init__(self, master):
         super().__init__(master, fg_color=COLORS["bg"])
 
@@ -21,12 +22,16 @@ class HomePage(ctk.CTkFrame):
         self.stop_requested = False
         self.start_time = None
         self.timer_job = None
+        self.pending = queue.Queue()
+        self.poll_job = None
+        self.closed = False
 
         self.build_ui()
+        self.poll_job = self.after(50, self.poll_events)
 
     def build_ui(self):
         heading(self, "Busca legada", "Prospecção pelo navegador, com exportação para Excel.")
-        form = ctk.CTkFrame(self, fg_color="transparent")
+        form = panel(self)
         form.pack(fill="x", padx=28, pady=(0, 12))
         for col in range(2):
             form.grid_columnconfigure(col, weight=1, uniform="fields")
@@ -34,13 +39,13 @@ class HomePage(ctk.CTkFrame):
                 ("segmentos", "Segmentos · separados por vírgula", "clínica odontológica"),
                 ("quantidade", "Quantidade · meta total no modo sem site", "5"), ("output", "Arquivo de saída", "exports/leads_loungtech.xlsx"))):
             cell = ctk.CTkFrame(form, fg_color="transparent")
-            cell.grid(row=index // 2, column=index % 2, sticky="ew", padx=(0, 12), pady=(0, 12))
+            cell.grid(row=index // 2, column=index % 2, sticky="ew", padx=12, pady=12)
             setattr(self, name, field(cell, label, value=value))
         self.no_website_switch = ctk.CTkSwitch(form, text="Sem site próprio · exige qualificação")
         self.no_website_switch.select()
         self.no_website_switch.grid(row=3, column=0, columnspan=2, sticky="w", pady=(0, 12))
         score_cell = ctk.CTkFrame(form, fg_color="transparent")
-        score_cell.grid(row=4, column=0, sticky="ew", padx=(0, 12), pady=(0, 12))
+        score_cell.grid(row=4, column=0, sticky="ew", padx=12, pady=12)
         self.min_score = field(score_cell, "Score mínimo · modo sem site", value=str(DEFAULT_MIN_SCORE))
         self.qualification_switch = ctk.CTkSwitch(form, text="Qualificar leads automaticamente")
         self.qualification_switch.deselect()
@@ -49,7 +54,7 @@ class HomePage(ctk.CTkFrame):
         actions.pack(fill="x", padx=28, pady=(0, 16))
         self.start_btn = button(actions, "Iniciar busca", self.start_search, kind="primary")
         self.start_btn.pack(side="left", padx=(0, 8))
-        self.stop_btn = button(actions, "Parar", self.stop_search, kind="danger", state="disabled", width=100)
+        self.stop_btn = button(actions, "Parar", self.stop_search, kind="secondary", state="disabled", width=100)
         self.stop_btn.pack(side="left")
         progress_row = ctk.CTkFrame(self, fg_color="transparent")
         progress_row.pack(fill="x", padx=28)
@@ -65,16 +70,35 @@ class HomePage(ctk.CTkFrame):
         self.log("Pronto para iniciar.")
 
     def log(self, text):
-        """
-        Pode ser chamado pela thread do scraper.
-        A atualização visual é enviada para a thread principal.
-        """
+        self.pending.put(("log", (str(text),)))
 
-        self.after(
-            0,
-            self._append_log,
-            str(text)
-        )
+    def poll_events(self):
+        self.poll_job = None
+        if self.closed:
+            return
+        handlers = {"log": self._append_log, "progress": self._apply_progress,
+                    "finish": self.finish_search, "error": self.handle_error}
+        for _ in range(50):
+            try:
+                kind, values = self.pending.get_nowait()
+            except queue.Empty:
+                break
+            handlers[kind](*values)
+        self.poll_job = self.after(50, self.poll_events)
+
+    def can_leave(self):
+        if self.running:
+            messagebox.showinfo("Busca em andamento", "Pare a busca e aguarde a conclusão antes de sair.", parent=self)
+            return False
+        return True
+
+    def destroy(self):
+        self.closed = True
+        self.stop_requested = True
+        self.stop_timer()
+        if self.poll_job is not None:
+            self.after_cancel(self.poll_job)
+        super().destroy()
 
     def _append_log(self, text):
         self.logs.insert(
@@ -255,22 +279,14 @@ class HomePage(ctk.CTkFrame):
                 min_score=min_score,
             )
 
-            self.after(
-                0,
-                self.finish_search,
-                summary
-            )
+            self.pending.put(("finish", (summary,)))
 
         except Exception as error:
             self.log(
                 f"❌ Erro inesperado: {error}"
             )
 
-            self.after(
-                0,
-                self.handle_error,
-                str(error)
-            )
+            self.pending.put(("error", (str(error),)))
 
     # ==================================================
     # Progresso
@@ -286,13 +302,7 @@ class HomePage(ctk.CTkFrame):
         Callback chamado pelo scraper.
         """
 
-        self.after(
-            0,
-            self._apply_progress,
-            processed,
-            total,
-            message
-        )
+        self.pending.put(("progress", (processed, total, message)))
 
     def _apply_progress(
         self,

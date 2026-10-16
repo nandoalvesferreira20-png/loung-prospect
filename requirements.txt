@@ -3,3 +3,4 @@ playwright
 pandas
 openpyxl
 python-dotenv>=1,<2
+groq>=0.31,<1

@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from datetime import date, datetime
 
-from .values import TERMINAL_STATUSES
+from .values import TERMINAL_STATUSES, commercial_status
 
 
 @dataclass
@@ -23,6 +23,7 @@ def build_day(rows, reference: date, *, tz=None):
     invalid_dates = 0
     for source in rows:
         row = dict(source)
+        row["status"] = commercial_status(row["status"])
         due = None
         if row.get("proximo_contato"):
             try:

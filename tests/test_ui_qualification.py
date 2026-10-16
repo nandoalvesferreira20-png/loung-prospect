@@ -10,7 +10,7 @@ from core.qualification.models import QualificationResult
 
 
 def fake_home():
-    page = SimpleNamespace(running=False, stop_requested=False)
+    page = SimpleNamespace(running=False, stop_requested=False, pending=Mock())
     for name in ("cidades", "segmentos", "quantidade", "output", "qualification_switch", "no_website_switch", "min_score",
                  "progress", "progress_label", "timer_label", "start_btn", "stop_btn"):
         setattr(page, name, Mock())

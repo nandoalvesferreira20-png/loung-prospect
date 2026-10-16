@@ -3,8 +3,22 @@ from datetime import datetime, timezone
 
 STATUSES = ("Novo", "Contato realizado", "Em conversa", "Reunião agendada",
             "Proposta enviada", "Fechado", "Não respondeu", "Retornar depois",
-            "Sem interesse", "Perdido")
-TERMINAL_STATUSES = frozenset(("Fechado", "Sem interesse", "Perdido"))
+            "Sem interesse", "Perdido", "Interessado", "Não contatar")
+TERMINAL_STATUSES = frozenset(("Fechado", "Sem interesse", "Perdido", "Não contatar"))
+# Read compatibility only: opening a screen never rewrites saved legacy values.
+STATUS_ALIASES = {"Novo Lead": "Novo", "Mensagem gerada": "Novo", "Revisado": "Novo",
+                  "Contatado": "Contato realizado", "Respondeu": "Em conversa",
+                  "Reunião": "Reunião agendada", "Reunião marcada": "Reunião agendada",
+                  "Não interessado": "Sem interesse"}
+
+
+def commercial_status(value):
+    return STATUS_ALIASES.get(value, value)
+
+
+def status_options(current=None):
+    value = commercial_status(current)
+    return list(dict.fromkeys((*STATUSES, *((value,) if value else ()))))
 INTERACTION_TYPES = ("Primeiro contato", "Follow-up", "Ligação", "Mensagem",
                      "Reunião", "Proposta", "Observação", "Outro")
 CHANNELS = ("whatsapp", "telefone", "instagram", "email", "outro")
@@ -41,6 +55,7 @@ def commercial_values(values):
             result[name] = utc_iso(value)
         elif name == "status":
             required_text(value, "um status")
+            result[name] = commercial_status(value)
         elif value is not None and not isinstance(value, str):
             raise ValueError(f"{name} deve ser texto ou vazio.")
     if result.get("proxima_acao") and len(result["proxima_acao"]) > 240:

@@ -60,7 +60,9 @@ class OpenAISalesProvider:
 
 def create_sales_provider():
     load_environment()
-    name = os.environ.get("AI_PROVIDER", "openai").strip().lower()
+    name = os.environ.get("AI_PROVIDER", "").strip().lower()
+    if not name:
+        name = "groq" if os.getenv("GROQ_API_KEY", "").strip() else "openai"
     model = os.environ.get("AI_MODEL", "")
     if name == "openai":
         provider = OpenAISalesProvider(key=os.environ.get("AI_API_KEY", ""), model=model)
@@ -69,8 +71,11 @@ def create_sales_provider():
         provider = OllamaSalesProvider(model=model,
             base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
             timeout=os.environ.get("OLLAMA_TIMEOUT", "120"))
+    elif name == "groq":
+        from .config import create_groq_provider
+        provider = create_groq_provider(load=False)
     else:
-        raise SalesConfigurationError("AI_PROVIDER não suportado; utilize openai ou ollama.")
+        raise SalesConfigurationError("AI_PROVIDER não suportado; utilize openai, ollama ou groq.")
     # Never log credentials, the endpoint, prompts or evidence.
     logging.getLogger(__name__).info("SDR IA: provider=%s model=%s", name,
         provider.model if name == "ollama" else "configurado")

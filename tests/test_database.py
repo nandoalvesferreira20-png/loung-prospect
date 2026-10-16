@@ -22,7 +22,9 @@ def test_schema_and_idempotence(repo):
     with closing(connect_database(repo.path)) as connection:
         assert connection.row_factory is sqlite3.Row
         columns = {row["name"] for row in connection.execute("PRAGMA table_info(leads)")}
-        assert columns == set(lead_repository.FIELDS) | {"id", "created_at", "updated_at"}
+        # Consent is managed exclusively by ContactService, never imported as lead data.
+        assert columns == set(lead_repository.FIELDS) | {"id", "created_at", "updated_at",
+            "whatsapp_consent", "consent_source", "consent_at", "consent_number", "do_not_contact"}
     row = repo.get_lead(identity)
     assert row["empresa"] == "Clínica" and row["status"] == "Novo"
     assert row["telefone"] is row["qualification_score"] is None

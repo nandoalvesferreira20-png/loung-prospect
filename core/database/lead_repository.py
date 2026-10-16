@@ -128,65 +128,30 @@ class LeadRepository:
         Blank components never form a deduplication key.
         """
 
-        keys = (
-            (
-                "provider",
-                "provider_place_id",
-            ),
-            ("google_maps",),
-            (
-                "empresa",
-                "endereco",
-            ),
-            (
-                "empresa",
-                "telefone",
-            ),
-        )
-
-        with closing(
-            connect_database(self.path)
-        ) as connection:
+        with closing(connect_database(self.path)) as connection:
             with connection:
-                connection.execute(
-                    "BEGIN IMMEDIATE"
-                )
+                connection.execute("BEGIN IMMEDIATE")
+                if self.find_existing(connection, data) is not None:
+                    return None
+                return self._insert(connection, data)
 
-                for fields in keys:
-                    values = [
-                        data.get(field)
-                        for field in fields
-                    ]
+    @staticmethod
+    def find_existing(connection, data):
+        """Shared exact identity rules; caller supplies a transaction/connection.
 
-                    if not all(
-                        isinstance(value, str)
-                        and value.strip()
-                        for value in values
-                    ):
-                        continue
-
-                    clause = " AND ".join(
-                        f"{field} = ?"
-                        for field in fields
-                    )
-
-                    existing = connection.execute(
-                        (
-                            "SELECT id "
-                            "FROM leads "
-                            f"WHERE {clause} "
-                            "LIMIT 1"
-                        ),
-                        values,
-                    ).fetchone()
-
-                    if existing:
-                        return None
-
-                return self._insert(
-                    connection,
-                    data,
-                )
+        This helper neither opens a database nor initializes its schema.
+        """
+        keys = (("provider", "provider_place_id"), ("google_maps",),
+                ("empresa", "endereco"), ("empresa", "telefone"))
+        for fields in keys:
+            values = [data.get(field) for field in fields]
+            if not all(isinstance(value, str) and value.strip() for value in values):
+                continue
+            clause = " AND ".join(f"{field} = ?" for field in fields)
+            existing = connection.execute(f"SELECT id FROM leads WHERE {clause} LIMIT 1", values).fetchone()
+            if existing:
+                return existing[0]
+        return None
 
     def get_lead(self, lead_id):
         with closing(
