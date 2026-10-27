@@ -5,14 +5,16 @@ from core.database.lead_repository import LeadRepository, LeadNotFoundError
 from core.database.outreach_repository import OutreachRepository
 from .models import SalesGeneration, OutreachStatus
 from .prompts import SYSTEM_PROMPT, build_evidence
-from .errors import SalesProviderError
+from .errors import SalesProviderError, GroqProviderError
 from .contact import blocked
 from .contact_routing import contact_context
 from core.database.contact_preference_repository import ContactPreferenceRepository
 
 
 class SalesGenerationError(RuntimeError):
-    pass
+    def __init__(self, message, *, provider_error=None):
+        super().__init__(message)
+        self.provider_error = provider_error
 
 
 class SalesAgent:
@@ -56,6 +58,8 @@ class SalesAgent:
             if regeneration_reason is not None and any(
                     result.mensagem.strip().casefold() == row["mensagem"].strip().casefold() for row in history):
                 raise SalesProviderError("A IA repetiu uma versão anterior. Nenhuma nova versão foi salva; tente outro motivo.")
+        except GroqProviderError as error:
+            raise SalesGenerationError(str(error), provider_error=error) from None
         except SalesProviderError as error:
             raise SalesGenerationError(str(error)) from None
         except Exception:

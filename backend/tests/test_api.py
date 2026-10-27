@@ -88,7 +88,7 @@ def test_no_writes_even_schema_or_timestamps(client, database):
     before = hashlib.sha256(database.read_bytes()).hexdigest()
     for url in ["/v1/leads","/v1/leads/1","/v1/overview"]:
         assert client.get(url).status_code == 200
-        assert client.post(url,json={"status":"Fechado"}).status_code == 405
+        assert client.post(url,json={"status":"Fechado"}).status_code == (422 if url == '/v1/leads' else 405)
     assert hashlib.sha256(database.read_bytes()).hexdigest() == before
     with ReadRepository(database).connect() as (connection, _):
         with pytest.raises(sqlite3.OperationalError):

@@ -16,6 +16,14 @@ with sync_playwright() as p:
     errors=[]
     page.on("pageerror",lambda error:errors.append(str(error)))
     assert page.request.get(api+"/__test/metrics").json()["signature"]=="phase22-synthetic-only"
+    if '--auth' in sys.argv:
+        config=page.request.get('http://127.0.0.1:8112/__test/config').json()
+        assert config['signature']=='auth-session-no-database'
+        page.goto(base+'/login')
+        page.get_by_label('E-mail',exact=True).fill('test@example.invalid')
+        page.get_by_label('Senha',exact=True).fill(config['password'])
+        page.get_by_role('button',name='Entrar',exact=True).click()
+        page.get_by_text('Synthetic Workspace',exact=True).first.wait_for(timeout=30000)
     assert page.request.get(base+"/api/leads").json()["total"]==1
     def local_only(route):
         assert urlparse(route.request.url).hostname in {"localhost","127.0.0.1"}, "External request forbidden"
@@ -46,6 +54,8 @@ with sync_playwright() as p:
     assert "São Paulo" in (out/"phase22-export.csv").read_text("utf-8-sig")
     page.get_by_role("button",name="Salvar selecionados").click()
     page.get_by_text("2 lead(s) salvo(s).",exact=False).wait_for()
+    first_job=page.evaluate("sessionStorage.getItem('loung:prospecting:active')")
+    assert page.request.post(base+'/api/leads/import',data={'searchId':first_job,'resultIds':[2]}).json()=={'inserted':0,'duplicates':1}
     assert page.request.get(base+"/api/leads").json()["total"]==3
     assert page.request.get(api+"/__test/metrics").json()["backups"]==1
     page.goto(base+"/leads",wait_until="networkidle")
@@ -73,8 +83,25 @@ with sync_playwright() as p:
     assert page.request.get(base+"/api/leads").json()["total"]==3
     assert page.request.get(base+"/api/prospecting/search/invalid").status==422
     assert page.request.post(base+"/api/prospecting/search",data=query,headers={"Origin":"https://external.example"}).status==403
+    if '--auth' in sys.argv:
+        # Results take longer than the 1.5s status poll. They must still render
+        # while the second mock Places page is blocked, without being aborted.
+        page.get_by_label('Nicho ou segmento',exact=True).fill('Lenta simulada')
+        page.get_by_role('button',name='Iniciar pesquisa').click()
+        page.get_by_text('Carregando resultados da pesquisa…',exact=True).wait_for(timeout=5000)
+        page.get_by_text('Teste empresa 20 — São Paulo',exact=True).wait_for(timeout=7000)
+        page.get_by_text('Pesquisando',exact=True).wait_for(timeout=1000)
+        page.get_by_role('button',name='Cancelar pesquisa').click()
+        page.get_by_text('Cancelada',exact=True).wait_for(timeout=15000)
+        page.get_by_label('Nicho ou segmento',exact=True).fill('Vazia simulada')
+        page.get_by_role('button',name='Iniciar pesquisa').click()
+        page.get_by_text('Concluída',exact=True).wait_for(timeout=15000)
+        page.get_by_text('Nenhum estabelecimento encontrado',exact=True).wait_for()
+        assert page.request.get(base+'/api/leads').json()['total']==3
     assert not errors,errors
     report={"status":"passed","checks":["BFF parameter validation before provider call","mock Google pagination","existing lead detection","selection across pages","CSV and Excel downloads","selected-only import and backup","saved leads visible in portfolio","session resume","three responsive viewports","sanitized provider error","cooperative cancel preserves partial results","no implicit writes"],"javascript_errors":errors,"source":"synthetic fixture; no real Google calls or real database writes"}
+    if '--auth' in sys.argv:
+        report['checks'].extend(['Supabase cookie login and verified JWT','slow results render while job running','empty completed search message','duplicate selected import inserts zero'])
     (out/"phase22-report.json").write_text(json.dumps(report,indent=2),encoding="utf-8")
     print(json.dumps(report,indent=2))
     browser.close()

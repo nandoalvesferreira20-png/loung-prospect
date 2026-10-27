@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/shared";
 import { LeadsTable } from "@/components/leads-table";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
+import Link from "next/link";
 export default function Leads() {
   return (
     <>
@@ -11,6 +12,7 @@ export default function Leads() {
         description="Encontre contatos, revise informações e acompanhe cada oportunidade."
         action={
           <div className="text-right">
+            <Button asChild className="mr-3"><Link href="/leads/novo">Criar lead</Link></Button>
             <Button variant="outline" disabled>
               <Download />
               Exportar leads

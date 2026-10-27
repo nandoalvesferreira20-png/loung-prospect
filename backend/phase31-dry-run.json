@@ -1,0 +1,48 @@
+{
+  "backup": "data\\backups\\loung_prospect-phase31-a1f06a9a799f4216836ad912a3d38fa9.db",
+  "backupSha256": "5706b627611bbed095faa7fba97212d4b06363dbb231785154a15e901747f867",
+  "integrity": "ok",
+  "tables": {
+    "leads": {
+      "source": 160,
+      "migrated": 0,
+      "ignored": 0,
+      "rejected": 0
+    },
+    "lead_interactions": {
+      "source": 17,
+      "migrated": 0,
+      "ignored": 0,
+      "rejected": 0
+    },
+    "outreach": {
+      "source": 0,
+      "migrated": 0,
+      "ignored": 0,
+      "rejected": 0
+    },
+    "outreach_revisions": {
+      "source": 0,
+      "migrated": 0,
+      "ignored": 0,
+      "rejected": 0
+    },
+    "lead_contact_preferences": {
+      "source": 0,
+      "migrated": 0,
+      "ignored": 0,
+      "rejected": 0
+    },
+    "template_drafts": {
+      "source": 0,
+      "migrated": 0,
+      "ignored": 0,
+      "rejected": 0
+    }
+  },
+  "dateWarnings": 0,
+  "duplicateGroups": 0,
+  "orphans": 0,
+  "applied": false,
+  "rejectedCount": 0
+}

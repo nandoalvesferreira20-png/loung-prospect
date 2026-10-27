@@ -37,7 +37,7 @@ def local_zone(name):
 class CrmService:
     def __init__(self, writer):
         self.writer = writer
-        self.reader = ReadRepository(writer.path)
+        self.reader = getattr(writer, "reader", None) or ReadRepository(writer.path)
 
     @staticmethod
     def require_lead(connection, lead_id):
@@ -224,7 +224,7 @@ class CrmService:
                     "overdue":summary.counts["atrasados"],"invalidDates":summary.invalid_dates,"referenceDate":str(reference),"timezone":tz,**self.capabilities(connection)}
 
     def metrics(self, tz="America/Sao_Paulo"):
-        local_zone(tz)
+        zone = local_zone(tz)
         with self.reader.connect() as (connection, lead_columns):
             rows = [dict(r) for r in connection.execute("SELECT * FROM leads")]
             has_activities = INTERACTIONS <= columns(connection,"lead_interactions")
@@ -251,7 +251,15 @@ class CrmService:
                       "responded":len(responses & existing_ids) if has_activities else None,
                       "negotiations":sum(commercial_status(r["status"]) in ("Em conversa","Interessado","Proposta enviada") for r in rows),
                       "converted":sum(commercial_status(r["status"]) == "Fechado" for r in rows)}
-        followups = self.followups(tz, limit=1)
-        return {**result,"pending":followups.get("pending") if followups["available"] else None,
-                "overdue":followups.get("overdue") if followups["available"] else None,
-                "invalidDates":followups["invalidDates"]}
+            # Reuse the same authorized snapshot: metrics only need counts,
+            # not another connection, another lead scan or a rendered card.
+            available = {"proximo_contato", "proxima_acao"} <= lead_columns
+            pending, overdue, invalid = None, None, 0
+            if available:
+                for row in rows:
+                    try: row["qualification_score"] = int(row.get("qualification_score") or 0)
+                    except (ValueError, TypeError): row["qualification_score"] = 0
+                summary = build_day(rows, datetime.now(zone).date(), tz=zone)
+                pending = sum(bool(r.get("proximo_contato") or r.get("proxima_acao")) for r in rows)
+                overdue, invalid = summary.counts["atrasados"], summary.invalid_dates
+        return {**result,"pending":pending,"overdue":overdue,"invalidDates":invalid}

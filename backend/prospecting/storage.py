@@ -25,6 +25,7 @@ class SelectionStore:
         try:
             connection.row_factory = sqlite3.Row
             connection.execute("PRAGMA busy_timeout=5000")
+            connection.execute("PRAGMA foreign_keys=ON")
             columns = {row[1] for row in connection.execute("PRAGMA table_info(leads)")}
             if not {*FIELDS, "id", "created_at", "updated_at"}.issubset(columns):
                 raise StorageError("Schema incompatível com importação. Atualize pelo desktop; a API não executa migrações.")

@@ -1,9 +1,1 @@
-.venv/
-.test-tmp/
-.desktop-test-tmp/
-.test-pytest-final/
-.pytest_cache/
-__pycache__/
-.phase22-*/
-.phase23-*/
-.phase24-*
+# Shared generated/private-file rules are maintained in ../.gitignore.

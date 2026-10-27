@@ -30,5 +30,5 @@ export interface SdrDraft {
 }
 export interface SdrHistory {
   available: boolean; writesEnabled: boolean; reason: string | null;
-  items: { id: number; message: string; status: string; createdAt: string; updatedAt: string; angle: string }[];
+  items: { actorName?: string; id: number; message: string; status: string; createdAt: string; updatedAt: string; angle: string }[];
 }

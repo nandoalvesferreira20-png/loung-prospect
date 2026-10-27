@@ -1,5 +1,7 @@
 # Loung Prospect Web — Fase 2.4
 
+O padrão atual é modo local sem Supabase. Siga o [guia local Windows/macOS](../docs/local/README.md). A documentação abaixo preserva o histórico anterior.
+
 Pipeline Kanban, perfil comercial `/leads/[id]`, histórico, observações e Meu Dia
 funcionais. Escrita opt-in com backup e proteção contra conflitos. Sem mudanças
 no schema/desktop. Veja [Fase 2.4](docs/phase-2-4.md) para regras e validação.

@@ -11,7 +11,7 @@ export interface Pipeline extends Capabilities {
 }
 export interface CommercialDetail extends Capabilities { lead: CommercialLead; stages: string[] }
 export interface Activities {
-  items: {id: string; kind: string; description: string; at: string | null; origin: "manual" | "record" | "draft"}[];
+  items: {actorName?: string; id: string; kind: string; description: string; at: string | null; origin: "manual" | "record" | "draft"}[];
   total: number; available: boolean;
 }
 export interface Followups extends Capabilities {

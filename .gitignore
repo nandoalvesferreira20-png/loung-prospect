@@ -1,127 +1,134 @@
-# =====================================
-# Ambiente Virtual
-# =====================================
+# Python environments and bytecode
 .venv/
+.venv-*/
 venv/
 env/
 ENV/
-.venv-*/
-
-# =====================================
-# Python
-# =====================================
 __pycache__/
 *.py[cod]
 *$py.class
 
-# =====================================
-# Compilações
-# =====================================
-build/
-dist/
-*.egg-info/
-.eggs/
-# Arquivos .spec são configuração de build e devem poder ser versionados.
-
-# =====================================
-# PyInstaller
-# =====================================
-*.manifest
-*.exe
-
-# =====================================
-# Logs
-# =====================================
-logs/
-*.log
-
-# =====================================
-# Exportações
-# =====================================
-exports/
-*.xlsx
-*.csv
-# Somente dados sintéticos devem ser colocados nesta pasta.
-!tests/fixtures/**/*.xlsx
-!tests/fixtures/**/*.csv
-~$*.xlsx
-
-# =====================================
-# Configurações Locais
-# =====================================
-.env
-.env.*
-!.env.example
-!.env.template
-config/local.json
-
-# =====================================
-# VS Code
-# =====================================
-.vscode/
-
-# =====================================
-# JetBrains
-# =====================================
-.idea/
-
-# =====================================
-# Sistema Operacional
-# =====================================
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# =====================================
-# Pytest
-# =====================================
+# Python tests, coverage and analysis
 .pytest_cache/
+.pytest_tmp/
+pytest-cache-files-*/
 .coverage
 .coverage.*
 coverage.xml
 htmlcov/
 .tox/
 .nox/
-
-# =====================================
-# MyPy
-# =====================================
 .mypy_cache/
-
-# =====================================
-# Ruff
-# =====================================
 .ruff_cache/
 
-# =====================================
-# Playwright
-# =====================================
+# Next.js, Node and frontend test output
+node_modules/
+.next/
+out/
+.npm-cache/
+.turbo/
+.vercel/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 playwright-report/
 test-results/
-
-# Navegadores instalados localmente (PLAYWRIGHT_BROWSERS_PATH=0).
 .local-browsers/
-# Estado autenticado do navegador: pode conter cookies e tokens.
 playwright/.auth/
 
-# =====================================
-# Arquivos Temporários
-# =====================================
-temp/
-tmp/
-*.tmp
+# Build/distribution output; source .spec files remain versionable
+build/
+dist/
+*.egg-info/
+.eggs/
+*.manifest
+*.exe
 
-# =====================================
-# Backups
-# =====================================
-*.bak
-*.old
+# Private environment and machine configuration
+.env
+.env.*
+*.env
+*.env.local
+.envrc
+.direnv/
+!.env.*.example
+!.env.*.template
+!*.env.example
+!*.env.template
+*.pem
+*.key
+*.p12
+*.pfx
+/config/local.json
+.vscode/
+.idea/
+/.aws/credentials
+/.aws/config
 
-# Banco local e arquivos auxiliares de transação
-data/
+# SQLite databases, journals, backups and private dumps
+/data/
+/backups/
 *.db
 *.sqlite
 *.sqlite3
 *.db-*
 *.sqlite-*
 *.sqlite3-*
+*-wal
+*-shm
+*.bak
+*.old
+*.dump
+*.sql.gz
+
+# Commercial exports and generated prototypes; templates are source
+exports/
+/output/
+/prototypes/
+*.csv
+*.xlsx
+~$*.xlsx
+
+# Explicitly versionable synthetic fixtures (never real commercial data)
+!tests/fixtures/**/*.csv
+!tests/fixtures/**/*.xlsx
+!tests/fixtures/**/*.db
+!tests/fixtures/**/*.sqlite
+!tests/fixtures/**/*.sqlite3
+!tests/fixtures/**/*.pem
+!tests/fixtures/**/*.key
+!backend/tests/fixtures/**/*.csv
+!backend/tests/fixtures/**/*.xlsx
+!backend/tests/fixtures/**/*.db
+!backend/tests/fixtures/**/*.sqlite
+!backend/tests/fixtures/**/*.sqlite3
+!backend/tests/fixtures/**/*.pem
+!backend/tests/fixtures/**/*.key
+
+# Logs, temporary files and disposable QA output
+logs/
+*.log
+temp/
+tmp/
+*.tmp
+/artifacts/qa/
+/backend/.test-tmp/
+/backend/.desktop-test-tmp/
+/backend/.test-pytest-final/
+/backend/.phase22-*/
+/backend/.phase23-*/
+/backend/.phase24-*
+/backend/.phase31-*/
+/backend/.phase32-*/
+
+# Inactive SaaS tools: generated/private state only, never source or migrations
+/supabase/.temp/
+/supabase/.branches/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini

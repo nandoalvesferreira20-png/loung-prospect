@@ -19,12 +19,21 @@ from .crm.routes import router as crm_router
 
 def create_app(settings: Settings | None = None, *, provider_factory=configured_provider, job_options=None, sdr_provider_factory=configured_sdr_provider):
     settings = settings or Settings.from_environment()
+    settings.validate()
+    if settings.storage_backend not in ('sqlite','postgres'):
+        raise ValueError('LOUNG_STORAGE_BACKEND deve ser sqlite ou postgres')
+    if settings.storage_backend == 'postgres':
+        from .persistence.runtime import create_postgres_app
+        return create_postgres_app(settings, provider_factory, job_options, sdr_provider_factory)
     repository = ReadRepository(settings.database_path)
     store = SelectionStore(settings.database_path, settings.writes_enabled)
     jobs = JobManager(store, provider_factory, **(job_options or {}))
     sdr = SdrService(store, sdr_provider_factory)
     @asynccontextmanager
     async def lifespan(_app):
+        if settings.initialize_local:
+            from .local_database import initialize_local_database
+            await asyncio.to_thread(initialize_local_database, settings.database_path)
         async def reap():
             while True:
                 await asyncio.sleep(30)
@@ -47,10 +56,17 @@ def create_app(settings: Settings | None = None, *, provider_factory=configured_
     app.include_router(prospecting_router)
     app.include_router(sdr_router)
     app.include_router(crm_router)
+    from .local_routes import router as local_router
+    app.include_router(local_router)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "[::1]", "testserver"])
 
     @app.middleware("http")
     async def local_only(request: Request, call_next):
+        peer = request.client.host if request.client else ''
+        if peer not in ('127.0.0.1', '::1', 'testclient') or any(
+            request.headers.get(key) for key in ('forwarded', 'x-forwarded-for', 'x-forwarded-host')
+        ):
+            return JSONResponse(status_code=403, content={'detail': 'Acesso permitido somente no computador local.'})
         # Browser requests go through same-origin Next BFF; no wildcard CORS.
         if request.headers.get("origin") or request.headers.get("sec-fetch-site") == "cross-site":
             return JSONResponse(status_code=403, content={"detail":"Utilize a aplicação web local para acessar a API."})

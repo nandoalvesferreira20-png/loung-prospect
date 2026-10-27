@@ -16,6 +16,7 @@ import {
   X,
   PanelLeftClose,
 } from "lucide-react";
+import { useSession, logout } from "@/components/session-provider";
 import { cn } from "@/lib/utils";
 const navigation = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -45,6 +46,7 @@ function Brand() {
 }
 function Sidebar({ close }: { close?: () => void }) {
   const path = usePathname();
+  const session = useSession();
   return (
     <div className="flex h-full flex-col bg-white px-4 py-7">
       <div className="px-3">
@@ -74,7 +76,7 @@ function Sidebar({ close }: { close?: () => void }) {
       </nav>
       <div className="mt-auto pt-12">
         <div className="rounded-xl border bg-slate-50 p-4">
-          <p className="text-xs font-semibold">Loung Tech</p>
+          <p className="text-xs font-semibold">{session?.organization || "Workspace"}</p>
           <p className="mt-1 text-xs leading-5 text-slate-500">
             Seu espaço de prospecção e relacionamento comercial.
           </p>
@@ -96,7 +98,9 @@ function Sidebar({ close }: { close?: () => void }) {
 }
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const session=useSession();
   const path = usePathname();
+  if (["/login","/recuperar-senha","/atualizar-senha"].includes(path)) return children;
   const label = path.startsWith("/leads/") ? "Perfil comercial" : navigation.find((n) => n.href === path)?.label ?? "Página";
   return (
     <div className="min-h-screen">
@@ -147,10 +151,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="font-medium text-slate-600">{label}</span>
             </span>
           </div>
-          <span className="rounded-full border px-3 py-1 text-[11px] text-slate-500">
-            <span className="mr-2 inline-block size-1.5 rounded-full bg-amber-400" />
-            Ambiente local
-          </span>
+          <div className="flex items-center gap-3 text-xs text-slate-500"><span>{session?.displayName} · {session?.organization}</span>{session?.role !== "local" && <button className="rounded border px-3 py-2" onClick={() => void logout()}>Sair</button>}</div>
         </div>
         <main
           id="conteudo"

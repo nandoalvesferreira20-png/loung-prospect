@@ -1,0 +1,2757 @@
+{
+  "categories": {
+    "A": "Generated candidates recorded in the separate deletion manifest",
+    "B": "Preserved SaaS legacy",
+    "C": "Preserved local/shared/project files",
+    "D": "No source file proved obsolete enough for deletion"
+  },
+  "files": [
+    {
+      "path": "REPOSITORY_CLEANUP_PLAN.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "REPOSITORY_CLEANUP_REPORT.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/.env.example",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/authorization.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/local_database.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/local_routes.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/migration-report.json",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "backend/persistence/__init__.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/persistence/errors.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/persistence/leads.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/persistence/postgres.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/persistence/runtime.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/persistence/sdr.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/persistence/searches.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/persistence/session_queries.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/persistence/team.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/persistence/timing.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/phase31-dry-run.json",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "backend/scripts/check_access.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/scripts/check_groq_config.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/scripts/check_migration_target.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/scripts/check_phase32_readiness.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/scripts/check_session_access.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/scripts/migrate_sqlite.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/scripts/profile_dashboard_db.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/scripts/run_api.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/auth_session_fixture.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/bootstrap_native_phase32.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/local_fixture_server.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/phase31_fixture_server.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/phase32_fixture_server.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/reproduce_owner_snapshot.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/test_access_diagnostics.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/test_auth_schema_acl.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/test_auth_tls.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/test_dashboard_performance.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/test_groq_integration.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/test_groq_tls.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/test_local_mode.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/test_migration_diagnostics.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/test_phase31_postgres.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/test_phase31_security.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/test_phase32_team.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/test_phase32_writes.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "backend/tests/test_prospecting_batch.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "backend/tests/test_stamp_claims_migration.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/auditoria-saas/01-DIAGNOSTICO-GERAL.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/auditoria-saas/02-ARQUITETURA-ATUAL.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/auditoria-saas/03-SEGURANCA-MULTITENANT.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/auditoria-saas/04-PRONTIDAO-PRODUCAO.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/auditoria-saas/05-PROSPECCAO-E-IA.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/auditoria-saas/06-REQUISITOS-COMERCIAIS.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/auditoria-saas/07-BACKLOG-PRIORIZADO.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/auditoria-saas/08-ROADMAP-IMPLEMENTACAO.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/auditoria-saas/09-RELATORIO-FINAL.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/local/AUDIT.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/local/GROQ_DIAGNOSIS.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/local/README.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/local/VALIDATION.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/local/saas-env-examples/backend.env.example",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "docs/local/saas-env-examples/desktop.env.example",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "docs/local/saas-env-examples/web.env.example",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "docs/roadmap-comercializacao/01-ESTADO-ATUAL.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/roadmap-comercializacao/02-BLOQUEADORES-COMERCIAIS.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/roadmap-comercializacao/03-BACKLOG-TECNICO.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/roadmap-comercializacao/04-DIVISAO-DA-EQUIPE.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/roadmap-comercializacao/05-CRONOGRAMA-ACELERADO.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/roadmap-comercializacao/06-TESTES-E-ESCALABILIDADE.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/roadmap-comercializacao/07-CHECKLIST-GO-LIVE.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/roadmap-comercializacao/08-RESUMO-EXECUTIVO.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/roadmap-comercializacao/09-BACKLOG-EQUILIBRADO.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/roadmap-comercializacao/10-EXECUCAO-PARALELA.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "docs/roadmap-comercializacao/11-TAREFAS-POR-DESENVOLVEDOR.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "supabase/migrations/202610190001_phase31.sql",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "supabase/migrations/202610200001_repair_auth_schema_usage.sql",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "supabase/migrations/202610200002_team_operations.sql",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "supabase/migrations/202610220001_stamp_actor_from_verified_claims.sql",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "supabase/validation/phase32_security_review.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "supabase/validation/session_access.sql",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "web/.env.example",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/docs/auth-login-diagnosis.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/docs/auth-schema-acl.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/docs/auth-session-investigation.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/docs/dashboard-react-performance.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/docs/phase-3-1-audit.json",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/docs/phase-3-1.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/docs/phase-3-2-audit.json",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/docs/phase-3-2-claims-fix.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/docs/phase-3-2-homologation.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/docs/phase-3-2.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/docs/post-login-access.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/docs/prospecting-results-fix.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/docs/sqlite-migration-diagnosis.md",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/scripts/auth.test.mjs",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/scripts/check-auth-config.mjs",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/scripts/check-auth-connectivity.mjs",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/scripts/check_auth_diagnostics.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/scripts/check_auth_session.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/scripts/check_dashboard_react.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/scripts/check_local.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/scripts/check_phase31.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/scripts/check_phase32.py",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/scripts/local.test.mjs",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/scripts/phase31-postgres.mjs",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/scripts/prospecting-postgres.mjs",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS-only implementation, diagnostic, fixture, or historical recovery documentation; preserved"
+    },
+    {
+      "path": "web/scripts/prospecting.test.mjs",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/scripts/team.test.mjs",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/leads/[leadId]/edit/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/local/preferences/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/organization/activities/route.ts",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "web/src/app/api/session/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/team/[id]/route.ts",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "web/src/app/api/team/route.ts",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "web/src/app/atualizar-senha/page.tsx",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "web/src/app/auth/confirm/route.ts",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "web/src/app/configuracoes/atividades/page.tsx",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "web/src/app/configuracoes/equipe/page.tsx",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "web/src/app/leads/[id]/editar/page.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/leads/novo/page.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/login/page.tsx",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "web/src/app/recuperar-senha/page.tsx",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "web/src/components/auth-form.tsx",
+      "category": "B",
+      "action": "preserve",
+      "reason": "SaaS/history/test recovery; not safely recoverable from local Git refs"
+    },
+    {
+      "path": "web/src/components/lead-editor.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/session-provider.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/dashboard-timing.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/team-proxy.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/auth/access-errors.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/auth/browser.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/auth/config.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/auth/errors.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/auth/server.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/runtime-mode.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/proxy.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": ".env.example",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": ".gitignore",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "LoungLeads.spec",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "README.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "app.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "assets/fonts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/.gitignore",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/README.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/config.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/crm/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/crm/models.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/crm/routes.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/crm/service.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/main.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/models.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/prospecting/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/prospecting/jobs.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/prospecting/models.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/prospecting/routes.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/prospecting/storage.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/repository.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/requirements-dev.txt",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/requirements.txt",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/scripts/check_crm_database_copy.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/scripts/check_database_copy.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/scripts/check_sdr_database_copy.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/scripts/run_offline_tests.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/sdr/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/sdr/models.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/sdr/policy.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/sdr/routes.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/sdr/service.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/sdr/storage.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/crm_fixture_server.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/fixture_server.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/prospecting_fixture_server.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/sdr_fixture_server.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/test_api.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/test_crm_api.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/test_prospecting_api.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "backend/tests/test_sdr_api.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "config",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/browser_launcher.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/commercial/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/commercial/day.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/commercial/service.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/commercial/values.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/database/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/database/connection.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/database/contact_preference_repository.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/database/interaction_repository.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/database/lead_repository.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/database/outreach_repository.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/database/schema.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/database/template_draft_repository.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/diagnostics.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/exporter.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/extractor.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/importers/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/importers/excel_leads.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/lead_filter.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/logger.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/maps.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/outreach/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/outreach/builder.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/outreach/models.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/outreach/templates.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/prospecting/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/prospecting/adapter.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/prospecting/limits.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/prospecting/service.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/prototype/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/prototype/generator.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/prototype/models.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/prototype/preview.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/prototype/registry.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/prototype/renderer.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/providers/README.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/providers/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/providers/environment.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/providers/google_places.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/providers/models.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/providers/search_query.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/qualification/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/qualification/adapter.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/qualification/digital_presence.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/qualification/models.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/qualification/rules.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/qualification/serialization.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/qualification/service.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/sales/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/sales/agent.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/sales/config.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/sales/contact.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/sales/contact_routing.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/sales/errors.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/sales/groq_provider.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/sales/models.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/sales/ollama.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/sales/prompts.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/sales/provider.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/scraper.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/validator.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "core/website_inspection.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/commercial-management.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/desktop-redesign-whatsapp.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/lead-target.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/outreach-v1.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/places-lead-target.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/sales-ai-v1.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/sdr-browser-preference.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/sdr-contact-routing.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/sdr-inteligente.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/sdr-performance.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/sdr-redesign-validation.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/sdr-simple-flow.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/sdr-visual-components.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/ux-priorities-implementation.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "docs/without-own-website.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "main.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "prototypes/dentista-24horas-dor-de-dente-sbc-9c58cdbc-b7c2-4cd5-88e5-477f5fbd0d17/css/style.css",
+      "category": "A",
+      "action": "remove-from-index-only; physical file preserved",
+      "reason": "Generated commercial prototype output; source templates and generator remain versionable"
+    },
+    {
+      "path": "prototypes/dentista-24horas-dor-de-dente-sbc-9c58cdbc-b7c2-4cd5-88e5-477f5fbd0d17/index.html",
+      "category": "A",
+      "action": "remove-from-index-only; physical file preserved",
+      "reason": "Generated commercial prototype output; source templates and generator remain versionable"
+    },
+    {
+      "path": "prototypes/dentista-24horas-dor-de-dente-sbc-9c58cdbc-b7c2-4cd5-88e5-477f5fbd0d17/js/script.js",
+      "category": "A",
+      "action": "remove-from-index-only; physical file preserved",
+      "reason": "Generated commercial prototype output; source templates and generator remain versionable"
+    },
+    {
+      "path": "prototypes/dentista-24horas-dor-de-dente-sbc-9c58cdbc-b7c2-4cd5-88e5-477f5fbd0d17/prototype.json",
+      "category": "A",
+      "action": "remove-from-index-only; physical file preserved",
+      "reason": "Generated commercial prototype output; source templates and generator remain versionable"
+    },
+    {
+      "path": "prototypes/pedroso-pedroso-sociedade-de-advogados-947cfd4d-a591-4c09-8279-8ae437a529e3/css/style.css",
+      "category": "A",
+      "action": "remove-from-index-only; physical file preserved",
+      "reason": "Generated commercial prototype output; source templates and generator remain versionable"
+    },
+    {
+      "path": "prototypes/pedroso-pedroso-sociedade-de-advogados-947cfd4d-a591-4c09-8279-8ae437a529e3/index.html",
+      "category": "A",
+      "action": "remove-from-index-only; physical file preserved",
+      "reason": "Generated commercial prototype output; source templates and generator remain versionable"
+    },
+    {
+      "path": "prototypes/pedroso-pedroso-sociedade-de-advogados-947cfd4d-a591-4c09-8279-8ae437a529e3/js/script.js",
+      "category": "A",
+      "action": "remove-from-index-only; physical file preserved",
+      "reason": "Generated commercial prototype output; source templates and generator remain versionable"
+    },
+    {
+      "path": "prototypes/pedroso-pedroso-sociedade-de-advogados-947cfd4d-a591-4c09-8279-8ae437a529e3/prototype.json",
+      "category": "A",
+      "action": "remove-from-index-only; physical file preserved",
+      "reason": "Generated commercial prototype output; source templates and generator remain versionable"
+    },
+    {
+      "path": "pytest.ini",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "requirements-dev.txt",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "requirements.txt",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "scripts/check_desktop_gui.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "scripts/check_priority_gui.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "scripts/check_sdr_gui.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "scripts/check_sdr_redesign_gui.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "scripts/test_google_places_real.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/aesthetics-luxury-v1/css/style.css",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/aesthetics-luxury-v1/index.html",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/aesthetics-luxury-v1/js/script.js",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/aesthetics-luxury-v1/template.json",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/dentist-modern-v1/css/style.css",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/dentist-modern-v1/index.html",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/dentist-modern-v1/js/script.js",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/dentist-modern-v1/template.json",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/lawyer-corporate-v1/css/style.css",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/lawyer-corporate-v1/index.html",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/lawyer-corporate-v1/js/script.js",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/lawyer-corporate-v1/template.json",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/veterinarian-friendly-v1/css/style.css",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/veterinarian-friendly-v1/index.html",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/veterinarian-friendly-v1/js/script.js",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "templates/veterinarian-friendly-v1/template.json",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/README.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/conftest.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_browser_preferences.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_commercial.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_commercial_ui.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_contact_routing.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_copy_field.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_database.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_desktop_redesign.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_diagnostics.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_digital_presence.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_digital_presence_rules.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_excel_importer.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_exporter.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_extractor.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_google_places.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_lead_target.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_lead_workspace.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_outreach.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_places_manual_cli.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_places_neighborhood.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_places_target.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_places_target_sprint.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_places_ui.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_priority_ux.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_prospecting.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_prototype_generator.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_prototype_models.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_prototype_preview.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_prototype_registry.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_prototype_renderer.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_prototype_ui.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_qualification_adapter.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_qualification_models.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_qualification_rules.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_qualification_serialization.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_qualification_service.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_sales.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_sales_contact.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_sales_groq.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_sales_ollama.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_sales_redesign.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_sales_workspace.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_scraper.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_scraper_qualification.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_sdr_presentation.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_sdr_responsiveness.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_sdr_workspace_redesign.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_template_library.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_ui_qualification.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_website_inspection.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_website_provenance.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_website_validator.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "tests/test_without_own_website.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/__init__.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/browser_action.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/commercial_logic.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/commercial_panel.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/components.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/copy_field.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/dashboard.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/dialogs.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/home.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/lead_workspace.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/lead_workspace_logic.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/my_day.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/outreach_panel.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/pending_edits.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/places_logic.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/places_search.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/presentation.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/prototype_logic.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/prototype_studio.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/responsive_text.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/sales_panel.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/sales_workspace.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/sales_workspace_logic.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/sdr_components.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/sdr_diagnostics.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/sdr_formatting.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/settings.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/sidebar.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "ui/theme.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/.gitignore",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/AGENTS.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/README.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/components.json",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/docs/architecture.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/docs/phase-2-1.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/docs/phase-2-2.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/docs/phase-2-3.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/docs/phase-2-4.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/docs/validation.md",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/eslint.config.mjs",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/next-env.d.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/next.config.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/package-lock.json",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/package.json",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/postcss.config.mjs",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/scripts/check_crm.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/scripts/check_prospecting.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/scripts/check_read_api.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/scripts/check_sdr.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/scripts/check_ui.py",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/dashboard/commercial/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/followups/[leadId]/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/followups/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/leads/[leadId]/activities/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/leads/[leadId]/followups/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/leads/[leadId]/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/leads/[leadId]/stage/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/leads/import/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/leads/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/overview/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/pipeline/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/prospecting/search/[searchId]/cancel/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/prospecting/search/[searchId]/export/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/prospecting/search/[searchId]/results/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/prospecting/search/[searchId]/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/prospecting/search/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/sdr/generate/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/sdr/history/[leadId]/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/sdr/history/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/api/sdr/leads/[leadId]/route.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/configuracoes/page.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/error.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/globals.css",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/layout.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/leads/[id]/page.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/leads/page.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/loading.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/meu-dia/page.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/not-found.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/page.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/pipeline/page.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/prospeccao/page.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/app/sdr/page.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/activity-chart.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/app-shell.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/crm/commercial-dashboard.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/crm/date.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/crm/followup-list.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/crm/lead-contact-actions.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/crm/lead-profile.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/crm/use-pending-form.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/dashboard-data.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/leads-table.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/prospecting-workspace.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/read-status.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/sdr/history-panel.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/sdr/lead-summary.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/sdr/pending-message-dialog.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/shared.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/ui/button.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/components/ui/card.tsx",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/client.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/contracts.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/crm-contracts.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/crm-proxy.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/local-request.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/prospecting-contracts.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/prospecting-proxy.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/proxy.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/sdr-contracts.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/sdr-proxy.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/api/use-read-resource.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/sdr-whatsapp.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/src/lib/utils.ts",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    },
+    {
+      "path": "web/tsconfig.json",
+      "category": "C",
+      "action": "preserve",
+      "reason": "Local runtime, shared import, tool, test, or project documentation; no proven safe source deletion"
+    }
+  ],
+  "generatedArtifacts": {
+    "category": "A",
+    "action": "delete only audited ignored generated files",
+    "manifest": "artifacts/qa/local-cleanup-20261026/pre-validation-deletion-manifest.json",
+    "groups": [
+      "Python __pycache__ bytecode outside installed dependencies",
+      "Compiler caches in two explicitly named old QA Next builds",
+      "Known pytest cache files"
+    ],
+    "activeWebBuildPreserved": true
+  }
+}

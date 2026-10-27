@@ -1,3 +1,5 @@
+O padrão atual é SQLite local sem login. Veja [execução local](../docs/local/README.md). As seções abaixo preservam o histórico das fases anteriores. Para o modo SaaS, veja [diagnóstico de autenticação](../web/docs/post-login-access.md).
+
 # Loung Prospect API — Fase 2.4
 
 CRM disponível: pipeline, atividades, perfil comercial, follow-ups e indicadores.

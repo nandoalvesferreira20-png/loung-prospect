@@ -1,3 +1,4 @@
+import { dashboardFetch } from "./dashboard-timing";
 import "server-only";
 import { isLocalRequest } from "./local-request";
 
@@ -6,6 +7,7 @@ export async function proxyRead(
   request: Request,
   path: "/v1/leads" | "/v1/overview",
 ) {
+  const headers: Record<string,string> = {"Cache-Control":"no-store"};
   if (!isLocalRequest(request)) {
     return Response.json(
       { detail: "Acesso permitido apenas pela aplicação local." },
@@ -34,11 +36,11 @@ export async function proxyRead(
         if (value !== null) url.searchParams.set(key, value);
       }
     }
-    const response = await fetch(url, {
+    const response = await dashboardFetch(url, {
       cache: "no-store",
       signal: AbortSignal.timeout(5000),
       redirect: "error",
-    });
+    }, headers);
     if (!response.ok) {
       return Response.json(
         {
@@ -47,13 +49,14 @@ export async function proxyRead(
               ? "Filtros inválidos. Revise os valores informados."
               : "Não foi possível consultar a base de leads. Verifique o backend local.",
         },
-        { status: response.status === 422 ? 422 : 502 },
+        { status: [401,403,422,503].includes(response.status) ? response.status : 502, headers },
       );
     }
     return Response.json(await response.json(), {
-      headers: { "Cache-Control": "no-store" },
+      headers,
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === "SESSION_EXPIRED") return Response.json({detail:"Sessao expirada. Entre novamente."},{status:401});
     return Response.json(
       {
         detail:

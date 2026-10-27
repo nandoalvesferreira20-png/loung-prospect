@@ -2,6 +2,8 @@
 from contextlib import closing
 from datetime import datetime, timezone
 import sqlite3
+import logging
+import json
 from fastapi import HTTPException
 from core.sales.contact import blocked
 from core.sales.models import validate_message
@@ -22,7 +24,7 @@ def compatible(connection):
 class SdrStore:
     def __init__(self, selection_store):
         self.writer = selection_store
-        self.reader = ReadRepository(selection_store.path)
+        self.reader = getattr(selection_store, "reader", None) or ReadRepository(selection_store.path)
 
     def lead(self, lead_id):
         with self.reader.connect() as (connection, _):
@@ -91,5 +93,11 @@ class SdrStore:
                 self.writer.backed_up = self.writer.backed_up or pending_backup
                 draft["savedId"] = saved_id
                 return saved_id
-        except (sqlite3.Error, OSError, StorageError):
-            raise HTTPException(503, "Não foi possível salvar. A transação foi revertida; verifique schema, bloqueios e backup.") from None
+        except (sqlite3.Error, OSError, StorageError) as error:
+            kinds = ('OperationalError', 'IntegrityError', 'DatabaseError', 'PermissionError', 'OSError', 'StorageError')
+            kind = type(error).__name__
+            logging.getLogger(__name__).warning(json.dumps({'event':'sdr.storage_failure',
+                'endpoint':'/v1/sdr/history', 'http':503,
+                'error_type':kind if kind in kinds else 'Error', 'code':'SDR_STORAGE_FAILED'}))
+            raise HTTPException(503, "Não foi possível salvar. A transação foi revertida; verifique schema, bloqueios e backup.",
+                                headers={'X-Loung-SDR-Code':'SDR_STORAGE_FAILED'}) from None

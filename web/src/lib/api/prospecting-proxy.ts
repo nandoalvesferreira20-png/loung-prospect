@@ -1,3 +1,4 @@
+import { backendHeaders } from "@/lib/auth/server";
 import "server-only";
 import { searchSchema, importSchema } from "./prospecting-contracts";
 import { isLocalRequest } from "./local-request";
@@ -82,7 +83,7 @@ export async function proxyProspecting(
         ? "POST"
         : "GET",
       body,
-      headers: body ? { "Content-Type": "application/json" } : undefined,
+      headers: await backendHeaders(!!body),
       cache: "no-store",
       redirect: "error",
       signal: AbortSignal.timeout(operation === "import" ? 30000 : 10000),
@@ -98,7 +99,7 @@ export async function proxyProspecting(
       }
       return fail(
         detail,
-        [403, 404, 409, 422, 429, 503].includes(response.status)
+        [401,403, 404, 409, 422, 429, 503].includes(response.status)
           ? response.status
           : 502,
       );
@@ -120,7 +121,11 @@ export async function proxyProspecting(
       status: response.status,
       headers,
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === "SESSION_EXPIRED") return fail("Sessao expirada. Entre novamente.",401);
+    if (error instanceof Error && error.name === "TimeoutError" && operation === "results") {
+      return fail("O carregamento dos resultados excedeu o tempo limite. A pesquisa pode ter terminado; tente carregar os resultados novamente.",503);
+    }
     return fail(
       "API local indisponível. Verifique o backend e tente novamente. Em caso de falha ao salvar, consulte a Carteira antes de repetir.",
       503,

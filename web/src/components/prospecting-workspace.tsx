@@ -71,7 +71,9 @@ export function ProspectingWorkspace() {
   const [operation, setOperation] = useState("");
   const [revision, setRevision] = useState(0);
   const initializedSearch = useRef("");
+  const latestJob = useRef<SearchJob | null>(null);
   const current = job?.id === jobId ? job : null;
+  const resultsReady = !!current;
   const active = !!jobId && !terminal(current);
   const busy = !!operation;
   const {
@@ -134,6 +136,7 @@ export function ProspectingWorkspace() {
           reset(next.query);
           initializedSearch.current = next.id;
         }
+        latestJob.current = next;
         setJob(next);
         setPollError("");
         failures = 0;
@@ -155,23 +158,35 @@ export function ProspectingWorkspace() {
   }, [jobId, revision, reset]);
 
   useEffect(() => {
-    if (!jobId || !current) return;
+    if (!jobId || !resultsReady) return;
     const controller = new AbortController();
-    json<SearchResults>(
-      `/api/prospecting/search/${jobId}/results?page=${page}&pageSize=20`,
-      { signal: controller.signal },
-    )
-      .then((data) => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let failures = 0;
+    async function load() {
+      const snapshot = latestJob.current;
+      try {
+        const data = await json<SearchResults>(
+          `/api/prospecting/search/${jobId}/results?page=${page}&pageSize=20`,
+          { signal: controller.signal },
+        );
         if (!controller.signal.aborted) {
           setResults(data);
           setResultsError("");
+          failures = 0;
+          // Finish this request before starting another. If it began while
+          // running, fetch again even when the status became terminal meanwhile.
+          if (!terminal(snapshot)) timer = setTimeout(load, 1500);
         }
-      })
-      .catch((error) => {
-        if (!controller.signal.aborted) setResultsError(error.message);
-      });
-    return () => controller.abort();
-  }, [jobId, current, page, revision]);
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setResultsError(error instanceof Error ? error.message : "Falha ao carregar resultados.");
+          if (++failures < 3) timer = setTimeout(load, 5000);
+        }
+      }
+    }
+    void load();
+    return () => {controller.abort();if (timer) clearTimeout(timer);};
+  }, [jobId, resultsReady, page, revision]);
 
   async function start(values: z.output<typeof searchSchema>) {
     if (
@@ -190,6 +205,7 @@ export function ProspectingWorkspace() {
       });
       remember(next.id);
       initializedSearch.current = next.id;
+      latestJob.current = next;
       setJob(next);
       setResults(null);
       setSelected(new Set());
@@ -485,7 +501,7 @@ export function ProspectingWorkspace() {
             <p className="mt-1 text-xs text-slate-500">
               {results
                 ? `${results.total} resultado(s) · ${selected.size} selecionado(s)`
-                : "Nenhuma pesquisa carregada"}
+                : resultsReady ? "Carregando resultados da pesquisa…" : "Nenhuma pesquisa carregada"}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -649,7 +665,13 @@ export function ProspectingWorkspace() {
               jobId
                 ? active
                   ? "Buscando empresas…"
-                  : "Nenhum resultado disponível"
+                  : !results && !resultsError
+                    ? "Carregando resultados…"
+                    : resultsError
+                      ? "Não foi possível carregar os resultados"
+                      : current?.status === "completed"
+                        ? "Nenhum estabelecimento encontrado"
+                        : "Nenhum resultado disponível"
                 : "As empresas encontradas aparecerão aqui"
             }
             description={

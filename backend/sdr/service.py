@@ -8,7 +8,8 @@ from threading import Lock, RLock
 from time import monotonic
 from uuid import uuid4
 from fastapi import HTTPException
-from core.sales.agent import SalesAgent
+from core.sales.agent import SalesAgent, SalesGenerationError
+from core.sales.errors import SalesConfigurationError, GroqProviderError
 from core.sales.config import create_groq_provider
 from core.sales.contact import normalize_phone, blocked
 from core.sales.prompts import build_evidence
@@ -114,7 +115,7 @@ class SdrService:
                         raise HTTPException(409, "Identificador já utilizado para outra solicitação.")
                     if "response" in previous:
                         return deepcopy(previous["response"])
-                    raise HTTPException(previous["status"], previous["detail"])
+                    raise HTTPException(previous["status"], previous["detail"], headers=previous.get('headers'))
                 # Never evict active drafts early: capacity applies backpressure.
                 if len(self.requests) >= 100:
                     raise HTTPException(429, "Limite local de gerações atingido. Aguarde alguns minutos.")
@@ -149,6 +150,18 @@ class SdrService:
                 with self.cache_lock:
                     self.requests[key].update(status=error.status_code, detail=error.detail)
                 raise
+            except (SalesGenerationError, SalesConfigurationError) as error:
+                diagnostic = getattr(error, 'provider_error', None)
+                if isinstance(diagnostic, GroqProviderError):
+                    status, detail, code = diagnostic.http_status, str(diagnostic), diagnostic.code
+                elif isinstance(error, SalesConfigurationError):
+                    status, detail, code = 503, 'Revise GROQ_API_KEY, GROQ_MODEL e GROQ_TIMEOUT no ambiente do backend.', 'GROQ_CONFIG_INVALID'
+                else:
+                    status, detail, code = 502, 'Não foi possível gerar uma abordagem válida. Nenhuma mensagem foi salva.', 'SDR_GENERATION_FAILED'
+                headers = {'X-Loung-SDR-Code': code}
+                with self.cache_lock:
+                    self.requests[key].update(status=status, detail=detail, headers=headers)
+                raise HTTPException(status, detail, headers=headers) from None
             except Exception:
                 # SDK errors may contain request/credentials. Never echo or log them.
                 detail = "Não foi possível gerar uma abordagem válida. Confira a configuração Groq existente, conexão e limites; tente novamente."

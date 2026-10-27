@@ -1,22 +1,52 @@
 """One bounded worker, process-local results, cooperative cancellation."""
 from concurrent.futures import ThreadPoolExecutor
+from contextvars import copy_context
 from dataclasses import dataclass, field
 from io import BytesIO, StringIO
 from threading import Event, RLock
 from time import monotonic
 from uuid import uuid4
 import csv
+import json
+import logging
 import sqlite3
 
 from core.database.lead_repository import FIELDS, LeadRepository
 from core.prospecting.service import prospect
 from core.prospecting.limits import MAX_CANDIDATES_SCANNED, DEFAULT_MAX_REQUESTS, ProspectingStopReason, STOP_MESSAGES
 from core.providers.environment import load_environment
-from core.providers.google_places import GooglePlacesProvider
+from core.providers.google_places import (GooglePlacesProvider, GooglePlacesHTTPError,
+    GooglePlacesConfigurationError, GooglePlacesTransportError, GooglePlacesSafetyLimitError)
 from .models import SearchRequest, SearchStatus
 from .storage import SelectionStore
 
 TERMINAL = {"completed", "failed", "cancelled"}
+logger = logging.getLogger('uvicorn.error')
+FAILURE_MESSAGES = {
+    'PLACES_CONFIGURATION':'Google Places não configurado no backend. Verifique GOOGLE_PLACES_API_KEY.',
+    'PLACES_UNAUTHORIZED':'Google Places recusou a autenticação. Verifique a chave no backend.',
+    'PLACES_FORBIDDEN':'Google Places recusou o acesso. Verifique API habilitada, restrições da chave e faturamento.',
+    'PLACES_RATE_LIMITED':'Limite de requisições da Google Places atingido. Verifique a quota antes de tentar novamente.',
+    'PLACES_BAD_REQUEST':'Google Places rejeitou os parâmetros da consulta. Verifique a configuração da integração.',
+    'PLACES_UNAVAILABLE':'Google Places temporariamente indisponível. Resultados parciais preservados.',
+    'PLACES_TRANSPORT':'Falha de conexão com Google Places. Resultados parciais preservados.',
+    'PLACES_SAFETY_LIMIT':'Limite de segurança da pesquisa atingido. Resultados parciais preservados.',
+}
+
+
+def failure_type(error):
+    if isinstance(error,GooglePlacesConfigurationError):return 'PLACES_CONFIGURATION'
+    if isinstance(error,GooglePlacesHTTPError):
+        return {400:'PLACES_BAD_REQUEST',401:'PLACES_UNAUTHORIZED',403:'PLACES_FORBIDDEN',429:'PLACES_RATE_LIMITED'}.get(error.status,'PLACES_UNAVAILABLE')
+    if isinstance(error,GooglePlacesTransportError):return 'PLACES_TRANSPORT'
+    if isinstance(error,GooglePlacesSafetyLimitError):return 'PLACES_SAFETY_LIMIT'
+    return 'SEARCH_FAILED'
+
+
+def search_event(event,job,**counts):
+    logger.info(json.dumps({'event':event,'search_id':job.id,'status':job.status,
+        'found':len(job.rows),'duplicates':job.duplicates,'failure_type':job.failure_type,
+        'duration_ms':round((monotonic()-job.created)*1000),**counts}))
 
 
 class JobError(Exception):
@@ -44,6 +74,9 @@ class Job:
     pages: int = 0
     error: str | None = None
     message: str = "Aguardando execução."
+    created: float = field(default_factory=monotonic)
+    duplicates: int = 0
+    failure_type: str | None = None
 
 
 class JobManager:
@@ -88,7 +121,7 @@ class JobManager:
             self.store.existing([])
             job = Job(request)
             self.jobs[job.id] = job
-            self.executor.submit(self._run, job)
+            self.executor.submit(copy_context().run, self._run, job)
             return self.status(job.id)
 
     def status(self, job_id):
@@ -113,9 +146,13 @@ class JobManager:
             return [dict(row) for row in self.get(job_id).rows]
 
     def results(self, job_id, page, page_size):
-        rows = self.rows(job_id)
+        with self.lock:
+            job = self.get(job_id)
+            rows = [dict(row) for row in job.rows]
         selected = rows[(page-1)*page_size:page*page_size]
         existing = self.store.existing(selected)
+        with self.lock:
+            search_event('search.results',job,page=page,page_duplicates=sum(existing),available=len(selected)-sum(existing))
         return {"items":[{"id":row["_result_id"], "company":row["empresa"], "phone":row.get("telefone"),
             "niche":row.get("segmento"), "location":row.get("cidade"), "address":row.get("endereco"),
             "website":row.get("site"), "score":row.get("qualification_score"), "alreadySaved":saved}
@@ -130,7 +167,9 @@ class JobManager:
             if any(value not in rows for value in ids):
                 raise JobError("Seleção contém resultados inexistentes.",422)
             selected = [{k:v for k,v in rows[value].items() if k != "_result_id"} for value in dict.fromkeys(ids)]
-        return self.store.save(selected)
+        saved=self.store.save(selected)
+        search_event('search.imported',job,inserted=saved['inserted'],import_duplicates=saved['duplicates'])
+        return saved
 
     def export(self, job_id, format):
         if self.get(job_id).status not in TERMINAL:
@@ -174,11 +213,15 @@ class JobManager:
             @property
             def pages_fetched(self): return getattr(provider,"pages_fetched",0)
             def iter_search(self, **kwargs):
-                for candidate in provider.iter_search(**kwargs):
-                    with manager.lock:
-                        job.scanned += 1
-                        job.requests, job.pages = self.request_count, self.pages_fetched
-                    yield candidate
+                try:
+                    for candidate in provider.iter_search(**kwargs):
+                        with manager.lock:
+                            job.scanned += 1
+                            job.requests, job.pages = self.request_count, self.pages_fetched
+                        yield candidate
+                except Exception as error:
+                    job.failure_type=failure_type(error)
+                    raise
 
         class Stage:
             def __init__(self):
@@ -198,6 +241,7 @@ class JobManager:
         try:
             with self.lock:
                 job.status, job.message = "running", "Consultando Google Places e qualificando resultados."
+                search_event('search.running',job)
             provider = self.provider_factory()
             stage = Stage()
             summary = prospect(city=job.request.location, segment=job.request.niche, limit=job.request.quantity,
@@ -205,14 +249,19 @@ class JobManager:
                 min_score=job.request.minScore, max_candidates_scanned=MAX_CANDIDATES_SCANNED,
                 provider=Tracked(), repository=stage, cancel_event=Stop(), stream_results=True)
             with self.lock:
+                job.duplicates=summary.duplicates
                 job.status = "cancelled" if job.cancel.is_set() else "failed" if monotonic() >= job.deadline or summary.errors or summary.persistence_errors or summary.stop_code == ProspectingStopReason.PROVIDER_ERROR else "completed"
                 if job.status == "failed":
                     job.error = "A pesquisa atingiu o tempo limite ou ocorreu uma falha no Google Places. Resultados parciais preservados."
+                    job.failure_type=job.failure_type or ('SEARCH_TIMEOUT' if monotonic() >= job.deadline else 'SEARCH_FAILED')
+                    job.error=FAILURE_MESSAGES.get(job.failure_type,job.error)
                 job.message = "Pesquisa cancelada; resultados parciais preservados." if job.status == "cancelled" else summary.stop_reason or STOP_MESSAGES.get(summary.stop_code) or ("Pesquisa concluída." if job.status == "completed" else "Pesquisa interrompida.")
-        except Exception:
+        except Exception as error:
             with self.lock:
+                job.failure_type=failure_type(error)
                 job.status = "cancelled" if job.cancel.is_set() else "failed"
                 job.error = None if job.cancel.is_set() else "Não foi possível pesquisar. Verifique a configuração Google Places, conexão e quota no backend."
+                if job.error:job.error=FAILURE_MESSAGES.get(job.failure_type,job.error)
                 job.message = "Resultados parciais preservados."
         finally:
             if stage is not None:
@@ -221,3 +270,4 @@ class JobManager:
                 if provider is not None:
                     job.requests, job.pages = provider.request_count, getattr(provider,"pages_fetched",0)
                 job.finished = monotonic()
+                search_event('search.finished',job,scanned=job.scanned,requests=job.requests,pages=job.pages)

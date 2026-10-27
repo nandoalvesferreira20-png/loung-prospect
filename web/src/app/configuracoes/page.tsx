@@ -1,11 +1,12 @@
 "use client";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Settings2, Building2, Plug, Check, ShieldCheck } from "lucide-react";
 import { z } from "zod";
 import { PageHeader } from "@/components/shared";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useSession } from "@/components/session-provider";
 const preferencesSchema = z.object({
   displayName: z
     .string()
@@ -37,11 +38,24 @@ function parsePreferences(stored: string | null): Preferences {
   return { displayName: "", startPage: "/" };
 }
 export default function Settings() {
+  const session = useSession();
   const stored = useSyncExternalStore(subscribe, readStorage, () => null);
   const [draft, setPreferences] = useState<Preferences | null>(null);
   const preferences = draft ?? parsePreferences(stored);
   const [feedback, setFeedback] = useState("");
-  function save(e: React.FormEvent) {
+  useEffect(() => {
+    if(session?.role !== "local") return;
+    const controller = new AbortController();
+    void fetch("/api/local/preferences", {signal:controller.signal}).then(r => {
+      if(!r.ok) throw new Error();
+      return r.json();
+    }).then(data => {
+      const parsed = preferencesSchema.safeParse(data.values);
+      if(parsed.success) setPreferences(parsed.data);
+    }).catch(() => {if(!controller.signal.aborted)setFeedback("Falha ao carregar preferências do SQLite.");});
+    return () => controller.abort();
+  }, [session?.role]);
+  async function save(e: React.FormEvent) {
     e.preventDefault();
     const parsed = preferencesSchema.safeParse(preferences);
     if (!parsed.success) {
@@ -49,11 +63,17 @@ export default function Settings() {
       return;
     }
     try {
+      if(session?.role === "local") {
+        const response = await fetch("/api/local/preferences", {method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({values:parsed.data})});
+        if(!response.ok) throw new Error();
+        setFeedback("Preferências salvas no SQLite local.");
+        return;
+      }
       localStorage.setItem(key, JSON.stringify(parsed.data));
       setFeedback("Preferências salvas neste navegador.");
     } catch {
       setFeedback(
-        "O navegador bloqueou o armazenamento. As preferências não foram salvas.",
+        "Não foi possível salvar as preferências. Verifique o armazenamento local e o backend.",
       );
     }
   }
@@ -90,7 +110,7 @@ export default function Settings() {
                     maxLength={80}
                   />
                   <p className="label-help">
-                    Guardado somente neste navegador; não cria uma conta.
+                    {session?.role === "local" ? "Guardado no SQLite deste computador; não cria uma conta." : "Guardado somente neste navegador; não cria uma conta."}
                   </p>
                 </label>
                 <label>
@@ -138,16 +158,18 @@ export default function Settings() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm font-semibold">Loung Tech</p>
+              <p className="text-sm font-semibold">{session?.organization}</p>
+              {session?.role !== "local" && <><Link href="/configuracoes/equipe" className="mt-3 inline-block text-sm text-blue-600">Consultar equipe e acessos →</Link>
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                Workspace de uso interno. A gestão de empresas, membros e
-                permissões será disponibilizada em uma próxima fase.
+                Carteira compartilhada entre os membros autorizados. Convites e
+                permissões são provisionados pelo administrador do workspace.
               </p>
               <div className="mt-4 flex items-start gap-2 rounded-lg bg-slate-50 p-3 text-xs leading-5 text-slate-500">
                 <ShieldCheck size={16} className="mt-0.5 shrink-0" />
-                Esta fase ainda não possui autenticação. Utilize somente em
-                ambiente local.
-              </div>
+                Sessão individual e acesso por organização. A publicação depende
+                da configuração e validação operacional descritas na Fase 3.1.
+              </div></>}
+              {session?.role === "local" && <p className="mt-2 text-sm text-slate-500">Base independente neste computador. Configure Google Places e Groq no arquivo de ambiente do backend.</p>}
             </CardContent>
           </Card>
         </div>

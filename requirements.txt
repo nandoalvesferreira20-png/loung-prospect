@@ -4,3 +4,4 @@ pandas
 openpyxl
 python-dotenv>=1,<2
 groq>=0.31,<1
+truststore==0.10.4; sys_platform == "win32"

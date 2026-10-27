@@ -1,9 +1,10 @@
+import { dashboardFetch } from "./dashboard-timing";
 import "server-only";
 import { isLocalRequest } from "./local-request";
 import { activitySchema, followupSchema, stageSchema } from "./crm-contracts";
 type Operation = "pipeline" | "detail" | "stage" | "activities" | "activity" | "schedule" | "followup" | "followups" | "metrics";
 export async function proxyCrm(request: Request, operation: Operation, id?: string) {
-  const headers = {"Cache-Control":"no-store"};
+  const headers: Record<string,string> = {"Cache-Control":"no-store"};
   const fail = (detail: string, status: number) => Response.json({detail},{status,headers});
   if (!isLocalRequest(request)) return fail("Utilize a aplicação local.",403);
   if (id !== undefined && !/^[1-9]\d{0,14}$/.test(id)) return fail("Identificador inválido.",422);
@@ -31,15 +32,16 @@ export async function proxyCrm(request: Request, operation: Operation, id?: stri
       if (!parsed.success) return fail("Revise etapa, confirmação, data com fuso e tamanho dos campos.",422);
       body = JSON.stringify(parsed.data);
     }
-    const response = await fetch(url,{ method:operation === "stage" || operation === "followup" ? "PATCH" : body ? "POST" : "GET", body,
-      headers:body ? {"Content-Type":"application/json"} : undefined, cache:"no-store",redirect:"error",signal:AbortSignal.timeout(20000) });
+    const response = await dashboardFetch(url,{ method:operation === "stage" || operation === "followup" ? "PATCH" : body ? "POST" : "GET", body,
+      cache:"no-store",redirect:"error",signal:AbortSignal.timeout(20000) },headers,!!body);
     if (!response.ok) {
       let detail = "Não foi possível concluir a operação comercial.";
       try {const data = await response.json(); if (typeof data.detail === "string") detail = data.detail.slice(0,500);} catch { /* Keep errors sanitized. */ }
-      return fail(detail,[403,404,409,422,503].includes(response.status) ? response.status : 502);
+      return fail(detail,[401,403,404,409,422,503].includes(response.status) ? response.status : 502);
     }
     return Response.json(await response.json(),{headers});
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === "SESSION_EXPIRED") return fail("Sessao expirada. Entre novamente.",401);
     return fail("API local indisponível. O texto foi preservado. Atualize os dados antes de repetir uma alteração.",503);
   }
 }

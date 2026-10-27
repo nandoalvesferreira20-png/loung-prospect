@@ -18,7 +18,7 @@ export function SdrHistoryPanel({ history, busy, onLoad }: {
             {history.items.map(item => (
               <li key={item.id} className="py-4 first:pt-0">
                 <div className="flex flex-wrap justify-between gap-2 text-xs text-slate-500">
-                  <span>{item.status} · {item.createdAt ? new Date(item.createdAt).toLocaleString("pt-BR") : "Data não informada"}</span>
+                  <span>{item.actorName || "Autoria legada desconhecida"} / {item.status} · {item.createdAt ? new Date(item.createdAt).toLocaleString("pt-BR") : "Data não informada"}</span>
                   <button className="font-medium text-blue-700 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-blue-600" disabled={busy} onClick={() => onLoad(item.message)}>Carregar no editor</button>
                 </div>
                 <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-600">{item.message}</p>

@@ -47,6 +47,25 @@ def test_official_sdk_request_and_response():
     assert factory.call_args.kwargs["timeout"] == 60
 
 
+def test_documented_sdr_model_uses_existing_json_contract(monkeypatch):
+    from core.sales.config import create_groq_provider
+    monkeypatch.setenv('GROQ_API_KEY', 'synthetic-test-key')
+    monkeypatch.setenv('GROQ_MODEL', 'openai/gpt-oss-20b')
+    monkeypatch.setenv('GROQ_TIMEOUT', '30')
+    selected = create_groq_provider(load=False)
+    payloads = []
+
+    def handler(request):
+        payloads.append(json.loads(request.content))
+        return httpx.Response(200, json={**completion(), 'model': 'openai/gpt-oss-20b'})
+
+    selected.client_factory = lambda **kwargs: groq.Groq(**kwargs, http_client=httpx.Client(transport=httpx.MockTransport(handler)))
+    assert selected.generate(system_prompt='Return JSON', evidence={'empresa': 'Synthetic'}) == ANSWER
+    assert payloads[0]['model'] == 'openai/gpt-oss-20b'
+    assert payloads[0]['response_format'] == {'type': 'json_object'}
+    assert payloads[0]['max_completion_tokens'] == 1600
+
+
 @pytest.mark.parametrize("status,expected", [(401, "credencial"), (403, "permissões"), (429, "429"), (500, "rejeitou"), (400, "GROQ_MODEL")])
 def test_http_errors_sanitized_no_retries(status, expected):
     calls = []

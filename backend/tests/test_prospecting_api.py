@@ -24,6 +24,36 @@ from core.prospecting.service import prospect
 QUERY={"niche":"Clínicas odontológicas","location":"São Paulo, SP","quantity":3}
 
 
+@pytest.mark.parametrize('status,code,message',[
+    (401,'PLACES_UNAUTHORIZED','autenticação'),
+    (403,'PLACES_FORBIDDEN','faturamento'),
+    (429,'PLACES_RATE_LIMITED','quota'),
+])
+def test_external_failures_have_safe_actionable_messages(database,monkeypatch,caplog,status,code,message):
+    caplog.set_level('INFO',logger='uvicorn.error')
+    def denied(*args):return status,b'{"error":{"message":"PRIVATE_KEY_AND_RESPONSE"}}'
+    with api(database,monkeypatch,send=denied) as client:
+        job_id=start(client);job=wait(client,job_id)
+        assert job['status']=='failed' and job['found']==0
+        assert message in job['error']
+        assert client.get(f'/v1/prospecting/search/{job_id}/results').json()['items']==[]
+    events=[json.loads(record.message) for record in caplog.records if record.message.startswith('{')]
+    event=next(event for event in events if event['event']=='search.finished')
+    assert event['search_id']==job_id and event['failure_type']==code and event['requests']==1
+    assert 'PRIVATE_KEY_AND_RESPONSE' not in caplog.text and 'unit-test-not-a-real-key' not in caplog.text
+
+
+def test_empty_search_is_completed_without_import(database,monkeypatch,caplog):
+    caplog.set_level('INFO',logger='uvicorn.error')
+    before=database.read_bytes()
+    with api(database,monkeypatch,send=lambda *args:(200,b'{}')) as client:
+        job_id=start(client);job=wait(client,job_id)
+        assert job['status']=='completed' and job['found']==0 and job['error'] is None
+        assert client.get(f'/v1/prospecting/search/{job_id}/results').json()['total']==0
+    assert database.read_bytes()==before
+    assert '"available": 0' in caplog.text
+
+
 def place(index, **extra):
     return {"id":f"synthetic-{index}","displayName":{"text":f"Teste busca {index}"},"formattedAddress":f"Rua de teste {index}","nationalPhoneNumber":"(11) 99999-0000",**extra}
 
