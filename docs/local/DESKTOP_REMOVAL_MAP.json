@@ -1,0 +1,3091 @@
+{
+  "recovery_commit": "3f5a14b0440fb869b816e7043ecf9225396c9496",
+  "initial_changes": " M web/next-env.d.ts\n",
+  "tracked_structure": {
+    "assets": 1,
+    "backend": 80,
+    "core": 63,
+    "docs": 44,
+    "scripts": 5,
+    "supabase": 6,
+    "templates": 16,
+    "tests": 54,
+    "ui": 29,
+    "web": 140
+  },
+  "dependencies": {
+    "app.py": {
+      "imports": [
+        "import customtkinter as ctk",
+        "from ui.theme import COLORS, install_theme",
+        "from ui.sidebar import Sidebar",
+        "from ui.home import HomePage",
+        "from ui.dashboard import DashboardPage",
+        "from ui.prototype_studio import PrototypeStudioPage",
+        "from ui.prototype_logic import PrototypeSession",
+        "from ui.lead_workspace import LeadWorkspacePage",
+        "from ui.places_search import PlacesSearchPage",
+        "from ui.my_day import MyDayPage",
+        "from ui.sales_workspace import SalesWorkspacePage",
+        "from core.providers.environment import load_environment",
+        "from ui.sdr_diagnostics import event, timed, callback_error"
+      ],
+      "dynamic": []
+    },
+    "backend/__init__.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "backend/authorization.py": {
+      "imports": [
+        "from contextvars import ContextVar",
+        "from dataclasses import dataclass",
+        "from uuid import UUID, uuid4",
+        "import json",
+        "import logging",
+        "from time import monotonic",
+        "import ssl",
+        "import sys",
+        "import jwt",
+        "from fastapi import HTTPException",
+        "import truststore"
+      ],
+      "dynamic": []
+    },
+    "backend/config.py": {
+      "imports": [
+        "from dataclasses import dataclass",
+        "import os",
+        "from pathlib import Path"
+      ],
+      "dynamic": []
+    },
+    "backend/crm/__init__.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "backend/crm/models.py": {
+      "imports": [
+        "from typing import Literal",
+        "from pydantic import BaseModel, ConfigDict, Field, field_validator",
+        "from core.commercial.values import utc_iso"
+      ],
+      "dynamic": []
+    },
+    "backend/crm/routes.py": {
+      "imports": [
+        "from typing import Annotated, Literal",
+        "from fastapi import APIRouter, Query, Request, Path",
+        "from .models import StageChange, ActivityCreate, FollowupChange"
+      ],
+      "dynamic": []
+    },
+    "backend/crm/service.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "import hashlib",
+        "import json",
+        "import sqlite3",
+        "from zoneinfo import ZoneInfo, ZoneInfoNotFoundError",
+        "from fastapi import HTTPException",
+        "from core.commercial.values import STATUSES, commercial_status",
+        "from core.commercial.day import build_day",
+        "from core.database.interaction_repository import InteractionRepository",
+        "from core.database.lead_repository import FIELDS",
+        "from core.sales.contact import blocked",
+        "from backend.repository import ReadRepository",
+        "from backend.prospecting.storage import StorageError"
+      ],
+      "dynamic": []
+    },
+    "backend/local_database.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "from pathlib import Path",
+        "import sqlite3",
+        "from uuid import uuid4",
+        "from core.database.schema import initialize_database"
+      ],
+      "dynamic": []
+    },
+    "backend/local_routes.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "import json",
+        "import sqlite3",
+        "from fastapi import APIRouter, Request, HTTPException",
+        "from pydantic import BaseModel, Field",
+        "from backend.persistence.leads import LeadFields, LeadEdit",
+        "from backend.crm.service import revision",
+        "from backend.prospecting.storage import StorageError",
+        "from core.database.lead_repository import LeadRepository"
+      ],
+      "dynamic": []
+    },
+    "backend/main.py": {
+      "imports": [
+        "from typing import Annotated",
+        "from contextlib import asynccontextmanager",
+        "import asyncio",
+        "from fastapi import FastAPI, HTTPException, Query, Request",
+        "from fastapi.responses import JSONResponse",
+        "from starlette.middleware.trustedhost import TrustedHostMiddleware",
+        "from .config import Settings",
+        "from .models import Lead, LeadPage, Overview",
+        "from .repository import DatabaseUnavailable, ReadRepository",
+        "from .prospecting.jobs import JobManager, JobError, configured_provider",
+        "from .prospecting.storage import SelectionStore, StorageError",
+        "from .prospecting.routes import router as prospecting_router",
+        "from .sdr.routes import router as sdr_router",
+        "from .sdr.service import SdrService, configured_provider as configured_sdr_provider",
+        "from .crm.service import CrmService, local_zone",
+        "from .crm.routes import router as crm_router",
+        "from .local_routes import router as local_router",
+        "from .persistence.runtime import create_postgres_app",
+        "from .local_database import initialize_local_database"
+      ],
+      "dynamic": []
+    },
+    "backend/models.py": {
+      "imports": [
+        "from typing import Literal",
+        "from pydantic import BaseModel"
+      ],
+      "dynamic": []
+    },
+    "backend/persistence/__init__.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "backend/persistence/errors.py": {
+      "imports": [
+        "from backend.repository import DatabaseUnavailable",
+        "import re"
+      ],
+      "dynamic": []
+    },
+    "backend/persistence/leads.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "from fastapi import APIRouter, Request, HTTPException, Path",
+        "from pydantic import BaseModel, ConfigDict, Field, StringConstraints",
+        "from typing import Annotated",
+        "from backend.crm.models import Mutation",
+        "from backend.crm.service import revision"
+      ],
+      "dynamic": []
+    },
+    "backend/persistence/postgres.py": {
+      "imports": [
+        "from contextlib import contextmanager, closing",
+        "from threading import RLock",
+        "import json",
+        "import re",
+        "import psycopg",
+        "from psycopg.rows import dict_row",
+        "from fastapi import HTTPException",
+        "from backend.authorization import identity, Identity",
+        "from backend.repository import ReadRepository, DatabaseUnavailable",
+        "from backend.prospecting.storage import SelectionStore",
+        "from backend.persistence.errors import DatabaseAccessError",
+        "from backend.persistence.session_queries import MEMBERSHIPS_SQL, PROFILE_SQL, STATEMENTS",
+        "from backend.persistence.timing import measure, timed"
+      ],
+      "dynamic": []
+    },
+    "backend/persistence/runtime.py": {
+      "imports": [
+        "from contextlib import asynccontextmanager",
+        "from types import SimpleNamespace",
+        "from threading import RLock",
+        "from fastapi import FastAPI, Request, HTTPException",
+        "from fastapi.responses import JSONResponse",
+        "from starlette.middleware.trustedhost import TrustedHostMiddleware",
+        "from backend.authorization import TokenVerifier, Identity, identity",
+        "from backend.repository import DatabaseUnavailable",
+        "from backend.prospecting.storage import StorageError",
+        "from backend.prospecting.jobs import JobError",
+        "from backend.persistence.searches import PgJobManager as JobManager",
+        "from backend.prospecting.routes import router as prospecting",
+        "from backend.sdr.routes import router as sdr_routes",
+        "from backend.sdr.service import SdrService",
+        "from backend.persistence.sdr import PgSdrStore",
+        "from backend.crm.routes import router as crm",
+        "from backend.crm.service import CrmService, local_zone",
+        "from backend.persistence.postgres import Database, PgStore, PgReader, PgCrmMixin",
+        "from backend.persistence.session_queries import PROFILE_SQL",
+        "from backend.persistence.timing import current as request_timings, measure",
+        "import asyncio",
+        "import logging",
+        "from backend.persistence.team import router as team_router",
+        "from backend.persistence.leads import router as lead_writes",
+        "from typing import Annotated",
+        "from fastapi import Query"
+      ],
+      "dynamic": []
+    },
+    "backend/persistence/sdr.py": {
+      "imports": [
+        "from backend.sdr.storage import SdrStore"
+      ],
+      "dynamic": []
+    },
+    "backend/persistence/searches.py": {
+      "imports": [
+        "import json",
+        "from contextlib import closing",
+        "from contextvars import copy_context",
+        "from backend.prospecting.jobs import JobManager, Job, JobError, TERMINAL, search_event",
+        "from backend.prospecting.models import SearchRequest",
+        "from backend.repository import DatabaseUnavailable",
+        "from backend.persistence.postgres import PgReader"
+      ],
+      "dynamic": []
+    },
+    "backend/persistence/session_queries.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "backend/persistence/team.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from typing import Literal",
+        "from uuid import UUID",
+        "from fastapi import APIRouter, HTTPException, Request, Query",
+        "from pydantic import BaseModel, ConfigDict",
+        "import psycopg",
+        "from backend.authorization import identity",
+        "from backend.persistence.errors import DatabaseAccessError"
+      ],
+      "dynamic": []
+    },
+    "backend/persistence/timing.py": {
+      "imports": [
+        "from contextvars import ContextVar",
+        "from contextlib import contextmanager",
+        "from functools import wraps",
+        "from time import perf_counter"
+      ],
+      "dynamic": []
+    },
+    "backend/prospecting/__init__.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "backend/prospecting/jobs.py": {
+      "imports": [
+        "from concurrent.futures import ThreadPoolExecutor",
+        "from contextvars import copy_context",
+        "from dataclasses import dataclass, field",
+        "from io import BytesIO, StringIO",
+        "from threading import Event, RLock",
+        "from time import monotonic",
+        "from uuid import uuid4",
+        "import csv",
+        "import json",
+        "import logging",
+        "import sqlite3",
+        "from core.database.lead_repository import FIELDS, LeadRepository",
+        "from core.prospecting.service import prospect",
+        "from core.prospecting.limits import MAX_CANDIDATES_SCANNED, DEFAULT_MAX_REQUESTS, ProspectingStopReason, STOP_MESSAGES",
+        "from core.providers.environment import load_environment",
+        "from core.providers.google_places import GooglePlacesProvider, GooglePlacesHTTPError, GooglePlacesConfigurationError, GooglePlacesTransportError, GooglePlacesSafetyLimitError",
+        "from .models import SearchRequest, SearchStatus",
+        "from .storage import SelectionStore",
+        "from openpyxl import Workbook"
+      ],
+      "dynamic": []
+    },
+    "backend/prospecting/models.py": {
+      "imports": [
+        "from typing import Annotated, Literal",
+        "from pydantic import BaseModel, ConfigDict, Field, StringConstraints"
+      ],
+      "dynamic": []
+    },
+    "backend/prospecting/routes.py": {
+      "imports": [
+        "from typing import Annotated, Literal",
+        "from fastapi import APIRouter, Query, Request",
+        "from fastapi.responses import Response",
+        "from .models import SearchRequest, ImportRequest, SearchStatus"
+      ],
+      "dynamic": []
+    },
+    "backend/prospecting/storage.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "from pathlib import Path",
+        "import sqlite3",
+        "from threading import RLock",
+        "from uuid import uuid4",
+        "from core.database.lead_repository import FIELDS, LeadRepository"
+      ],
+      "dynamic": []
+    },
+    "backend/repository.py": {
+      "imports": [
+        "from contextlib import contextmanager",
+        "from datetime import date, datetime",
+        "from pathlib import Path",
+        "import sqlite3",
+        "import unicodedata",
+        "from core.commercial.day import build_day",
+        "from core.commercial.values import STATUSES, commercial_status",
+        "from core.sales.contact_routing import classify_contact",
+        "from .models import Lead, LeadPage, Overview, StageCount"
+      ],
+      "dynamic": []
+    },
+    "backend/scripts/check_access.py": {
+      "imports": [
+        "import argparse",
+        "import json",
+        "import os",
+        "from pathlib import Path",
+        "from uuid import uuid4",
+        "from dotenv import dotenv_values",
+        "from backend.persistence.errors import database_error_code",
+        "import psycopg",
+        "from psycopg.conninfo import conninfo_to_dict"
+      ],
+      "dynamic": []
+    },
+    "backend/scripts/check_crm_database_copy.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from pathlib import Path",
+        "from tempfile import TemporaryDirectory",
+        "import hashlib",
+        "import sqlite3",
+        "from fastapi.testclient import TestClient",
+        "from backend.config import Settings",
+        "from backend.main import create_app"
+      ],
+      "dynamic": []
+    },
+    "backend/scripts/check_database_copy.py": {
+      "imports": [
+        "from contextlib import closing",
+        "import hashlib",
+        "from pathlib import Path",
+        "import sqlite3",
+        "from tempfile import TemporaryDirectory",
+        "from uuid import uuid4",
+        "from backend.config import Settings",
+        "from backend.prospecting.storage import SelectionStore"
+      ],
+      "dynamic": []
+    },
+    "backend/scripts/check_groq_config.py": {
+      "imports": [
+        "import argparse",
+        "import json",
+        "import os",
+        "from pathlib import Path",
+        "import re",
+        "from dotenv import dotenv_values"
+      ],
+      "dynamic": []
+    },
+    "backend/scripts/check_migration_target.py": {
+      "imports": [
+        "import argparse",
+        "import hashlib",
+        "import json",
+        "from uuid import UUID",
+        "import psycopg",
+        "from psycopg import sql",
+        "from backend.scripts.migrate_sqlite import ORDER, migration_dsn, safe_failure"
+      ],
+      "dynamic": []
+    },
+    "backend/scripts/check_phase32_readiness.py": {
+      "imports": [
+        "import argparse",
+        "import json",
+        "import os",
+        "from pathlib import Path",
+        "from dotenv import dotenv_values",
+        "import psycopg",
+        "from psycopg.conninfo import conninfo_to_dict"
+      ],
+      "dynamic": []
+    },
+    "backend/scripts/check_sdr_database_copy.py": {
+      "imports": [
+        "from contextlib import closing",
+        "import hashlib",
+        "from pathlib import Path",
+        "import sqlite3",
+        "from tempfile import TemporaryDirectory",
+        "from uuid import uuid4",
+        "from fastapi.testclient import TestClient",
+        "from backend.config import Settings",
+        "from backend.main import create_app",
+        "from backend.tests.test_sdr_api import Provider"
+      ],
+      "dynamic": []
+    },
+    "backend/scripts/check_session_access.py": {
+      "imports": [
+        "import argparse",
+        "import json",
+        "import os",
+        "from pathlib import Path",
+        "from uuid import UUID, uuid4",
+        "from dotenv import dotenv_values",
+        "from psycopg.conninfo import conninfo_to_dict",
+        "from backend.authorization import identity, Identity",
+        "from backend.persistence.postgres import Database, PgReader",
+        "from backend.persistence.errors import DatabaseAccessError, permission_details",
+        "from backend.persistence.session_queries import PROFILE_SQL"
+      ],
+      "dynamic": []
+    },
+    "backend/scripts/migrate_sqlite.py": {
+      "imports": [
+        "import argparse",
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "import hashlib",
+        "import json",
+        "import os",
+        "import re",
+        "from pathlib import Path",
+        "import sqlite3",
+        "from uuid import UUID, uuid4",
+        "import psycopg",
+        "import psycopg",
+        "from psycopg import sql",
+        "from psycopg.rows import dict_row",
+        "from dotenv import dotenv_values"
+      ],
+      "dynamic": []
+    },
+    "backend/scripts/profile_dashboard_db.py": {
+      "imports": [
+        "import argparse",
+        "import json",
+        "from time import perf_counter",
+        "from pathlib import Path",
+        "from dotenv import dotenv_values",
+        "import psycopg",
+        "from psycopg.conninfo import conninfo_to_dict",
+        "from backend.persistence.postgres import TABLES"
+      ],
+      "dynamic": []
+    },
+    "backend/scripts/run_api.py": {
+      "imports": [
+        "import argparse",
+        "from pathlib import Path",
+        "import uvicorn",
+        "from dotenv import load_dotenv",
+        "from backend.config import Settings",
+        "import os"
+      ],
+      "dynamic": []
+    },
+    "backend/scripts/run_offline_tests.py": {
+      "imports": [
+        "import socket",
+        "import os",
+        "import sys",
+        "import pytest"
+      ],
+      "dynamic": []
+    },
+    "backend/sdr/__init__.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "backend/sdr/models.py": {
+      "imports": [
+        "from typing import Literal",
+        "from uuid import UUID",
+        "from pydantic import BaseModel, ConfigDict, Field, field_validator"
+      ],
+      "dynamic": []
+    },
+    "backend/sdr/policy.py": {
+      "imports": [
+        "import re",
+        "from core.sales.contact_routing import classify_contact, normalize_niche"
+      ],
+      "dynamic": []
+    },
+    "backend/sdr/routes.py": {
+      "imports": [
+        "from fastapi import APIRouter, Request, Path",
+        "from .models import GenerateRequest, SaveRequest"
+      ],
+      "dynamic": []
+    },
+    "backend/sdr/service.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from threading import Lock, RLock",
+        "from time import monotonic",
+        "from uuid import uuid4",
+        "from fastapi import HTTPException",
+        "from core.sales.agent import SalesAgent, SalesGenerationError",
+        "from core.sales.errors import SalesConfigurationError, GroqProviderError",
+        "from core.sales.config import create_groq_provider",
+        "from core.sales.contact import normalize_phone, blocked",
+        "from core.sales.prompts import build_evidence",
+        "from .policy import routing, SERVICES, WEB_POLICY",
+        "from .storage import SdrStore"
+      ],
+      "dynamic": []
+    },
+    "backend/sdr/storage.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "import sqlite3",
+        "import logging",
+        "import json",
+        "from fastapi import HTTPException",
+        "from core.sales.contact import blocked",
+        "from core.sales.models import validate_message",
+        "from core.database.lead_repository import FIELDS",
+        "from backend.repository import ReadRepository",
+        "from backend.prospecting.storage import StorageError"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/auth_session_fixture.py": {
+      "imports": [
+        "from datetime import datetime, timedelta, timezone",
+        "import json",
+        "from secrets import token_urlsafe",
+        "from uuid import uuid4",
+        "import jwt",
+        "from cryptography.hazmat.primitives.asymmetric import ec",
+        "from fastapi import FastAPI, HTTPException, Request",
+        "from fastapi.middleware.cors import CORSMiddleware",
+        "from fastapi.responses import JSONResponse",
+        "from backend.authorization import TokenVerifier"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/bootstrap_native_phase32.py": {
+      "imports": [
+        "from pathlib import Path",
+        "import psycopg"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/crm_fixture_server.py": {
+      "imports": [
+        "from contextlib import asynccontextmanager",
+        "from pathlib import Path",
+        "from tempfile import TemporaryDirectory",
+        "from datetime import datetime, timedelta, timezone",
+        "import sqlite3",
+        "from backend.config import Settings",
+        "from backend.main import create_app as production_app",
+        "from core.database.schema import initialize_database",
+        "from backend.tests.test_sdr_api import Provider"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/fixture_server.py": {
+      "imports": [
+        "from contextlib import asynccontextmanager",
+        "from pathlib import Path",
+        "from tempfile import TemporaryDirectory",
+        "import sqlite3",
+        "from backend.config import Settings",
+        "from backend.main import create_app as production_app",
+        "from core.database.schema import initialize_database"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/local_fixture_server.py": {
+      "imports": [
+        "from pathlib import Path",
+        "from uuid import uuid4",
+        "from backend.config import Settings",
+        "from backend.main import create_app",
+        "from backend.tests.test_sdr_api import Provider",
+        "from core.providers.google_places import GooglePlacesProvider",
+        "import json",
+        "import os"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/phase31_fixture_server.py": {
+      "imports": [
+        "from datetime import datetime, timedelta, timezone",
+        "from secrets import token_urlsafe",
+        "from uuid import uuid4",
+        "from pathlib import Path",
+        "import json",
+        "import jwt",
+        "import psycopg",
+        "from cryptography.hazmat.primitives.asymmetric import ec",
+        "from fastapi import FastAPI, Request",
+        "from fastapi.responses import JSONResponse",
+        "from fastapi.middleware.cors import CORSMiddleware",
+        "from backend.main import create_app as runtime",
+        "from backend.config import Settings",
+        "from backend.authorization import Identity, identity",
+        "from backend.persistence.postgres import Database, PgStore",
+        "from backend.tests.test_phase31_postgres import DSN"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/phase32_fixture_server.py": {
+      "imports": [
+        "import psycopg",
+        "from uuid import uuid4",
+        "from pathlib import Path",
+        "from backend.tests.phase31_fixture_server import create_app as base_app",
+        "from backend.tests.test_phase31_postgres import DSN"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/prospecting_fixture_server.py": {
+      "imports": [
+        "from contextlib import asynccontextmanager",
+        "from pathlib import Path",
+        "from tempfile import TemporaryDirectory",
+        "from time import sleep",
+        "import asyncio",
+        "import json",
+        "import os",
+        "import sqlite3",
+        "from backend.config import Settings",
+        "from backend.main import create_app as production_app",
+        "from core.database.schema import initialize_database",
+        "from core.providers.google_places import GooglePlacesProvider",
+        "from backend.authorization import TokenVerifier",
+        "from fastapi import HTTPException, Request",
+        "from fastapi.responses import JSONResponse"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/reproduce_owner_snapshot.py": {
+      "imports": [
+        "from uuid import uuid4",
+        "import psycopg",
+        "from backend.tests.bootstrap_native_phase32 import DSN"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/sdr_fixture_server.py": {
+      "imports": [
+        "from contextlib import asynccontextmanager",
+        "from pathlib import Path",
+        "from tempfile import TemporaryDirectory",
+        "from time import sleep",
+        "import sqlite3",
+        "from backend.config import Settings",
+        "from backend.main import create_app as production_app",
+        "from backend.tests.test_sdr_api import Provider",
+        "from core.database.schema import initialize_database"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_access_diagnostics.py": {
+      "imports": [
+        "from pathlib import Path",
+        "from types import SimpleNamespace",
+        "from uuid import uuid4",
+        "import psycopg",
+        "import pytest",
+        "from fastapi.testclient import TestClient",
+        "from backend.main import create_app",
+        "from backend.config import Settings",
+        "from backend.persistence.postgres import Database",
+        "from backend.persistence.errors import DatabaseAccessError, database_error_code",
+        "from backend.authorization import Identity",
+        "from backend.scripts.run_api import main",
+        "from backend.persistence.errors import permission_details",
+        "from backend.scripts.check_session_access import diagnose"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_api.py": {
+      "imports": [
+        "from datetime import date, datetime, timedelta, timezone",
+        "import hashlib",
+        "import sqlite3",
+        "import pytest",
+        "from fastapi.testclient import TestClient",
+        "from backend.config import Settings",
+        "from backend.main import create_app",
+        "from backend.repository import ReadRepository",
+        "from core.database.schema import initialize_database"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_auth_schema_acl.py": {
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "from types import SimpleNamespace",
+        "import psycopg",
+        "from psycopg import sql",
+        "from fastapi.testclient import TestClient",
+        "import pytest",
+        "from backend.persistence.errors import permission_details",
+        "from backend.tests.test_phase31_postgres import workspace, DSN"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_auth_tls.py": {
+      "imports": [
+        "from datetime import datetime, timedelta, timezone",
+        "from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer",
+        "from threading import Thread",
+        "import ssl",
+        "import pytest",
+        "import jwt",
+        "from cryptography import x509",
+        "from cryptography.hazmat.primitives import hashes, serialization",
+        "from cryptography.hazmat.primitives.asymmetric import ec",
+        "from cryptography.x509.oid import NameOID",
+        "from backend.authorization import TokenVerifier",
+        "from fastapi import HTTPException",
+        "import json",
+        "from types import SimpleNamespace"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_crm_api.py": {
+      "imports": [
+        "from concurrent.futures import ThreadPoolExecutor",
+        "from datetime import datetime, timezone",
+        "import sqlite3",
+        "from zoneinfo import ZoneInfo",
+        "import pytest",
+        "from fastapi.testclient import TestClient",
+        "from backend.config import Settings",
+        "from backend.main import create_app",
+        "from backend.tests.test_api import database",
+        "from core.commercial.day import build_day",
+        "from core.commercial.values import STATUS_ALIASES"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_dashboard_performance.py": {
+      "imports": [
+        "from contextlib import contextmanager",
+        "from types import SimpleNamespace",
+        "import pytest",
+        "from fastapi import HTTPException",
+        "from backend.authorization import Identity, identity",
+        "from backend.persistence.postgres import Connection, TABLES",
+        "from backend.persistence.session_queries import STATEMENTS",
+        "from backend.persistence.timing import current, measure",
+        "from backend.crm.service import CrmService",
+        "from backend.prospecting.storage import SelectionStore",
+        "from backend.tests.test_api import database"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_groq_integration.py": {
+      "imports": [
+        "import json",
+        "from uuid import uuid4",
+        "import groq",
+        "import httpx",
+        "import pytest",
+        "from fastapi.testclient import TestClient",
+        "from backend.config import Settings",
+        "from backend.main import create_app",
+        "from backend.tests.test_api import database",
+        "from core.sales.groq_provider import GroqSalesProvider",
+        "from core.sales.config import groq_settings",
+        "import sqlite3",
+        "from core.sales.config import create_groq_provider",
+        "from dotenv import load_dotenv",
+        "from backend.prospecting.storage import StorageError",
+        "from backend.scripts.check_groq_config import report"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_groq_tls.py": {
+      "imports": [
+        "from datetime import datetime, timedelta, timezone",
+        "from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer",
+        "from threading import Thread",
+        "import json",
+        "import ssl",
+        "import sys",
+        "import groq",
+        "import httpx",
+        "import pytest",
+        "from cryptography import x509",
+        "from cryptography.hazmat.primitives import hashes, serialization",
+        "from cryptography.hazmat.primitives.asymmetric import ec",
+        "from cryptography.x509.oid import NameOID",
+        "from core.sales.groq_provider import GroqSalesProvider, _sdk_client",
+        "from core.sales.errors import GroqProviderError",
+        "import truststore",
+        "import truststore"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_local_mode.py": {
+      "imports": [
+        "from contextlib import closing",
+        "import sqlite3",
+        "from uuid import uuid4",
+        "import pytest",
+        "from fastapi.testclient import TestClient",
+        "from backend.config import Settings, CLOUD_MARKERS",
+        "from backend.local_database import initialize_local_database",
+        "from backend.main import create_app",
+        "from backend.tests.test_sdr_api import Provider",
+        "from core.database.schema import initialize_database"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_migration_diagnostics.py": {
+      "imports": [
+        "import json",
+        "import pytest",
+        "from backend.scripts.migrate_sqlite import migration_dsn, safe_failure",
+        "import os",
+        "import psycopg"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_phase31_postgres.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone, timedelta",
+        "from pathlib import Path",
+        "from uuid import uuid4",
+        "from types import SimpleNamespace",
+        "import json",
+        "import sqlite3",
+        "import jwt",
+        "import psycopg",
+        "import pytest",
+        "from concurrent.futures import ThreadPoolExecutor",
+        "from time import monotonic, sleep",
+        "from fastapi.testclient import TestClient",
+        "from cryptography.hazmat.primitives.asymmetric import ec",
+        "from backend.main import create_app",
+        "from backend.config import Settings",
+        "from backend.authorization import identity, Identity, TokenVerifier",
+        "from backend.persistence.postgres import Database, PgStore, PgReader",
+        "from backend.tests.test_phase31_security import source",
+        "from backend.scripts.migrate_sqlite import inspect_source, apply",
+        "from backend.tests.test_sdr_api import Provider",
+        "from backend.tests.test_prospecting_api import transport",
+        "from core.providers.google_places import GooglePlacesProvider",
+        "from backend.scripts.check_migration_target import inspect_target"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_phase31_security.py": {
+      "imports": [
+        "from datetime import datetime, timezone, timedelta",
+        "from pathlib import Path",
+        "from types import SimpleNamespace",
+        "from uuid import uuid4",
+        "import hashlib",
+        "import sqlite3",
+        "import jwt",
+        "import pytest",
+        "from cryptography.hazmat.primitives.asymmetric import ec",
+        "from fastapi import HTTPException",
+        "from fastapi.testclient import TestClient",
+        "from backend.authorization import TokenVerifier",
+        "from backend.config import Settings",
+        "from backend.main import create_app",
+        "from backend.scripts.migrate_sqlite import inspect_source, apply",
+        "from core.database.schema import initialize_database",
+        "from backend.repository import DatabaseUnavailable"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_phase32_team.py": {
+      "imports": [
+        "from pathlib import Path",
+        "import psycopg",
+        "import pytest",
+        "from fastapi.testclient import TestClient",
+        "from backend.tests.test_phase31_postgres import workspace, DSN",
+        "from backend.authorization import Identity",
+        "from backend.persistence.postgres import Database",
+        "from backend.tests.test_auth_schema_acl import capture",
+        "from backend.main import create_app",
+        "from backend.config import Settings",
+        "from concurrent.futures import ThreadPoolExecutor",
+        "import json",
+        "import json",
+        "from concurrent.futures import ThreadPoolExecutor",
+        "from time import monotonic, sleep"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_phase32_writes.py": {
+      "imports": [
+        "from uuid import uuid4",
+        "import psycopg",
+        "from psycopg import sql",
+        "import pytest",
+        "from fastapi.testclient import TestClient",
+        "from backend.tests.test_phase31_postgres import workspace, DSN",
+        "from backend.config import Settings",
+        "from backend.main import create_app",
+        "from backend.scripts.check_phase32_readiness import inspect"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_prospecting_api.py": {
+      "imports": [
+        "from contextlib import contextmanager",
+        "from io import BytesIO",
+        "from pathlib import Path",
+        "from threading import Event",
+        "from time import monotonic, sleep",
+        "import hashlib",
+        "import json",
+        "import sqlite3",
+        "import pytest",
+        "from fastapi.testclient import TestClient",
+        "from openpyxl import load_workbook",
+        "from backend.config import Settings",
+        "from backend.main import create_app",
+        "from backend.prospecting.models import SearchRequest",
+        "from backend.prospecting.storage import SelectionStore, StorageError",
+        "from backend.tests.test_api import database",
+        "from core.database.lead_repository import LeadRepository",
+        "from core.database.schema import initialize_database",
+        "from core.providers.google_places import GooglePlacesProvider",
+        "from core.providers.models import LeadCandidate",
+        "from core.prospecting.service import prospect"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_prospecting_batch.py": {
+      "imports": [
+        "import json",
+        "from types import SimpleNamespace",
+        "import psycopg",
+        "from psycopg.rows import dict_row",
+        "import pytest",
+        "from backend.persistence.postgres import PgStore",
+        "from backend.prospecting.storage import SelectionStore"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_sdr_api.py": {
+      "imports": [
+        "from concurrent.futures import ThreadPoolExecutor",
+        "import hashlib",
+        "import sqlite3",
+        "from threading import Event",
+        "from uuid import uuid4",
+        "import pytest",
+        "from fastapi.testclient import TestClient",
+        "from backend.config import Settings",
+        "from backend.main import create_app",
+        "from backend.sdr.policy import routing, WEB_POLICY",
+        "from core.sales.contact import normalize_phone",
+        "from core.sales.errors import SalesProviderError",
+        "from backend.tests.test_api import database",
+        "from backend.sdr import service",
+        "from backend.prospecting.storage import StorageError"
+      ],
+      "dynamic": []
+    },
+    "backend/tests/test_stamp_claims_migration.py": {
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "import psycopg",
+        "from psycopg import sql",
+        "import pytest",
+        "from backend.config import Settings",
+        "from backend.main import create_app",
+        "from backend.scripts.check_phase32_readiness import inspect, claims_stamp_installed",
+        "from backend.tests.test_phase31_postgres import workspace, DSN",
+        "from backend.tests.test_phase32_writes import test_owner_lead_pipeline_interaction_sdr_and_audit as run_owner_flow, test_audit_failure_rolls_back_business_and_all_children as run_rollback_flow",
+        "from backend.tests.test_sdr_api import Provider"
+      ],
+      "dynamic": []
+    },
+    "core/__init__.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "core/browser_launcher.py": {
+      "imports": [
+        "import os",
+        "from pathlib import Path",
+        "import shutil",
+        "import subprocess",
+        "import webbrowser",
+        "import winreg"
+      ],
+      "dynamic": []
+    },
+    "core/commercial/__init__.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "core/commercial/day.py": {
+      "imports": [
+        "from dataclasses import dataclass",
+        "from datetime import date, datetime",
+        "from .values import TERMINAL_STATUSES, commercial_status"
+      ],
+      "dynamic": []
+    },
+    "core/commercial/service.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "from core.database.connection import DEFAULT_DATABASE_PATH, connect_database",
+        "from core.database.lead_repository import LeadRepository",
+        "from core.database.interaction_repository import InteractionRepository",
+        "from .values import commercial_values"
+      ],
+      "dynamic": []
+    },
+    "core/commercial/values.py": {
+      "imports": [
+        "from datetime import datetime, timezone"
+      ],
+      "dynamic": []
+    },
+    "core/database/__init__.py": {
+      "imports": [
+        "from .connection import connect_database",
+        "from .schema import initialize_database",
+        "from .lead_repository import LeadRepository, LeadNotFoundError",
+        "from .interaction_repository import InteractionRepository"
+      ],
+      "dynamic": []
+    },
+    "core/database/connection.py": {
+      "imports": [
+        "from pathlib import Path",
+        "import sqlite3"
+      ],
+      "dynamic": []
+    },
+    "core/database/contact_preference_repository.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "from core.sales.contact_routing import CONTACT_TYPES",
+        "from .connection import connect_database"
+      ],
+      "dynamic": []
+    },
+    "core/database/interaction_repository.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "from pathlib import Path",
+        "from .connection import DEFAULT_DATABASE_PATH, connect_database",
+        "from .schema import initialize_database",
+        "from .lead_repository import LeadNotFoundError",
+        "from core.commercial.values import required_text"
+      ],
+      "dynamic": []
+    },
+    "core/database/lead_repository.py": {
+      "imports": [
+        "from collections.abc import Mapping",
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "from pathlib import Path",
+        "from typing import Any",
+        "from .connection import DEFAULT_DATABASE_PATH, connect_database",
+        "from .schema import initialize_database",
+        "from core.commercial.values import commercial_values"
+      ],
+      "dynamic": []
+    },
+    "core/database/outreach_repository.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "from pathlib import Path",
+        "from .connection import DEFAULT_DATABASE_PATH, connect_database",
+        "from .schema import initialize_database",
+        "from .lead_repository import LeadNotFoundError",
+        "from core.sales.models import OutreachStatus, SalesGeneration, validate_message",
+        "from core.sales.contact import blocked"
+      ],
+      "dynamic": []
+    },
+    "core/database/schema.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from .connection import DEFAULT_DATABASE_PATH, connect_database"
+      ],
+      "dynamic": []
+    },
+    "core/database/template_draft_repository.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "from .connection import connect_database"
+      ],
+      "dynamic": []
+    },
+    "core/diagnostics.py": {
+      "imports": [
+        "import json",
+        "from contextlib import contextmanager",
+        "from contextvars import ContextVar",
+        "from dataclasses import asdict, is_dataclass"
+      ],
+      "dynamic": []
+    },
+    "core/exporter.py": {
+      "imports": [
+        "from pathlib import Path",
+        "import os"
+      ],
+      "dynamic": []
+    },
+    "core/extractor.py": {
+      "imports": [
+        "from playwright.sync_api import Page",
+        "from core.diagnostics import trace",
+        "from core.website_inspection import enrich_website_verification, inspect_explicit_website"
+      ],
+      "dynamic": []
+    },
+    "core/importers/__init__.py": {
+      "imports": [
+        "from .excel_leads import ImportSummary, ImportIssue, import_leads_from_excel"
+      ],
+      "dynamic": []
+    },
+    "core/importers/excel_leads.py": {
+      "imports": [
+        "from dataclasses import dataclass, field",
+        "from pathlib import Path",
+        "import re",
+        "from openpyxl import load_workbook"
+      ],
+      "dynamic": []
+    },
+    "core/lead_filter.py": {
+      "imports": [
+        "from enum import Enum",
+        "from core.validator import website_observation",
+        "from core.qualification.models import ObservationStatus",
+        "from core.qualification.rules import classify_priority",
+        "from core.qualification.digital_presence import classify_digital_presence, DigitalPresenceType"
+      ],
+      "dynamic": []
+    },
+    "core/logger.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "core/maps.py": {
+      "imports": [
+        "from urllib.parse import quote_plus",
+        "from playwright.sync_api import Page"
+      ],
+      "dynamic": []
+    },
+    "core/outreach/__init__.py": {
+      "imports": [
+        "from .builder import TemplateOutreachGenerator, context_from_lead",
+        "from .models import OutreachContext, OutreachGenerator, OutreachRequest, OutreachResult"
+      ],
+      "dynamic": []
+    },
+    "core/outreach/builder.py": {
+      "imports": [
+        "from typing import Any, Mapping",
+        "from .models import OutreachContext, OutreachRequest, OutreachResult",
+        "from .templates import GREETINGS, FIRST_CONTACT, CONTINUATIONS, SUBJECTS, CLOSINGS, normalize_segment, template_id"
+      ],
+      "dynamic": []
+    },
+    "core/outreach/models.py": {
+      "imports": [
+        "from dataclasses import dataclass",
+        "from typing import Protocol"
+      ],
+      "dynamic": []
+    },
+    "core/outreach/templates.py": {
+      "imports": [
+        "import unicodedata"
+      ],
+      "dynamic": []
+    },
+    "core/prospecting/__init__.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "core/prospecting/adapter.py": {
+      "imports": [
+        "from core.providers.models import LeadCandidate",
+        "from core.validator import WEBSITE_VERIFICATION_KEY, PlacesWebsiteVerification",
+        "from core.qualification.models import QualificationResult",
+        "from core.qualification.rules import classify_priority",
+        "from core.qualification.serialization import qualification_result_to_columns"
+      ],
+      "dynamic": []
+    },
+    "core/prospecting/limits.py": {
+      "imports": [
+        "from enum import Enum"
+      ],
+      "dynamic": []
+    },
+    "core/prospecting/service.py": {
+      "imports": [
+        "from dataclasses import dataclass, field",
+        "from datetime import datetime, timezone",
+        "from pathlib import Path",
+        "from time import monotonic",
+        "import pandas as pd",
+        "from core.database.lead_repository import LeadRepository",
+        "from core.exporter import export_excel",
+        "from core.providers.environment import load_environment",
+        "from core.providers.google_places import GooglePlacesConfigurationError, GooglePlacesHTTPError, GooglePlacesProvider, GooglePlacesSafetyLimitError, build_query",
+        "from core.qualification.models import QualificationNote, QualificationResult",
+        "from core.qualification.rules import classify_priority",
+        "from core.qualification.service import qualify_record",
+        "from core.lead_filter import DEFAULT_MIN_SCORE, WebsiteStatus, classificar_status_site, accepted_columns, new_search_stats, meets_min_score",
+        "from .limits import MAX_CANDIDATES_SCANNED, ProspectingStopReason, STOP_MESSAGES",
+        "from core.providers.search_query import normalize_neighborhood",
+        "from core.lead_filter import record_presence, is_without_own_website",
+        "from core.qualification.digital_presence import DigitalPresenceType",
+        "from .adapter import candidate_to_record, record_to_database, record_to_export"
+      ],
+      "dynamic": []
+    },
+    "core/prototype/__init__.py": {
+      "imports": [
+        "from .models import PrototypeLead, PrototypeTemplate, PrototypeRequest, PrototypeManifest, PrototypeResult, PrototypeStatus"
+      ],
+      "dynamic": []
+    },
+    "core/prototype/generator.py": {
+      "imports": [
+        "import json",
+        "import re",
+        "import shutil",
+        "import unicodedata",
+        "from datetime import datetime, timezone",
+        "from pathlib import Path",
+        "from uuid import uuid4",
+        "from .models import PrototypeManifest, PrototypeRequest, PrototypeResult",
+        "from .renderer import render_index"
+      ],
+      "dynamic": []
+    },
+    "core/prototype/models.py": {
+      "imports": [
+        "from dataclasses import dataclass, field",
+        "from datetime import datetime",
+        "from enum import Enum"
+      ],
+      "dynamic": []
+    },
+    "core/prototype/preview.py": {
+      "imports": [
+        "from pathlib import Path",
+        "import webbrowser",
+        "from .models import PrototypeResult, PrototypeStatus"
+      ],
+      "dynamic": []
+    },
+    "core/prototype/registry.py": {
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "from .models import PrototypeTemplate"
+      ],
+      "dynamic": []
+    },
+    "core/prototype/renderer.py": {
+      "imports": [
+        "import html",
+        "import re",
+        "from .models import PrototypeLead"
+      ],
+      "dynamic": []
+    },
+    "core/providers/__init__.py": {
+      "imports": [
+        "from .models import LeadCandidate, LeadProvider",
+        "from .google_places import GooglePlacesProvider"
+      ],
+      "dynamic": []
+    },
+    "core/providers/environment.py": {
+      "imports": [
+        "from pathlib import Path",
+        "from dotenv import load_dotenv"
+      ],
+      "dynamic": []
+    },
+    "core/providers/google_places.py": {
+      "imports": [
+        "import http.client",
+        "import json",
+        "import math",
+        "import os",
+        "from .models import LeadCandidate",
+        "from .search_query import normalize_neighborhood",
+        "from core.lead_filter import possui_site",
+        "from core.prospecting.limits import DEFAULT_MAX_REQUESTS"
+      ],
+      "dynamic": []
+    },
+    "core/providers/models.py": {
+      "imports": [
+        "from dataclasses import dataclass",
+        "from typing import Protocol"
+      ],
+      "dynamic": []
+    },
+    "core/providers/search_query.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "core/qualification/__init__.py": {
+      "imports": [
+        "from .models import ObservationStatus, QualificationInput, QualificationNote, QualificationResult, QualificationStatus"
+      ],
+      "dynamic": []
+    },
+    "core/qualification/adapter.py": {
+      "imports": [
+        "from collections.abc import Mapping",
+        "from typing import Any",
+        "from core.validator import website_observation",
+        "from .models import ObservationStatus, QualificationInput"
+      ],
+      "dynamic": []
+    },
+    "core/qualification/digital_presence.py": {
+      "imports": [
+        "from dataclasses import dataclass",
+        "from enum import Enum",
+        "from types import MappingProxyType",
+        "from urllib.parse import urlsplit",
+        "from .models import ObservationStatus"
+      ],
+      "dynamic": []
+    },
+    "core/qualification/models.py": {
+      "imports": [
+        "from dataclasses import dataclass, field",
+        "from datetime import datetime",
+        "from enum import Enum"
+      ],
+      "dynamic": []
+    },
+    "core/qualification/rules.py": {
+      "imports": [
+        "from enum import Enum",
+        "from types import MappingProxyType",
+        "from core.diagnostics import trace",
+        "from .digital_presence import DigitalPresenceType, classify_digital_presence",
+        "from .models import ObservationStatus, QualificationInput, QualificationNote, QualificationResult, QualificationStatus"
+      ],
+      "dynamic": []
+    },
+    "core/qualification/serialization.py": {
+      "imports": [
+        "from .models import QualificationNote, QualificationResult"
+      ],
+      "dynamic": []
+    },
+    "core/qualification/service.py": {
+      "imports": [
+        "from collections.abc import Iterable, Mapping",
+        "from dataclasses import replace",
+        "from datetime import datetime, timezone",
+        "from typing import Any",
+        "from core.diagnostics import trace",
+        "from .adapter import adapt_record_to_qualification_input",
+        "from .models import QualificationNote, QualificationResult, QualificationStatus",
+        "from .rules import evaluate_rules"
+      ],
+      "dynamic": []
+    },
+    "core/sales/__init__.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "core/sales/agent.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from core.database.lead_repository import LeadRepository, LeadNotFoundError",
+        "from core.database.outreach_repository import OutreachRepository",
+        "from .models import SalesGeneration, OutreachStatus",
+        "from .prompts import SYSTEM_PROMPT, build_evidence",
+        "from .errors import SalesProviderError, GroqProviderError",
+        "from .contact import blocked",
+        "from .contact_routing import contact_context",
+        "from core.database.contact_preference_repository import ContactPreferenceRepository"
+      ],
+      "dynamic": []
+    },
+    "core/sales/config.py": {
+      "imports": [
+        "import os",
+        "from core.providers.environment import load_environment",
+        "from .groq_provider import GroqSalesProvider"
+      ],
+      "dynamic": []
+    },
+    "core/sales/contact.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "import re",
+        "from urllib.parse import urlencode",
+        "from core.commercial.values import utc_iso, STATUSES, commercial_status",
+        "from core.database.connection import connect_database",
+        "from core.database.interaction_repository import InteractionRepository",
+        "from core.sales.models import validate_message"
+      ],
+      "dynamic": []
+    },
+    "core/sales/contact_routing.py": {
+      "imports": [
+        "import re",
+        "import unicodedata"
+      ],
+      "dynamic": []
+    },
+    "core/sales/errors.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "core/sales/groq_provider.py": {
+      "imports": [
+        "import json",
+        "import logging",
+        "import math",
+        "import ssl",
+        "import sys",
+        "from .errors import SalesConfigurationError, SalesProviderError, GroqProviderError",
+        "from .models import SalesGeneration",
+        "import groq",
+        "import truststore",
+        "import groq",
+        "import groq"
+      ],
+      "dynamic": []
+    },
+    "core/sales/models.py": {
+      "imports": [
+        "from dataclasses import dataclass",
+        "from enum import Enum",
+        "import math",
+        "from typing import Mapping, Protocol"
+      ],
+      "dynamic": []
+    },
+    "core/sales/ollama.py": {
+      "imports": [
+        "import http.client",
+        "import json",
+        "import math",
+        "import re",
+        "from urllib.parse import urlsplit",
+        "from .errors import SalesConfigurationError, SalesProviderError",
+        "from .models import SalesGeneration",
+        "from .provider import SCHEMA"
+      ],
+      "dynamic": []
+    },
+    "core/sales/prompts.py": {
+      "imports": [
+        "from .contact_routing import CONTACT_GUIDANCE"
+      ],
+      "dynamic": []
+    },
+    "core/sales/provider.py": {
+      "imports": [
+        "import http.client",
+        "import json",
+        "import os",
+        "import logging",
+        "from core.providers.environment import load_environment",
+        "from .errors import SalesConfigurationError",
+        "from .ollama import OllamaSalesProvider",
+        "from .config import create_groq_provider"
+      ],
+      "dynamic": []
+    },
+    "core/scraper.py": {
+      "imports": [
+        "import time",
+        "import os",
+        "from core.diagnostics import diagnostic_logging, trace",
+        "from pathlib import Path",
+        "from typing import Callable",
+        "import pandas as pd",
+        "from playwright.sync_api import sync_playwright",
+        "from core.extractor import extract_company_data",
+        "from core.exporter import export_excel",
+        "from core.maps import collect_links, iter_links",
+        "from core.lead_filter import DEFAULT_MIN_SCORE, WebsiteStatus, classificar_status_site, accepted_columns, new_search_stats, meets_min_score",
+        "from core.lead_filter import record_presence, is_without_own_website",
+        "from core.qualification.digital_presence import DigitalPresenceType",
+        "from core.validator import WEBSITE_VERIFICATION_KEY",
+        "from core.qualification.service import qualify_records",
+        "from core.qualification.serialization import qualification_result_to_columns"
+      ],
+      "dynamic": []
+    },
+    "core/validator.py": {
+      "imports": [
+        "from collections.abc import Mapping",
+        "from dataclasses import dataclass",
+        "from typing import Any",
+        "from core.qualification.models import ObservationStatus"
+      ],
+      "dynamic": []
+    },
+    "core/website_inspection.py": {
+      "imports": [
+        "from urllib.parse import urlsplit",
+        "from core.diagnostics import trace, enabled",
+        "from core.validator import WebsiteVerification, with_website_verification"
+      ],
+      "dynamic": []
+    },
+    "main.py": {
+      "imports": [
+        "import argparse",
+        "import sys",
+        "import time",
+        "from urllib.parse import quote_plus",
+        "import pandas as pd",
+        "from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError",
+        "from core.lead_filter import DEFAULT_MIN_SCORE",
+        "from app import LoungLeadsApp",
+        "from core.prospecting.service import prospect",
+        "from core.scraper import run_scraper"
+      ],
+      "dynamic": []
+    },
+    "scripts/check_desktop_gui.py": {
+      "imports": [
+        "import argparse",
+        "from contextlib import ExitStack",
+        "from pathlib import Path",
+        "import sys",
+        "import tempfile",
+        "import time",
+        "from unittest.mock import Mock, patch",
+        "from core.database import LeadRepository",
+        "from core.database.outreach_repository import OutreachRepository",
+        "from core.sales.models import SalesGeneration",
+        "from ui.sales_workspace import ContactPanel",
+        "import app",
+        "from ui.settings import UserSettings",
+        "from urllib.parse import parse_qs, urlsplit",
+        "import customtkinter as ctk"
+      ],
+      "dynamic": []
+    },
+    "scripts/check_priority_gui.py": {
+      "imports": [
+        "from contextlib import ExitStack",
+        "from pathlib import Path",
+        "import socket",
+        "import sys",
+        "import tempfile",
+        "from unittest.mock import Mock, patch",
+        "import customtkinter as ctk",
+        "import app",
+        "from core.database import LeadRepository",
+        "from core.database.outreach_repository import OutreachRepository",
+        "from core.database.template_draft_repository import TemplateDraftRepository",
+        "from core.sales.models import SalesGeneration",
+        "from ui.pending_edits import ask_pending_action",
+        "from ui.settings import UserSettings"
+      ],
+      "dynamic": []
+    },
+    "scripts/check_sdr_gui.py": {
+      "imports": [
+        "import argparse",
+        "from contextlib import ExitStack",
+        "from pathlib import Path",
+        "import sys",
+        "import tempfile",
+        "import threading",
+        "import time",
+        "from unittest.mock import Mock, patch",
+        "from core.database.lead_repository import LeadRepository",
+        "from core.database.outreach_repository import OutreachRepository",
+        "from core.sales.models import SalesGeneration",
+        "from ui.sales_workspace import SalesWorkspacePage",
+        "import app",
+        "from ui.settings import UserSettings",
+        "import os"
+      ],
+      "dynamic": []
+    },
+    "scripts/check_sdr_redesign_gui.py": {
+      "imports": [
+        "from contextlib import ExitStack",
+        "from pathlib import Path",
+        "import socket",
+        "import sys",
+        "import tempfile",
+        "import time",
+        "from unittest.mock import Mock, patch",
+        "from urllib.parse import parse_qs, urlsplit",
+        "import app",
+        "from core.database import LeadRepository",
+        "from core.database.connection import connect_database",
+        "from core.database.outreach_repository import OutreachRepository",
+        "from core.sales.models import SalesGeneration",
+        "from ui.settings import UserSettings",
+        "from contextlib import closing"
+      ],
+      "dynamic": []
+    },
+    "scripts/test_google_places_real.py": {
+      "imports": [
+        "import argparse",
+        "import os",
+        "from pathlib import Path",
+        "import sys",
+        "from core.providers.google_places import GooglePlacesProvider, GooglePlacesError, GooglePlacesConfigurationError, GooglePlacesHTTPError, GooglePlacesResponseError, GooglePlacesTransportError",
+        "from core.providers.environment import load_environment"
+      ],
+      "dynamic": []
+    },
+    "tests/conftest.py": {
+      "imports": [
+        "import socket",
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from playwright.sync_api import BrowserType, PlaywrightContextManager",
+        "from core import scraper"
+      ],
+      "dynamic": []
+    },
+    "tests/test_browser_preferences.py": {
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from core import browser_launcher as launcher",
+        "from ui import settings",
+        "from ui.browser_action import BrowserAction",
+        "from ui.sales_workspace import ContactPanel, SalesWorkspacePage",
+        "from ui import browser_action as module"
+      ],
+      "dynamic": []
+    },
+    "tests/test_commercial.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from copy import deepcopy",
+        "from datetime import date, datetime, timedelta, timezone",
+        "from unittest.mock import Mock",
+        "import sqlite3",
+        "import pytest",
+        "from core.database import LeadRepository, InteractionRepository, LeadNotFoundError, initialize_database, connect_database",
+        "from core.database.schema import LEADS_SCHEMA",
+        "from core.commercial.service import CommercialService",
+        "from core.commercial.values import STATUSES, utc_iso",
+        "from core.commercial.day import build_day, get_my_day",
+        "from ui.commercial_logic import CommercialLead, parse_contact_date, parse_reference_date, format_date, priority_label, history_text, interaction_values, day_values"
+      ],
+      "dynamic": []
+    },
+    "tests/test_commercial_ui.py": {
+      "imports": [
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "from core.commercial.day import DaySummary",
+        "from ui import my_day",
+        "from ui.commercial_panel import CommercialPanel"
+      ],
+      "dynamic": []
+    },
+    "tests/test_contact_routing.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "import json",
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "import groq",
+        "import httpx",
+        "import pytest",
+        "from core.database import LeadRepository, initialize_database",
+        "from core.database.contact_preference_repository import ContactPreferenceRepository",
+        "from core.sales.agent import SalesAgent",
+        "from core.sales.contact_routing import classify_contact, normalize_niche, CONTACT_GUIDANCE",
+        "from core.sales.groq_provider import GroqSalesProvider",
+        "from core.sales.prompts import SYSTEM_PROMPT",
+        "from ui.sales_panel import SalesPanel"
+      ],
+      "dynamic": []
+    },
+    "tests/test_copy_field.py": {
+      "imports": [
+        "from tkinter import TclError",
+        "from unittest.mock import Mock, call",
+        "import pytest",
+        "from ui import copy_field"
+      ],
+      "dynamic": []
+    },
+    "tests/test_database.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from datetime import datetime, timezone",
+        "import sqlite3",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from core.database import LeadRepository, LeadNotFoundError, connect_database, initialize_database",
+        "from core.database import lead_repository"
+      ],
+      "dynamic": []
+    },
+    "tests/test_desktop_redesign.py": {
+      "imports": [
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "from urllib.parse import parse_qs, urlsplit",
+        "import pytest",
+        "from core.sales.contact import normalize_phone, whatsapp_url",
+        "from ui.browser_action import BrowserAction",
+        "from ui.sales_workspace import ContactPanel",
+        "from ui.presentation import overview_details",
+        "from ui.theme import COLORS",
+        "import queue",
+        "from ui.home import HomePage",
+        "from ui.sales_workspace import SalesWorkspacePage",
+        "from app import LoungLeadsApp",
+        "from ui.places_search import PlacesSearchPage"
+      ],
+      "dynamic": []
+    },
+    "tests/test_diagnostics.py": {
+      "imports": [
+        "import json",
+        "from unittest.mock import Mock",
+        "from core.diagnostics import diagnostic_logging, trace"
+      ],
+      "dynamic": []
+    },
+    "tests/test_digital_presence.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from dataclasses import FrozenInstanceError",
+        "import pytest",
+        "from core.qualification.digital_presence import classify_digital_presence",
+        "from core.qualification.adapter import adapt_record_to_qualification_input",
+        "from core.qualification.rules import evaluate_rules"
+      ],
+      "dynamic": []
+    },
+    "tests/test_digital_presence_rules.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "import pytest",
+        "from core.qualification.adapter import adapt_record_to_qualification_input",
+        "from core.qualification.rules import evaluate_rules"
+      ],
+      "dynamic": []
+    },
+    "tests/test_excel_importer.py": {
+      "imports": [
+        "from openpyxl import Workbook",
+        "import pytest",
+        "from core.database import LeadRepository",
+        "from core.importers.excel_leads import import_leads_from_excel"
+      ],
+      "dynamic": []
+    },
+    "tests/test_exporter.py": {
+      "imports": [
+        "from unittest.mock import Mock",
+        "import pandas as pd",
+        "import pytest",
+        "from openpyxl import load_workbook",
+        "from core.exporter import export_excel"
+      ],
+      "dynamic": []
+    },
+    "tests/test_extractor.py": {
+      "imports": [
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from core.extractor import extract_company_data"
+      ],
+      "dynamic": []
+    },
+    "tests/test_google_places.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "import json",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from core.providers.google_places import GooglePlacesProvider, GooglePlacesError, GooglePlacesConfigurationError, FIELD_MASK, build_query, normalize_place"
+      ],
+      "dynamic": []
+    },
+    "tests/test_lead_target.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from unittest.mock import Mock",
+        "import pandas as pd",
+        "import pytest",
+        "from core import scraper, maps",
+        "from core.lead_filter import possui_site, classificar_status_site, WebsiteStatus",
+        "from core.validator import WebsiteVerification, with_website_verification",
+        "from core.qualification.models import QualificationResult",
+        "import main",
+        "from test_ui_qualification import fake_home",
+        "from ui import home",
+        "from ui.dialogs import format_finish_summary",
+        "from types import SimpleNamespace",
+        "from ui import home"
+      ],
+      "dynamic": []
+    },
+    "tests/test_lead_workspace.py": {
+      "imports": [
+        "import sqlite3",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from core.database import LeadRepository",
+        "from ui import lead_workspace_logic as logic",
+        "from ui.lead_workspace import LeadWorkspacePage"
+      ],
+      "dynamic": []
+    },
+    "tests/test_outreach.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from itertools import product",
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from core.outreach import OutreachContext, OutreachRequest, OutreachResult, TemplateOutreachGenerator, context_from_lead",
+        "from core.outreach.builder import sender_name",
+        "from core.outreach.models import CHANNELS, OBJECTIVES, TONES",
+        "from core.outreach.templates import normalize_segment, segment_display",
+        "from ui.outreach_panel import OutreachPanel, OutreachSession",
+        "from core.database.lead_repository import LeadRepository",
+        "from contextlib import closing",
+        "from core.database.connection import connect_database"
+      ],
+      "dynamic": []
+    },
+    "tests/test_places_manual_cli.py": {
+      "imports": [
+        "from unittest.mock import Mock",
+        "import json",
+        "import pytest",
+        "from scripts import test_google_places_real as cli",
+        "from core.providers.models import LeadCandidate",
+        "from core.providers.google_places import GooglePlacesConfigurationError, GooglePlacesHTTPError",
+        "from core.providers.google_places import GooglePlacesProvider"
+      ],
+      "dynamic": []
+    },
+    "tests/test_places_neighborhood.py": {
+      "imports": [
+        "from unittest.mock import Mock",
+        "import pandas as pd",
+        "import pytest",
+        "from core.providers.google_places import build_query",
+        "from core.prospecting.service import prospect",
+        "from core.database import LeadRepository",
+        "from ui.places_logic import parse_search",
+        "from test_places_target import provider, place",
+        "from test_places_ui import page",
+        "from ui import places_search as ui",
+        "import main",
+        "import core.prospecting.service as service"
+      ],
+      "dynamic": []
+    },
+    "tests/test_places_target.py": {
+      "imports": [
+        "import json",
+        "from threading import Event",
+        "from unittest.mock import Mock",
+        "import pandas as pd",
+        "import pytest",
+        "from core.database import LeadRepository",
+        "from core.providers.google_places import GooglePlacesProvider, normalize_place, FIELD_MASK",
+        "from core.prospecting.adapter import candidate_to_record",
+        "from core.prospecting.service import prospect",
+        "from core.lead_filter import classificar_status_site, WebsiteStatus",
+        "from core.qualification.adapter import adapt_record_to_qualification_input",
+        "import main",
+        "import core.prospecting.service as service",
+        "from test_places_ui import page",
+        "from ui import places_search as ui"
+      ],
+      "dynamic": []
+    },
+    "tests/test_places_target_sprint.py": {
+      "imports": [
+        "from threading import Event",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from test_places_target import place, provider",
+        "from core.database import LeadRepository",
+        "from core.prospecting.service import prospect",
+        "from test_places_ui import page",
+        "from core.prospecting.service import ProspectingSummary"
+      ],
+      "dynamic": []
+    },
+    "tests/test_places_ui.py": {
+      "imports": [
+        "import queue",
+        "from threading import Event",
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from ui import places_search as ui",
+        "from core.prospecting.service import ProspectingSummary",
+        "from core.providers.google_places import GooglePlacesConfigurationError",
+        "import sys",
+        "from core.providers import environment",
+        "from scripts import test_google_places_real"
+      ],
+      "dynamic": []
+    },
+    "tests/test_priority_ux.py": {
+      "imports": [
+        "from datetime import date, timezone",
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from core.commercial.day import build_day",
+        "from core.commercial.values import STATUSES, commercial_status",
+        "from core.database import LeadRepository",
+        "from core.database.template_draft_repository import TemplateDraftRepository",
+        "from core.database.outreach_repository import OutreachRepository",
+        "from core.sales.contact import ContactService, SDR_STATUSES",
+        "from core.sales.models import SalesGeneration",
+        "from ui import pending_edits",
+        "from ui.commercial_panel import CommercialPanel",
+        "from ui.lead_workspace_logic import LeadWorkspace, counts",
+        "from ui.outreach_panel import OutreachPanel",
+        "from ui.sales_panel import SalesPanel",
+        "from ui.sales_workspace_logic import list_sales_leads, sales_counts"
+      ],
+      "dynamic": []
+    },
+    "tests/test_prospecting.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from copy import deepcopy",
+        "from dataclasses import replace",
+        "from datetime import datetime, timezone",
+        "from threading import Event",
+        "from concurrent.futures import ThreadPoolExecutor",
+        "from unittest.mock import Mock",
+        "import json",
+        "import sqlite3",
+        "import pytest",
+        "from core.database import LeadRepository, connect_database, initialize_database",
+        "from core.providers.models import LeadCandidate",
+        "from core.providers.google_places import GooglePlacesProvider, GooglePlacesHTTPError",
+        "from core.prospecting.adapter import candidate_to_record, record_to_database",
+        "from core.prospecting import service",
+        "from core.qualification.adapter import adapt_record_to_qualification_input",
+        "from core.qualification.models import QualificationResult, QualificationNote",
+        "from core.qualification.rules import RULES_VERSION",
+        "from ui.places_logic import parse_search, summary_text"
+      ],
+      "dynamic": []
+    },
+    "tests/test_prototype_generator.py": {
+      "imports": [
+        "import json",
+        "from copy import deepcopy",
+        "from pathlib import Path",
+        "from uuid import UUID",
+        "import pytest",
+        "from core.prototype import generator",
+        "from core.prototype.models import PrototypeLead, PrototypeTemplate, PrototypeRequest"
+      ],
+      "dynamic": []
+    },
+    "tests/test_prototype_models.py": {
+      "imports": [
+        "import ast",
+        "from dataclasses import FrozenInstanceError, asdict",
+        "from datetime import datetime, timezone",
+        "from pathlib import Path",
+        "import pytest",
+        "from core.prototype import PrototypeLead, PrototypeTemplate, PrototypeRequest, PrototypeManifest, PrototypeResult, PrototypeStatus",
+        "import core.prototype.models as models"
+      ],
+      "dynamic": []
+    },
+    "tests/test_prototype_preview.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from datetime import datetime, timezone",
+        "from pathlib import Path",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from core.prototype.models import PrototypeManifest, PrototypeResult",
+        "from core.prototype import preview"
+      ],
+      "dynamic": []
+    },
+    "tests/test_prototype_registry.py": {
+      "imports": [
+        "import ast",
+        "import json",
+        "from pathlib import Path",
+        "import pytest",
+        "from core.prototype.models import PrototypeTemplate",
+        "from core.prototype import registry"
+      ],
+      "dynamic": []
+    },
+    "tests/test_prototype_renderer.py": {
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "import pytest",
+        "from core.prototype.generator import generate_prototype",
+        "from core.prototype.models import PrototypeLead, PrototypeRequest",
+        "from core.prototype.registry import get_template",
+        "from core.prototype.renderer import render_index"
+      ],
+      "dynamic": []
+    },
+    "tests/test_prototype_ui.py": {
+      "imports": [
+        "from unittest.mock import Mock",
+        "from types import SimpleNamespace",
+        "import pytest",
+        "from ui import prototype_logic as logic",
+        "from ui import prototype_studio as studio",
+        "from core.prototype.models import PrototypeResult",
+        "from core.prototype.registry import TemplateRegistry, TemplateNotFoundError"
+      ],
+      "dynamic": []
+    },
+    "tests/test_qualification_adapter.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from types import MappingProxyType",
+        "import pytest",
+        "from core.qualification.adapter import adapt_record_to_qualification_input",
+        "from core.qualification.models import ObservationStatus, QualificationInput"
+      ],
+      "dynamic": []
+    },
+    "tests/test_qualification_models.py": {
+      "imports": [
+        "from dataclasses import FrozenInstanceError",
+        "from datetime import datetime, timezone",
+        "import pytest",
+        "from core.qualification import ObservationStatus, QualificationInput, QualificationNote, QualificationResult, QualificationStatus"
+      ],
+      "dynamic": []
+    },
+    "tests/test_qualification_rules.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from itertools import product",
+        "import pytest",
+        "from core.qualification.models import QualificationInput",
+        "from core.qualification.rules import RULES_VERSION, WEIGHTS, CommercialPriority, classify_priority, evaluate_rules"
+      ],
+      "dynamic": []
+    },
+    "tests/test_qualification_serialization.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from datetime import datetime, timedelta, timezone",
+        "from unittest.mock import Mock",
+        "from openpyxl import load_workbook",
+        "from core import scraper",
+        "from core.qualification.models import QualificationNote, QualificationResult",
+        "from core.qualification.serialization import qualification_result_to_columns"
+      ],
+      "dynamic": []
+    },
+    "tests/test_qualification_service.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from dataclasses import replace",
+        "from datetime import datetime, timezone",
+        "from types import MappingProxyType",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from core.qualification import service",
+        "from core.qualification.adapter import adapt_record_to_qualification_input",
+        "from core.qualification.models import QualificationInput",
+        "from core.qualification.rules import RULES_VERSION, evaluate_rules"
+      ],
+      "dynamic": []
+    },
+    "tests/test_sales.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from datetime import datetime",
+        "import json",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from core.database.lead_repository import LeadRepository, LeadNotFoundError",
+        "from core.database.interaction_repository import InteractionRepository",
+        "from core.database.schema import initialize_database",
+        "from core.sales.agent import SalesAgent, SalesGenerationError",
+        "from core.sales.models import SalesGeneration",
+        "from core.sales.prompts import SYSTEM_PROMPT, build_evidence",
+        "from core.sales.provider import OpenAISalesProvider, create_sales_provider, SalesConfigurationError",
+        "import core.sales.provider as module",
+        "from types import SimpleNamespace",
+        "from ui.sales_panel import SalesPanel",
+        "from types import SimpleNamespace",
+        "from ui.lead_workspace import LeadWorkspacePage",
+        "import queue",
+        "from types import SimpleNamespace",
+        "from ui import sales_panel as ui"
+      ],
+      "dynamic": []
+    },
+    "tests/test_sales_contact.py": {
+      "imports": [
+        "from datetime import datetime, timezone",
+        "import sqlite3",
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "from urllib.parse import parse_qs, urlsplit",
+        "import pytest",
+        "from core.database.lead_repository import LeadRepository",
+        "from core.database.schema import initialize_database, LEADS_SCHEMA",
+        "from core.database.interaction_repository import InteractionRepository",
+        "from core.sales.contact import ContactService, normalize_phone, SDR_STATUSES",
+        "from core.sales.agent import SalesAgent, SalesGenerationError",
+        "from ui.sales_workspace_logic import list_sales_leads, sales_counts"
+      ],
+      "dynamic": []
+    },
+    "tests/test_sales_groq.py": {
+      "imports": [
+        "import json",
+        "from unittest.mock import Mock",
+        "import groq",
+        "import httpx",
+        "import pytest",
+        "from core.sales.groq_provider import GroqSalesProvider",
+        "from core.sales.errors import SalesConfigurationError, SalesProviderError",
+        "from core.sales import provider",
+        "from core.sales.agent import SalesAgent, SalesGenerationError",
+        "from core.database.lead_repository import LeadRepository",
+        "from core.sales.config import create_groq_provider"
+      ],
+      "dynamic": []
+    },
+    "tests/test_sales_ollama.py": {
+      "imports": [
+        "import json",
+        "import logging",
+        "import queue",
+        "import sqlite3",
+        "from copy import deepcopy",
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from core.database.lead_repository import LeadRepository",
+        "from core.database.schema import OUTREACH_SCHEMA, initialize_database",
+        "from core.sales.agent import SalesAgent, SalesGenerationError",
+        "from core.sales.errors import SalesConfigurationError, SalesProviderError",
+        "from core.sales.ollama import OllamaSalesProvider, parse_ollama_output",
+        "from core.sales import ollama, provider",
+        "from core.sales.prompts import SYSTEM_PROMPT",
+        "from ui import sales_panel as ui",
+        "from ui import sales_panel as ui"
+      ],
+      "dynamic": []
+    },
+    "tests/test_sales_redesign.py": {
+      "imports": [
+        "import json",
+        "import os",
+        "import queue",
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "import groq",
+        "import httpx",
+        "import pytest",
+        "from core.providers import environment",
+        "from core.sales import provider",
+        "from core.sales.config import create_groq_provider",
+        "from core.sales.groq_provider import GroqSalesProvider",
+        "from core.sales.errors import SalesConfigurationError, SalesProviderError",
+        "from ui.sales_workspace import SalesWorkspacePage",
+        "from ui.sales_workspace_logic import sales_counts",
+        "from ui import sales_workspace as ui"
+      ],
+      "dynamic": []
+    },
+    "tests/test_sales_workspace.py": {
+      "imports": [
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "from ui import sales_panel, sales_workspace"
+      ],
+      "dynamic": []
+    },
+    "tests/test_scraper.py": {
+      "imports": [
+        "import pandas as pd",
+        "import pytest"
+      ],
+      "dynamic": []
+    },
+    "tests/test_scraper_qualification.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from unittest.mock import Mock",
+        "import pandas as pd",
+        "import pytest",
+        "from core import scraper",
+        "from core.qualification.service import qualify_records"
+      ],
+      "dynamic": []
+    },
+    "tests/test_sdr_presentation.py": {
+      "imports": [
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from ui.sdr_formatting import draft_label, local_date, confidence_badge, feedback_tone",
+        "from ui.sdr_components import Stepper, StatusBar",
+        "from ui.theme import COLORS, SPACING"
+      ],
+      "dynamic": []
+    },
+    "tests/test_sdr_responsiveness.py": {
+      "imports": [
+        "import queue",
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from ui.responsive_text import WrappedLabels",
+        "from ui.sales_workspace import SalesWorkspacePage",
+        "from ui.sales_workspace_logic import filter_sales_leads",
+        "from ui.sdr_diagnostics import callback_error",
+        "from ui import sales_workspace as module",
+        "from app import LoungLeadsApp"
+      ],
+      "dynamic": []
+    },
+    "tests/test_sdr_workspace_redesign.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "from urllib.parse import parse_qs, urlsplit",
+        "import pytest",
+        "from core.database import LeadRepository",
+        "from core.database.connection import connect_database",
+        "from core.sales.contact import ContactService",
+        "from ui.sales_workspace import ContactPanel",
+        "from ui.sales_workspace import SalesWorkspacePage",
+        "from ui.sales_workspace_logic import filter_sales_leads",
+        "import queue"
+      ],
+      "dynamic": []
+    },
+    "tests/test_template_library.py": {
+      "imports": [
+        "from concurrent.futures import ThreadPoolExecutor",
+        "from html.parser import HTMLParser",
+        "import json",
+        "from pathlib import Path",
+        "import pytest",
+        "from core.prototype.registry import list_templates, find_templates_for_segment",
+        "from core.prototype.generator import generate_prototype",
+        "from core.prototype.models import PrototypeLead, PrototypeRequest"
+      ],
+      "dynamic": []
+    },
+    "tests/test_ui_qualification.py": {
+      "imports": [
+        "from types import SimpleNamespace",
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from ui import home",
+        "from ui.dialogs import format_finish_summary",
+        "from core import scraper",
+        "from core.qualification.models import QualificationResult"
+      ],
+      "dynamic": []
+    },
+    "tests/test_website_inspection.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "from unittest.mock import Mock",
+        "import pandas as pd",
+        "import pytest",
+        "from core.extractor import extract_company_data",
+        "from core.qualification.adapter import adapt_record_to_qualification_input",
+        "from core.validator import WEBSITE_VERIFICATION_KEY",
+        "from core.website_inspection import enrich_website_verification"
+      ],
+      "dynamic": []
+    },
+    "tests/test_website_provenance.py": {
+      "imports": [
+        "from unittest.mock import Mock",
+        "import pytest",
+        "from core.extractor import extract_company_data",
+        "from core.website_inspection import EXPLICIT_WEBSITE",
+        "from core.validator import WEBSITE_VERIFICATION_KEY",
+        "from core.qualification.adapter import adapt_record_to_qualification_input",
+        "from core.qualification.digital_presence import classify_digital_presence",
+        "from core.website_inspection import enrich_website_verification, inspect_explicit_website"
+      ],
+      "dynamic": []
+    },
+    "tests/test_website_validator.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "import pytest",
+        "from core.validator import WEBSITE_VERIFICATION_KEY, WebsiteVerification, website_observation, with_website_verification",
+        "from core.qualification.adapter import adapt_record_to_qualification_input"
+      ],
+      "dynamic": []
+    },
+    "tests/test_without_own_website.py": {
+      "imports": [
+        "from copy import deepcopy",
+        "import pandas as pd",
+        "import pytest",
+        "from core.lead_filter import is_without_own_website",
+        "from core.qualification.digital_presence import classify_digital_presence as classify",
+        "from core.prospecting.service import prospect",
+        "from core.database import LeadRepository",
+        "from test_places_target import place, provider"
+      ],
+      "dynamic": []
+    },
+    "ui/__init__.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "ui/browser_action.py": {
+      "imports": [
+        "import queue",
+        "import threading",
+        "import time",
+        "from core.browser_launcher import open_browser, BrowserNotFoundError"
+      ],
+      "dynamic": []
+    },
+    "ui/commercial_logic.py": {
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from core.commercial.service import CommercialService",
+        "from core.commercial.values import required_text, commercial_status",
+        "from core.qualification.rules import classify_priority"
+      ],
+      "dynamic": []
+    },
+    "ui/commercial_panel.py": {
+      "imports": [
+        "from tkinter import messagebox",
+        "import customtkinter as ctk",
+        "from core.commercial.values import STATUSES, CHANNELS, INTERACTION_TYPES, commercial_status, status_options",
+        "from ui.pending_edits import resolve_pending",
+        "from ui.commercial_logic import CommercialLead, format_date, history_text",
+        "from ui.theme import COLORS, TYPOGRAPHY",
+        "from ui.components import field, button, section_label"
+      ],
+      "dynamic": []
+    },
+    "ui/components.py": {
+      "imports": [
+        "from tkinter import ttk",
+        "import customtkinter as ctk",
+        "from ui.responsive_text import WrappedLabels",
+        "from ui.theme import COLORS, FONT, SPACING, RADIUS, TYPOGRAPHY, SIZES"
+      ],
+      "dynamic": []
+    },
+    "ui/copy_field.py": {
+      "imports": [
+        "from tkinter import TclError",
+        "import customtkinter as ctk",
+        "from ui.theme import COLORS, TYPOGRAPHY",
+        "from ui.components import button_options"
+      ],
+      "dynamic": []
+    },
+    "ui/dashboard.py": {
+      "imports": [
+        "from tkinter import messagebox",
+        "import queue",
+        "import threading",
+        "import customtkinter as ctk",
+        "from core.database import LeadRepository",
+        "from ui.theme import COLORS, TYPOGRAPHY, SPACING",
+        "from ui.components import heading, button, MetricStrip, section_label, badge, panel",
+        "from ui.presentation import overview_data, overview_details, empty_copy, priority_tone, status_tone",
+        "from ui.commercial_logic import priority_label, format_date",
+        "from ui.responsive_text import WrappedLabels",
+        "from ui.sdr_diagnostics import log_current_error"
+      ],
+      "dynamic": []
+    },
+    "ui/dialogs.py": {
+      "imports": [
+        "import customtkinter as ctk",
+        "from core.exporter import open_excel, open_folder",
+        "from ui.theme import COLORS, TYPOGRAPHY",
+        "from ui.components import button"
+      ],
+      "dynamic": []
+    },
+    "ui/home.py": {
+      "imports": [
+        "import queue",
+        "import threading",
+        "import time",
+        "from tkinter import messagebox",
+        "import customtkinter as ctk",
+        "from core.scraper import run_scraper",
+        "from core.lead_filter import DEFAULT_MIN_SCORE",
+        "from ui.dialogs import show_finish_dialog",
+        "from ui.theme import COLORS, TYPOGRAPHY, SIZES",
+        "from ui.components import panel, heading, field, button"
+      ],
+      "dynamic": []
+    },
+    "ui/lead_workspace.py": {
+      "imports": [
+        "import queue",
+        "import threading",
+        "import webbrowser",
+        "from tkinter import filedialog, messagebox, ttk",
+        "import customtkinter as ctk",
+        "from core.database import LeadRepository",
+        "from ui.lead_workspace_logic import LeadWorkspace, STATUSES, counts, list_values, valid_url",
+        "from ui.theme import COLORS, TYPOGRAPHY, SPACING",
+        "from ui.components import panel, heading, button, field, table, badge",
+        "from ui.presentation import portfolio_values, priority_tone, status_tone, empty_copy",
+        "from ui.commercial_logic import priority_label",
+        "from ui.copy_field import add_copy_field",
+        "from ui.commercial_panel import CommercialPanel",
+        "from core.commercial.values import commercial_status",
+        "from core.database.template_draft_repository import TemplateDraftRepository",
+        "from ui.outreach_panel import OutreachPanel",
+        "from ui.sales_panel import SalesPanel"
+      ],
+      "dynamic": []
+    },
+    "ui/lead_workspace_logic.py": {
+      "imports": [
+        "from urllib.parse import urlsplit",
+        "from core.importers import import_leads_from_excel",
+        "from core.commercial.values import STATUSES, commercial_status"
+      ],
+      "dynamic": []
+    },
+    "ui/my_day.py": {
+      "imports": [
+        "from datetime import datetime",
+        "from tkinter import ttk, messagebox",
+        "import customtkinter as ctk",
+        "from core.database import LeadRepository",
+        "from core.commercial.day import get_my_day",
+        "from ui.commercial_logic import parse_reference_date, day_values",
+        "from ui.theme import COLORS, TYPOGRAPHY",
+        "from ui.components import panel, heading, field, button, MetricStrip, table",
+        "from ui.presentation import empty_copy"
+      ],
+      "dynamic": []
+    },
+    "ui/outreach_panel.py": {
+      "imports": [
+        "import customtkinter as ctk",
+        "from core.outreach import OutreachRequest, TemplateOutreachGenerator, context_from_lead",
+        "from ui.components import button, field",
+        "from ui.copy_field import copy_to_clipboard",
+        "from ui.theme import COLORS",
+        "from ui.pending_edits import resolve_pending"
+      ],
+      "dynamic": []
+    },
+    "ui/pending_edits.py": {
+      "imports": [
+        "import customtkinter as ctk",
+        "from ui.components import button",
+        "from ui.theme import COLORS, TYPOGRAPHY"
+      ],
+      "dynamic": []
+    },
+    "ui/places_logic.py": {
+      "imports": [
+        "from core.providers.search_query import normalize_neighborhood"
+      ],
+      "dynamic": []
+    },
+    "ui/places_search.py": {
+      "imports": [
+        "import queue",
+        "import threading",
+        "from datetime import datetime",
+        "from pathlib import Path",
+        "from tkinter import messagebox",
+        "import customtkinter as ctk",
+        "from core.exporter import open_excel, open_folder",
+        "from core.lead_filter import DEFAULT_MIN_SCORE",
+        "from core.prospecting.service import ProspectingError, create_provider, prospect",
+        "from core.providers.google_places import GooglePlacesConfigurationError",
+        "from ui.places_logic import parse_search, summary_text",
+        "from ui.theme import COLORS, TYPOGRAPHY, SIZES",
+        "from ui.components import panel, heading, field, button, MetricStrip"
+      ],
+      "dynamic": []
+    },
+    "ui/presentation.py": {
+      "imports": [
+        "from datetime import datetime",
+        "from collections import Counter",
+        "from core.commercial.day import build_day",
+        "from core.qualification.rules import classify_priority",
+        "from ui.commercial_logic import format_date, priority_label",
+        "from core.commercial.values import commercial_status"
+      ],
+      "dynamic": []
+    },
+    "ui/prototype_logic.py": {
+      "imports": [
+        "from core.prototype.models import PrototypeLead, PrototypeRequest",
+        "from core.prototype.registry import TemplateRegistry",
+        "from core.prototype.generator import generate_prototype"
+      ],
+      "dynamic": []
+    },
+    "ui/prototype_studio.py": {
+      "imports": [
+        "import os",
+        "from tkinter import filedialog, messagebox",
+        "import customtkinter as ctk",
+        "from core.prototype.preview import get_preview_path, open_preview",
+        "from ui.prototype_logic import PrototypeSession",
+        "from ui.theme import COLORS, FONT, TYPOGRAPHY",
+        "from ui.components import panel, heading, field, button, section_label"
+      ],
+      "dynamic": []
+    },
+    "ui/responsive_text.py": {
+      "imports": [],
+      "dynamic": []
+    },
+    "ui/sales_panel.py": {
+      "imports": [
+        "import queue",
+        "import threading",
+        "from tkinter import messagebox",
+        "import customtkinter as ctk",
+        "from core.sales.agent import SalesAgent, SalesGenerationError",
+        "from core.sales.errors import SalesConfigurationError",
+        "from core.sales.provider import create_sales_provider",
+        "from core.database.outreach_repository import OutreachRepository",
+        "from ui.components import button, badge",
+        "from ui.sdr_components import StatusBar",
+        "from ui.sdr_formatting import draft_label, confidence_badge, STATUS_LABELS",
+        "from ui.theme import COLORS, TYPOGRAPHY",
+        "from ui.copy_field import copy_to_clipboard",
+        "from ui.responsive_text import WrappedLabels",
+        "from ui.sdr_diagnostics import log_current_error",
+        "from ui.pending_edits import resolve_pending",
+        "from core.sales.contact_routing import CONTACT_TYPES, classify_contact",
+        "from core.database.contact_preference_repository import ContactPreferenceRepository"
+      ],
+      "dynamic": []
+    },
+    "ui/sales_workspace.py": {
+      "imports": [
+        "import queue",
+        "import threading",
+        "from tkinter import messagebox",
+        "import customtkinter as ctk",
+        "from core.database.lead_repository import LeadRepository",
+        "from core.database.interaction_repository import InteractionRepository",
+        "from core.sales.contact import ContactService, SDR_STATUSES",
+        "from core.sales.config import create_groq_provider",
+        "from core.sales.errors import SalesConfigurationError",
+        "from ui.components import field, button, keyboard_focus, badge",
+        "from ui.sdr_components import Card, KpiCard, StatusDot, Stepper, LeadListItem, StatusBar, LineIcon, IconButton, attach_icon, FullWidthTabs",
+        "from ui.copy_field import add_copy_field, copy_to_clipboard",
+        "from ui.browser_action import BrowserAction",
+        "from ui.sales_panel import SalesPanel",
+        "from ui.sales_workspace_logic import list_sales_leads, sales_counts, filter_sales_leads",
+        "from ui.responsive_text import WrappedLabels",
+        "from ui.sdr_diagnostics import event, timed, log_current_error",
+        "from ui.theme import COLORS, TYPOGRAPHY, RADIUS, SPACING",
+        "from core.commercial.values import commercial_status, status_options",
+        "from ui.settings import UserSettings, BROWSER_CHOICES",
+        "from ui.sdr_formatting import local_date, STATUS_LABELS",
+        "from ui.commercial_logic import format_date",
+        "from ui.commercial_logic import parse_contact_date"
+      ],
+      "dynamic": []
+    },
+    "ui/sales_workspace_logic.py": {
+      "imports": [
+        "from contextlib import closing",
+        "from core.database.connection import connect_database",
+        "from core.sales.contact import blocked",
+        "from core.commercial.values import commercial_status"
+      ],
+      "dynamic": []
+    },
+    "ui/sdr_components.py": {
+      "imports": [
+        "import tkinter as tk",
+        "import customtkinter as ctk",
+        "from ui.theme import COLORS, TYPOGRAPHY, RADIUS, SPACING",
+        "from ui.components import button, badge",
+        "from ui.responsive_text import WrappedLabels",
+        "from ui.sdr_formatting import feedback_tone"
+      ],
+      "dynamic": []
+    },
+    "ui/sdr_diagnostics.py": {
+      "imports": [
+        "from contextlib import contextmanager",
+        "import logging",
+        "import os",
+        "from pathlib import Path",
+        "from time import perf_counter",
+        "import traceback",
+        "import sys"
+      ],
+      "dynamic": []
+    },
+    "ui/sdr_formatting.py": {
+      "imports": [
+        "from datetime import datetime",
+        "from zoneinfo import ZoneInfo"
+      ],
+      "dynamic": []
+    },
+    "ui/settings.py": {
+      "imports": [
+        "import json",
+        "import os",
+        "from pathlib import Path",
+        "import tempfile"
+      ],
+      "dynamic": []
+    },
+    "ui/sidebar.py": {
+      "imports": [
+        "import customtkinter as ctk",
+        "from ui.theme import COLORS, TYPOGRAPHY, SIZES, FONT",
+        "from ui.components import button",
+        "from ui.sdr_components import LineIcon"
+      ],
+      "dynamic": []
+    },
+    "ui/theme.py": {
+      "imports": [
+        "import customtkinter as ctk"
+      ],
+      "dynamic": []
+    },
+    "web/scripts/check_auth_diagnostics.py": {
+      "imports": [
+        "import sys",
+        "from playwright.sync_api import sync_playwright, expect"
+      ],
+      "dynamic": []
+    },
+    "web/scripts/check_auth_session.py": {
+      "imports": [
+        "import json",
+        "from urllib.request import urlopen, Request",
+        "from urllib.parse import urlsplit",
+        "from playwright.sync_api import sync_playwright, expect"
+      ],
+      "dynamic": []
+    },
+    "web/scripts/check_crm.py": {
+      "imports": [
+        "from pathlib import Path",
+        "from urllib.parse import urlsplit",
+        "import json",
+        "import re",
+        "import urllib.request",
+        "from playwright.sync_api import sync_playwright, expect"
+      ],
+      "dynamic": []
+    },
+    "web/scripts/check_dashboard_react.py": {
+      "imports": [
+        "import json",
+        "import sys",
+        "from urllib.request import urlopen",
+        "from urllib.parse import urlsplit",
+        "from playwright.sync_api import sync_playwright, expect"
+      ],
+      "dynamic": []
+    },
+    "web/scripts/check_local.py": {
+      "imports": [
+        "from playwright.sync_api import sync_playwright",
+        "from urllib.parse import urlparse",
+        "import json, time"
+      ],
+      "dynamic": []
+    },
+    "web/scripts/check_phase31.py": {
+      "imports": [
+        "import json",
+        "import re",
+        "from urllib.request import urlopen",
+        "from urllib.parse import urlsplit",
+        "from pathlib import Path",
+        "from uuid import uuid4",
+        "from playwright.sync_api import sync_playwright, expect"
+      ],
+      "dynamic": []
+    },
+    "web/scripts/check_phase32.py": {
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "from urllib.request import urlopen",
+        "from urllib.parse import urlsplit",
+        "from uuid import uuid4",
+        "from playwright.sync_api import sync_playwright, expect"
+      ],
+      "dynamic": []
+    },
+    "web/scripts/check_prospecting.py": {
+      "imports": [
+        "from pathlib import Path",
+        "import json",
+        "import sys",
+        "from urllib.parse import urlparse",
+        "from playwright.sync_api import sync_playwright"
+      ],
+      "dynamic": []
+    },
+    "web/scripts/check_read_api.py": {
+      "imports": [
+        "from pathlib import Path",
+        "import json",
+        "import sys",
+        "from urllib.parse import urlparse",
+        "from playwright.sync_api import sync_playwright"
+      ],
+      "dynamic": []
+    },
+    "web/scripts/check_sdr.py": {
+      "imports": [
+        "from pathlib import Path",
+        "from urllib.parse import urlsplit, parse_qs",
+        "import json",
+        "import urllib.request",
+        "from playwright.sync_api import sync_playwright, expect"
+      ],
+      "dynamic": [
+        "__import__('re').compile('encaminhar')",
+        "__import__('re').compile('responsável')",
+        "__import__('re').compile('encaminhar')",
+        "__import__('re')",
+        "__import__('re')",
+        "__import__('re')"
+      ]
+    },
+    "web/scripts/check_ui.py": {
+      "imports": [
+        "from pathlib import Path",
+        "import json",
+        "import sys",
+        "from urllib.parse import urlparse",
+        "from playwright.sync_api import sync_playwright"
+      ],
+      "dynamic": []
+    }
+  },
+  "remove": [
+    "LoungLeads.spec",
+    "app.py",
+    "assets/fonts",
+    "docs/local/saas-env-examples/desktop.env.example",
+    "scripts/check_desktop_gui.py",
+    "scripts/check_priority_gui.py",
+    "scripts/check_sdr_gui.py",
+    "scripts/check_sdr_redesign_gui.py",
+    "tests/test_commercial_ui.py",
+    "tests/test_copy_field.py",
+    "tests/test_lead_workspace.py",
+    "tests/test_prototype_ui.py",
+    "tests/test_sales_workspace.py",
+    "tests/test_sdr_presentation.py",
+    "tests/test_sdr_responsiveness.py",
+    "tests/test_sdr_workspace_redesign.py",
+    "ui/__init__.py",
+    "ui/browser_action.py",
+    "ui/commercial_logic.py",
+    "ui/commercial_panel.py",
+    "ui/components.py",
+    "ui/copy_field.py",
+    "ui/dashboard.py",
+    "ui/dialogs.py",
+    "ui/home.py",
+    "ui/lead_workspace.py",
+    "ui/lead_workspace_logic.py",
+    "ui/my_day.py",
+    "ui/outreach_panel.py",
+    "ui/pending_edits.py",
+    "ui/places_logic.py",
+    "ui/places_search.py",
+    "ui/presentation.py",
+    "ui/prototype_logic.py",
+    "ui/prototype_studio.py",
+    "ui/responsive_text.py",
+    "ui/sales_panel.py",
+    "ui/sales_workspace.py",
+    "ui/sales_workspace_logic.py",
+    "ui/sdr_components.py",
+    "ui/sdr_diagnostics.py",
+    "ui/sdr_formatting.py",
+    "ui/settings.py",
+    "ui/sidebar.py",
+    "ui/theme.py"
+  ],
+  "mixed_tests": {
+    "tests/test_browser_preferences.py": [
+      "test_preference_persists_and_preserves_other_settings",
+      "test_invalid_settings_fall_back_to_system_default",
+      "test_failed_atomic_save_keeps_existing_preferences",
+      "test_windows_settings_belong_to_current_user",
+      "test_browser_missing_is_offered_from_ui_thread_and_choice_is_snapshotted",
+      "test_fallback_is_explicit_and_does_not_change_preference",
+      "test_save_failure_keeps_session_preference_and_explains"
+    ],
+    "tests/test_commercial.py": [
+      "test_date_helpers",
+      "test_bad_ui_contact_dates",
+      "test_day_filters_counts_and_order",
+      "test_priority_reuses_rules",
+      "test_modal_controller_history_and_partial_followup",
+      "test_constants_and_validation"
+    ],
+    "tests/test_commercial_ui.py": [
+      "test_day_refresh_applies_filters_and_opens_lead",
+      "test_day_empty_selection_no_navigation",
+      "test_commercial_save_refreshes_without_closing",
+      "test_history_refresh_preserves_unsaved_form"
+    ],
+    "tests/test_contact_routing.py": [
+      "test_ui_override_saves_without_generating_or_replacing_current_text",
+      "test_ui_failed_override_keeps_previous_choice"
+    ],
+    "tests/test_copy_field.py": [
+      "test_available_text",
+      "test_clipboard_clears_then_appends_complete_value",
+      "test_empty_does_not_clear_clipboard",
+      "test_clipboard_failure_inline",
+      "test_ctrl_c_copies_selection",
+      "test_ctrl_c_without_selection_preserves_clipboard",
+      "test_field_readonly_and_copy_button"
+    ],
+    "tests/test_desktop_redesign.py": [
+      "test_current_editor_and_selected_identity_used_each_time",
+      "test_browser_worker_uses_new_tab_and_no_widgets",
+      "test_browser_failure_is_reported_safely",
+      "test_browser_timeout_and_destroy_ignore_late_result",
+      "test_copy_link_revalidates_and_uses_clipboard",
+      "test_dashboard_aggregates_only_real_data",
+      "test_shared_palette",
+      "test_legacy_worker_callbacks_only_enqueue",
+      "test_unsaved_contact_can_block_navigation",
+      "test_same_page_navigation_preserves_form"
+    ],
+    "tests/test_lead_target.py": [
+      "test_ui_target_snapshot_validation_and_locked_fields",
+      "test_finish_summary_explains_target",
+      "test_target_ui_default_enabled"
+    ],
+    "tests/test_lead_workspace.py": [
+      "workspace",
+      "test_score",
+      "test_bad_score",
+      "test_urls",
+      "test_filters_counts_and_unknown_status",
+      "test_atomic_save_and_rollback",
+      "test_import_delegates_to_existing_importer",
+      "test_link_opening_only_by_action"
+    ],
+    "tests/test_outreach.py": [
+      "test_rotation_and_selection_reset",
+      "test_future_generator_can_be_injected",
+      "test_editable_copy_uses_current_text_and_inline_feedback",
+      "test_generation_callback_only_reads_and_updates_text",
+      "test_missing_lead_preserves_edited_text",
+      "test_generation_and_copy_leave_database_and_history_unchanged"
+    ],
+    "tests/test_places_neighborhood.py": [
+      "test_query_and_parse",
+      "test_ui_snapshot_and_lifecycle"
+    ],
+    "tests/test_places_target.py": [
+      "test_ui_passes_shared_mode_snapshot"
+    ],
+    "tests/test_places_ui.py": [
+      "page",
+      "test_start_runs_only_on_action_and_uses_worker",
+      "test_start_without_export_passes_none",
+      "test_missing_key_never_starts",
+      "test_completion_restores_controls",
+      "test_done_with_export_enables_buttons",
+      "test_cancel_is_cooperative"
+    ],
+    "tests/test_priority_ux.py": [
+      "test_legacy_stage_read_filters_and_no_rewrite",
+      "test_three_way_decision_never_continues_after_failed_save",
+      "test_commercial_dirty_detection_covers_entire_form",
+      "test_ai_save_before_replacement_persists_and_refreshes_cached_text",
+      "test_continue_editing_blocks_template_replacement",
+      "test_template_failed_save_keeps_message_and_dirty_snapshot"
+    ],
+    "tests/test_prospecting.py": [
+      "test_ui_validation",
+      "test_ui_presentation"
+    ],
+    "tests/test_prototype_ui.py": [
+      "test_build_request_and_templates",
+      "test_score",
+      "test_invalid_score",
+      "test_required_fields",
+      "test_missing_and_incompatible_template",
+      "test_explicit_generation_and_last_result",
+      "test_preview_guard",
+      "test_failed_disables_buttons"
+    ],
+    "tests/test_sales.py": [
+      "test_ui_saves_exact_edited_message",
+      "test_workspace_action_requires_selection",
+      "test_ui_generation_is_explicit_worker_and_restores_controls"
+    ],
+    "tests/test_sales_contact.py": [
+      "test_listing_filters_metrics_reuse_existing_leads"
+    ],
+    "tests/test_sales_ollama.py": [
+      "test_worker_surfaces_safe_error_and_restores_controls",
+      "test_configuration_error_displayed_without_starting_worker"
+    ],
+    "tests/test_sales_redesign.py": [
+      "test_lead_switch_retains_editors_and_drafts",
+      "test_late_generation_only_updates_status_and_counts",
+      "test_connection_worker_only_updates_queue",
+      "test_metrics_come_from_existing_states"
+    ],
+    "tests/test_sales_workspace.py": [
+      "test_unsaved_edit_requires_confirmation",
+      "test_cancel_discard_does_not_call_provider",
+      "test_saved_message_loaded_without_provider",
+      "test_whatsapp_rechecks_contact_restrictions_at_click_and_never_marks_sent",
+      "test_button_disabled_without_valid_phone"
+    ],
+    "tests/test_sdr_presentation.py": [
+      "test_draft_label_converts_utc_without_mutating_row",
+      "test_local_date_handles_day_rollover_and_historic_dst",
+      "test_invalid_date_never_exposes_raw_value",
+      "test_confidence_is_only_display_formatting",
+      "test_unknown_confidence",
+      "test_stepper_only_changes_visual_configuration",
+      "test_feedback_semantics",
+      "test_tokens_have_requested_aliases",
+      "test_normal_text_palette_meets_aa",
+      "test_statusbar_cancels_expiry_before_destroy"
+    ],
+    "tests/test_sdr_responsiveness.py": [
+      "test_resize_ignores_height_changes_and_coalesces_width",
+      "test_filters_reuse_loaded_rows",
+      "test_load_worker_never_calls_widgets",
+      "test_closed_page_drops_late_load",
+      "test_filter_debounce",
+      "test_clean_hidden_editors_are_released_only",
+      "test_callback_log_does_not_expose_exception_payload",
+      "test_duplicate_sidebar_navigation_does_not_destroy_page"
+    ],
+    "tests/test_sdr_workspace_redesign.py": [
+      "contact",
+      "test_open_uses_current_message_and_never_marks_contact",
+      "test_invalid_requirements_disable_and_block_even_if_clicked",
+      "test_pending_do_not_contact_blocks_opening",
+      "test_missing_legacy_authorization_never_blocks_or_changes_data",
+      "test_tracking_save_preserves_all_legacy_authorization_fields",
+      "test_tracking_save_needs_no_authorization_and_can_record_restriction",
+      "test_actual_message_and_generation_control_availability",
+      "test_discarded_draft_is_never_offered_as_contact_message",
+      "test_browser_in_progress_disables_action",
+      "test_explicit_all_filter_options_keep_every_lead",
+      "test_database_loading_error_explains_retry"
+    ],
+    "tests/test_ui_qualification.py": [
+      "fake_home",
+      "test_switch_default_off_and_label",
+      "test_switch_snapshot_forwarded_and_locked",
+      "test_finish_restores_switch",
+      "test_unexpected_error_restores_switch",
+      "test_legacy_summary_text",
+      "test_aggregates_and_display"
+    ],
+    "tests/test_places_target_sprint.py": [
+      "test_ui_exhaustion_does_not_show_full_progress (indirect GUI helper)"
+    ]
+  },
+  "removed_bytes": 263000,
+  "edit_tests": [
+    "tests/test_browser_preferences.py",
+    "tests/test_commercial.py",
+    "tests/test_contact_routing.py",
+    "tests/test_desktop_redesign.py",
+    "tests/test_lead_target.py",
+    "tests/test_outreach.py",
+    "tests/test_places_neighborhood.py",
+    "tests/test_places_target.py",
+    "tests/test_places_ui.py",
+    "tests/test_priority_ux.py",
+    "tests/test_prospecting.py",
+    "tests/test_sales.py",
+    "tests/test_sales_contact.py",
+    "tests/test_sales_ollama.py",
+    "tests/test_sales_redesign.py",
+    "tests/test_ui_qualification.py"
+  ],
+  "note": "Initial status recorded before baseline build regenerated Next declarations."
+}

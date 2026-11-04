@@ -1,4 +1,3 @@
-customtkinter
 playwright
 pandas
 openpyxl

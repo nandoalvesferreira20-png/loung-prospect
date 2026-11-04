@@ -4,9 +4,9 @@ O padrão atual é modo local sem Supabase. Siga o [guia local Windows/macOS](..
 
 Pipeline Kanban, perfil comercial `/leads/[id]`, histórico, observações e Meu Dia
 funcionais. Escrita opt-in com backup e proteção contra conflitos. Sem mudanças
-no schema/desktop. Veja [Fase 2.4](docs/phase-2-4.md) para regras e validação.
+no schema SQLite. Veja [Fase 2.4](docs/phase-2-4.md) para regras e validação.
 
-Frontend independente dentro do repositório existente. A aplicação desktop continua em `main.py` / `app.py`; nenhum módulo Python precisa ser movido para executar a web.
+Frontend independente dentro do repositório existente. O produto usa exclusivamente a interface Next.js e o backend FastAPI, com regras em `core/`.
 
 ## Executar localmente
 
@@ -36,7 +36,7 @@ Não é necessário configurar `.env` nem iniciar a aplicação desktop. Para co
 - Prospecção real por Google Places via BFF/FastAPI e motor Python existente: nicho, localização, bairro, quantidade e filtro sem site próprio/score. Jobs em segundo plano, andamento sem porcentagens inventadas, cancelamento, resultados paginados, seleção, importação deduplicada e exportação CSV/Excel.
 - A pesquisa nunca grava automaticamente. Importação exige `LOUNG_ENABLE_WRITES=1` no processo backend, com backup antes da primeira inserção. Consulte o relatório 2.2 antes de habilitar.
 - Tabela de leads reais com busca, etapas, seleção local e paginação pelo servidor. Etapas personalizadas e aliases legados são preservados. Não há registros simulados na aplicação.
-- Dashboard com total, contatos para hoje, retornos atrasados e reuniões, distribuição atual por etapa e seleção de próximas ações seguindo as regras do desktop.
+- Dashboard com total, contatos para hoje, retornos atrasados e reuniões, distribuição atual por etapa e seleção de próximas ações seguindo as regras comerciais compartilhadas.
 - SDR funcional: seleção de lead real, classificação automática/manual, serviço, geração Groq, regeneração, edição, cópia e WhatsApp em nova aba com texto preenchido. Histórico compatível, salvamento revisado/aprovado opt-in e proteção contra substituição de texto não salvo. Veja [Fase 2.3](docs/phase-2-3.md).
 - Kanban estrutural com etapas comerciais. Sem movimentação fictícia ou dados de demonstração.
 - Nome de exibição e atalho preferido em `localStorage`, chave `loung-prospect:web:preferences:v1`. O atalho pode ser aberto na própria tela de configurações. Bloqueios de armazenamento e clipboard têm feedback.
@@ -68,7 +68,7 @@ Com o servidor em execução, a partir da raiz do repositório:
 .venv\Scripts\python.exe web\scripts\check_ui.py http://localhost:3000
 ```
 
-O script usa o Playwright já disponível no ambiente Python, com Edge ou Chrome instalado, sem instalar bibliotecas no desktop. Os artefatos ficam em `web/test-results/` (ignorados pelo Git). Ele visita as seis rotas em três resoluções, testa menu móvel, validação do formulário, preferências e editor, e rejeita erros JavaScript e requisições a serviços externos.
+O script usa o Playwright já disponível no ambiente Python, com Edge ou Chrome instalado, sem instalar uma GUI Python. Os artefatos ficam em `web/test-results/` (ignorados pelo Git). Ele visita as seis rotas em três resoluções, testa menu móvel, validação do formulário, preferências e editor, e rejeita erros JavaScript e requisições a serviços externos.
 
 Para validação manual sem consumo, use a fixture sintética documentada na Fase 2.2. O teste geral valida apenas entradas inválidas do formulário e não inicia pesquisa. Na configuração real, enviar critérios válidos em Prospecção consulta o Google e pode consumir quota; a gravação continua exigindo seleção e configuração explícitas. A edição/cópia no SDR não envia mensagens.
 

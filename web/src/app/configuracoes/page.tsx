@@ -208,7 +208,7 @@ export default function Settings() {
             ))}
             <p className="text-xs leading-6 text-slate-500">
               Nenhuma chave é solicitada ou exposta no frontend. Os arquivos de
-              configuração do desktop permanecem intactos.
+              configuração local permanecem intactos.
             </p>
           </CardContent>
         </Card>

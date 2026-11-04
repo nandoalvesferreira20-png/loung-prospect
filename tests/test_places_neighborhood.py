@@ -7,18 +7,7 @@ import pytest
 from core.providers.google_places import build_query
 from core.prospecting.service import prospect
 from core.database import LeadRepository
-from ui.places_logic import parse_search
 from test_places_target import provider, place
-
-
-@pytest.mark.parametrize("neighborhood,location", [(None, "São Bernardo do Campo"), ("", "São Bernardo do Campo"),
-    ("  ", "São Bernardo do Campo"), ("  Rudge Ramos  ", "Rudge Ramos, São Bernardo do Campo"),
-    ("Jardim do Mar", "Jardim do Mar, São Bernardo do Campo"), ("Baeta Neves", "Baeta Neves, São Bernardo do Campo"),
-    ("Vila São-José", "Vila São-José, São Bernardo do Campo")])
-def test_query_and_parse(neighborhood, location):
-    params = parse_search(" São Bernardo do Campo ", " restaurante ", "5", neighborhood)
-    assert params["neighborhood"] == (neighborhood.strip() or None if neighborhood is not None else None)
-    assert build_query(params["city"], params["segment"], params["neighborhood"]) == f"restaurante em {location}"
 
 
 @pytest.mark.parametrize("target", [False, True])
@@ -48,27 +37,6 @@ def test_query_preserved_on_next_page(monkeypatch):
     assert len(result) == 2
     assert all(call.args[0]["textQuery"] == "dentista em Centro, Santos" for call in transport.call_args_list)
     assert all(item.cidade == "Santos" for item in result)
-
-
-def test_ui_snapshot_and_lifecycle(monkeypatch):
-    from test_places_ui import page
-    from ui import places_search as ui
-    state = page()
-    assert state.entries["neighborhood"].get() == ""
-    state.entries["neighborhood"].get.return_value = " Rudge Ramos "
-    monkeypatch.setattr(ui, "create_provider", Mock())
-    run, thread = Mock(), Mock()
-    monkeypatch.setattr(ui, "prospect", run)
-    monkeypatch.setattr(ui.threading, "Thread", thread)
-    ui.PlacesSearchPage.start(state)
-    state.entries["neighborhood"].get.return_value = "Mudou depois"
-    thread.call_args.kwargs["target"]()
-    assert run.call_args.kwargs["neighborhood"] == "Rudge Ramos"
-    state.entries["neighborhood"].configure.assert_called_with(state="disabled")
-    ui.PlacesSearchPage.cancel(state)
-    assert state.cancel_event.is_set()
-    ui.PlacesSearchPage.set_running(state, False)
-    state.entries["neighborhood"].configure.assert_called_with(state="normal")
 
 
 def test_cli_neighborhood(monkeypatch):

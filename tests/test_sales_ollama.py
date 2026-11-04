@@ -151,33 +151,3 @@ def test_success_history_and_old_schema_migration(tmp_path):
     new = next(row for row in rows if row["id"] == draft)
     assert new["provider"] == "ollama" and new["model"] == "gemma3:4b"
     assert new["status"] == "GERADA" and new["enviado_em"] is None
-
-
-def test_worker_surfaces_safe_error_and_restores_controls(tmp_path, monkeypatch):
-    from ui import sales_panel as ui
-    repo = LeadRepository(tmp_path / "sales.db")
-    lead = repo.create_lead({"empresa": "Empresa"})
-    selected = OllamaSalesProvider(model="gemma3:4b", transport=Mock(side_effect=ConnectionRefusedError()))
-    monkeypatch.setattr(ui, "create_sales_provider", lambda: selected)
-    thread = Mock()
-    monkeypatch.setattr(ui.threading, "Thread", thread)
-    page = SimpleNamespace(busy=False, repository=repo, lead_id=lead, snapshot=None,
-        buttons=[Mock() for _ in range(5)], history=Mock(), message=Mock(), feedback=Mock(),
-        pending=queue.Queue(), after=Mock(), poll=Mock(), refresh=Mock(), current_id=None, rows={})
-    ui.SalesPanel.generate(page)
-    assert page.busy
-    selected.transport.assert_not_called()
-    thread.call_args.kwargs["target"]()
-    ui.SalesPanel.poll(page)
-    assert not page.busy and "conectar ao Ollama" in page.feedback.configure.call_args.kwargs["text"]
-    page.refresh.assert_not_called()
-    page.buttons[0].configure.assert_called_with(state="normal")
-
-
-def test_configuration_error_displayed_without_starting_worker(monkeypatch):
-    from ui import sales_panel as ui
-    monkeypatch.setattr(ui, "create_sales_provider", Mock(side_effect=SalesConfigurationError("Configure AI_MODEL")))
-    page = SimpleNamespace(busy=False, repository=Mock(), feedback=Mock())
-    ui.SalesPanel.generate(page)
-    page.feedback.configure.assert_called_once_with(text="Configure AI_MODEL")
-    assert not page.busy

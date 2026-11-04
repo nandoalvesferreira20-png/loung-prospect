@@ -114,21 +114,3 @@ def test_cli_selects_existing_places_service(monkeypatch):
     main.cli_main(["--fonte", "google_places", "--cidades", "Campinas", "--segmentos", "dentista", "--sem-site", "--max", "20"])
     assert run.call_args.kwargs["only_without_website"] is True
     assert run.call_args.kwargs["limit"] == 20
-
-
-def test_ui_passes_shared_mode_snapshot(monkeypatch):
-    from test_places_ui import page
-    from ui import places_search as ui
-    state = page()
-    state.no_website_switch.get.return_value = 1
-    state.min_score.get.return_value = "65"
-    monkeypatch.setattr(ui, "create_provider", Mock())
-    run = Mock()
-    monkeypatch.setattr(ui, "prospect", run)
-    thread = Mock()
-    monkeypatch.setattr(ui.threading, "Thread", thread)
-    ui.PlacesSearchPage.start(state)
-    thread.call_args.kwargs["target"]()
-    assert run.call_args.kwargs["only_without_website"] is True
-    assert run.call_args.kwargs["min_score"] == 65
-    state.no_website_switch.configure.assert_called_with(state="disabled")

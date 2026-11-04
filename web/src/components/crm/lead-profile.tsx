@@ -93,7 +93,7 @@ function ProfileForms({data,refresh,reload}: {data: CommercialDetail; refresh: (
       <Card><CardHeader><CardTitle>Próximo follow-up</CardTitle></CardHeader><CardContent><form className="space-y-4" onSubmit={async event => {event.preventDefault();await mutate(`/api/leads/${lead.id}/followups`,"POST",{action:"schedule",dueAt:due ? new Date(due).toISOString() : null,note},"Retorno salvo no Meu Dia.");}}>
         <label>Data e horário locais · opcionais<input className="field mt-2" type="datetime-local" value={due} disabled={busy} onChange={e => setDue(e.target.value)} /></label>
         <label>Próxima ação / observação<input className="field mt-2" value={note} maxLength={240} disabled={busy} onChange={e => setNote(e.target.value)} /></label>
-        <p className="text-xs leading-5 text-slate-500">Um retorno pendente por lead, como no desktop. Sem data, informe a ação. Reagendamentos e conclusões ficam no histórico.</p>
+        <p className="text-xs leading-5 text-slate-500">Um retorno pendente por lead. Sem data, informe a ação. Reagendamentos e conclusões ficam no histórico.</p>
         <div className="flex flex-wrap gap-2"><Button disabled={busy || !data.writesEnabled || (!due && !note.trim())}>Salvar retorno</Button><Button type="button" variant="outline" disabled={busy || !data.writesEnabled || (!lead.nextContact && !lead.nextAction)} onClick={async () => {if (await mutate(`/api/followups/${lead.id}`,"PATCH",{action:"complete"},"Follow-up concluído. Nenhum contato foi registrado automaticamente.")) {setDue("");setNote("");}}}>Concluir follow-up</Button></div>
       </form></CardContent></Card>
     </div>

@@ -102,7 +102,7 @@ export function DashboardData() {
               }
               description={
                 data
-                  ? "A distribuição aparecerá quando houver registros na base desktop."
+                  ? "A distribuição aparecerá quando houver registros na base local."
                   : "Verifique a API local para consultar os indicadores."
               }
             />
@@ -152,7 +152,7 @@ export function DashboardData() {
             }
             description={
               data
-                ? "Organize os retornos pelo Meu Dia ou pelo perfil do lead. A seleção segue as regras do desktop."
+                ? "Organize os retornos pelo Meu Dia ou pelo perfil do lead. A seleção segue as regras comerciais."
                 : "Conecte o backend local para consultar os próximos passos."
             }
           />

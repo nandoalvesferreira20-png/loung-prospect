@@ -64,6 +64,6 @@ scraper podem ser substituídos com monkeypatch, sem modificar produção.
 ## Verificações adicionais
 
 ```powershell
-python -m compileall -q main.py app.py core ui tests
+python -m compileall -q main.py core tests
 git diff --check
 ```

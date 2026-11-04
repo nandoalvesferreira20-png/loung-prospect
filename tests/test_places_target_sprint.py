@@ -83,13 +83,3 @@ def test_same_name_without_address_uses_distinct_place_ids(monkeypatch, tmp_path
     summary = prospect(city="A", segment="B", provider=api, repository=LeadRepository(tmp_path / "test.db"),
                        only_without_website=True, min_score=0)
     assert summary.accepted == 2
-
-
-def test_ui_exhaustion_does_not_show_full_progress():
-    from test_places_ui import page
-    from core.prospecting.service import ProspectingSummary
-    state = page()
-    summary = ProspectingSummary(requested=20, inserted=5, stats={"analisadas": 60, "com_site": 55})
-    state.pending.put(("done", summary))
-    state.poll()
-    assert state.progress.set.call_args.args == (0.25,)

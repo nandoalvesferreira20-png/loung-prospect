@@ -39,7 +39,7 @@ test-results/
 .local-browsers/
 playwright/.auth/
 
-# Build/distribution output; source .spec files remain versionable
+# Build/distribution output and obsolete desktop packaging
 build/
 dist/
 *.egg-info/
@@ -132,3 +132,9 @@ tmp/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# PyInstaller packaging artifacts
+*.spec
+*.app/
+*.dmg
+*.msi

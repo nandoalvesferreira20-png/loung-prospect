@@ -14,7 +14,6 @@ from core.sales.agent import SalesAgent
 from core.sales.contact_routing import classify_contact, normalize_niche, CONTACT_GUIDANCE
 from core.sales.groq_provider import GroqSalesProvider
 from core.sales.prompts import SYSTEM_PROMPT
-from ui.sales_panel import SalesPanel
 
 
 @pytest.mark.parametrize("segment,expected", [
@@ -126,21 +125,3 @@ def test_incomplete_data_contains_no_invented_facts(tmp_path):
     assert provider.generate.call_args.kwargs["evidence"] == dict(empresa="Empresa sintética", tipo_contato="indefinido", tipo_contato_origem="sugestao_nicho")
     assert "Não invente" in SYSTEM_PROMPT and "não afirme estrutura ou porte" in SYSTEM_PROMPT
     assert "Site vazio NÃO prova ausência" in SYSTEM_PROMPT
-
-
-def test_ui_override_saves_without_generating_or_replacing_current_text():
-    page = SimpleNamespace(contact_type="recepcao_equipe", contact_preferences=Mock(), lead_id=1,
-        snapshot={"old": "snapshot"}, contact_type_label=Mock(), feedback=Mock(), message=Mock(), generate=Mock())
-    SalesPanel.change_contact_type(page, "Indefinido")
-    page.contact_preferences.save.assert_called_once_with(1, "indefinido")
-    assert page.snapshot is None and page.contact_type == "indefinido"
-    page.message.delete.assert_not_called()
-    page.generate.assert_not_called()
-
-
-def test_ui_failed_override_keeps_previous_choice():
-    page = SimpleNamespace(contact_type="recepcao_equipe", contact_preferences=Mock(save=Mock(side_effect=OSError())),
-        lead_id=1, contact_type_selector=Mock(), feedback=Mock(), message=Mock(), snapshot={"keep": True})
-    SalesPanel.change_contact_type(page, "Contato direto")
-    page.contact_type_selector.set.assert_called_once_with("Recepção/equipe")
-    assert page.snapshot == {"keep": True} and page.contact_type == "recepcao_equipe"

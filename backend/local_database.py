@@ -30,7 +30,7 @@ def initialize_local_database(path: Path):
                 c.backup(destination)
                 if destination.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
                     raise RuntimeError('Backup SQLite invalido; migracao cancelada.')
-    # Reuse the additive, idempotent desktop migration before local extensions.
+    # Reuse the shared additive, idempotent SQLite migration before local extensions.
     initialize_database(path)
     with closing(sqlite3.connect(path, timeout=10)) as c, c:
         c.execute('PRAGMA journal_mode=WAL')

@@ -10,7 +10,6 @@ from core.outreach import OutreachContext, OutreachRequest, OutreachResult, Temp
 from core.outreach.builder import sender_name
 from core.outreach.models import CHANNELS, OBJECTIVES, TONES
 from core.outreach.templates import normalize_segment, segment_display
-from ui.outreach_panel import OutreachPanel, OutreachSession
 
 
 @pytest.mark.parametrize("segment", ["dentista", "estetica", "veterinario", "advogado", "restaurante", "desconhecido"])
@@ -92,68 +91,6 @@ def test_long_input_warns_without_truncation():
     result = TemplateOutreachGenerator().generate(OutreachRequest(OutreachContext(company_name=name)))
     assert name in result.message and any("caracteres" in warning for warning in result.warnings)
 
-
-def test_rotation_and_selection_reset():
-    session = OutreachSession()
-    assert session.last_result is None
-    ids = [session.generate({}, "whatsapp", "first_contact", "friendly", another=True).template_id for _ in range(4)]
-    assert len(set(ids)) == 3 and ids[0] == ids[3]
-    session.generate({}, "instagram", "first_contact", "friendly", another=True)
-    assert session.variation == 0
-    session.generate({}, "instagram", "first_contact", "friendly")
-    assert session.variation == 0
-
-
-def test_future_generator_can_be_injected():
-    generator = Mock()
-    session = OutreachSession(generator)
-    assert session.generate({}, "phone", "follow_up", "direct") is generator.generate.return_value
-    generator.generate.assert_called_once()
-
-
-def test_editable_copy_uses_current_text_and_inline_feedback():
-    panel = SimpleNamespace(message=Mock(get=Mock(return_value="Texto editado manualmente")), feedback=Mock(),
-                            clipboard_clear=Mock(), clipboard_append=Mock())
-    OutreachPanel.copy_message(panel)
-    panel.clipboard_clear.assert_called_once()
-    panel.clipboard_append.assert_called_once_with("Texto editado manualmente")
-    panel.feedback.configure.assert_called_once_with(text="Copiado!")
-
-
-def test_generation_callback_only_reads_and_updates_text():
-    row = {"empresa": "Restaurante Teste", "status": "Novo", "observacoes": "Manter"}
-    panel = SimpleNamespace(load_lead=Mock(return_value=row), session=OutreachSession(),
-        has_pending_edits=Mock(return_value=False),
-        selectors=[(Mock(get=Mock(return_value=x)), {x: x}) for x in ("whatsapp", "first_contact", "direct")],
-        message=Mock(), another=Mock(), feedback=Mock())
-    original = deepcopy(row)
-    OutreachPanel.generate(panel)
-    panel.message.insert.assert_called_once_with("1.0", panel.session.last_result.message)
-    panel.another.configure.assert_called_once_with(state="normal")
-    assert row == original
-
-
-def test_missing_lead_preserves_edited_text():
-    panel = SimpleNamespace(load_lead=lambda: None, message=Mock(), feedback=Mock(), has_pending_edits=Mock(return_value=False))
-    OutreachPanel.generate(panel)
-    panel.message.delete.assert_not_called()
-    assert "não encontrado" in panel.feedback.configure.call_args.kwargs["text"]
-
-
-def test_generation_and_copy_leave_database_and_history_unchanged(tmp_path):
-    from core.database.lead_repository import LeadRepository
-    from contextlib import closing
-    from core.database.connection import connect_database
-    repository = LeadRepository(tmp_path / "leads.db")
-    lead_id = repository.create_lead({"empresa": "Teste"})
-    before = dict(repository.get_lead(lead_id))
-    session = OutreachSession()
-    result = session.generate(before, "whatsapp", "first_contact", "direct")
-    panel = SimpleNamespace(message=Mock(get=Mock(return_value=result.message)), feedback=Mock(), clipboard_clear=Mock(), clipboard_append=Mock())
-    OutreachPanel.copy_message(panel)
-    assert dict(repository.get_lead(lead_id)) == before
-    with closing(connect_database(tmp_path / "leads.db")) as connection:
-        assert connection.execute("SELECT COUNT(*) FROM lead_interactions").fetchone()[0] == 0
 
 @pytest.mark.parametrize('channel', CHANNELS)
 def test_restaurant_name_regression(channel):

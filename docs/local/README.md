@@ -70,7 +70,7 @@ Abra **http://127.0.0.1:3000/**. Backend: http://127.0.0.1:8000/health. Os scrip
 
 - Padrão: `data/loung_prospect.db`, relativo à raiz. Altere `LOUNG_DATABASE_PATH` para outro arquivo SQLite local se desejar uma base independente.
 - O bootstrap ocorre no ciclo de inicialização do servidor configurado pelo ambiente. Importar módulos não cria nem migra a base. Testes fornecem bases temporárias.
-- Base nova começa vazia. Base existente recebe snapshot validado em `data/backups/*-pre-local-*.db` antes da primeira migração local. A migração desktop é aditiva e idempotente; extensões locais usam `local_migrations` e `PRAGMA user_version=1`. Uma interrupção permite retomar as operações aditivas.
+- Base nova começa vazia. Base existente recebe snapshot validado em `data/backups/*-pre-local-*.db` antes da primeira migração local. A migração SQLite compartilhada é aditiva e idempotente; extensões locais usam `local_migrations` e `PRAGMA user_version=1`. Uma interrupção permite retomar as operações aditivas.
 - Nenhum lead remoto é copiado. Não há acesso ao Supabase no modo local.
 - Pipeline, notas e follow-ups usam leads/interações; SDR e revisões usam outreach/outreach_revisions; preferências de contato existentes são preservadas; configurações da interface são salvas em `local_settings` via BFF.
 - Escritas usam transações, busy timeout e locks. CRUD manual usa revisão otimista: edição concorrente retorna 409. Importações deduplicam por provider/place ID, Maps, empresa/endereço ou empresa/telefone. Nomes iguais sozinhos não provam duplicidade.
@@ -86,7 +86,7 @@ Use um arquivo separado no backend com `LOUNG_AUTH_MODE=saas`, `LOUNG_STORAGE_BA
 
 ## Validação e limites
 
-Use `backend/requirements-dev.txt` para testes da API e `requirements-dev.txt` para testes do desktop. Rode `python -m backend.scripts.run_offline_tests backend/tests` e, em `web`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`. A suíte local cobre bootstrap sem Supabase, migração/backup, CRUD, concorrência, Pipeline, follow-ups, SDR simulado, reinício e bloqueios de rede. A regressão existente cobre Places simulado, importação/deduplicação, CSV e Excel.
+Use `backend/requirements-dev.txt` para testes da API e `requirements-dev.txt` para testes dos serviços de negócio e da CLI. Rode `python -m backend.scripts.run_offline_tests backend/tests` e, em `web`, `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`. A suíte local cobre bootstrap sem Supabase, migração/backup, CRUD, concorrência, Pipeline, follow-ups, SDR simulado, reinício e bloqueios de rede. A regressão existente cobre Places simulado, importação/deduplicação, CSV e Excel.
 
 Pesquisas e rascunhos SDR ainda não salvos são transitórios e expiram. Mensagens salvas e revisões persistem. Dados pertencem a cada máquina. Google Places e Groq exigem internet e credenciais válidas; “local” descreve execução e persistência.
 

@@ -193,7 +193,7 @@ export function LeadsTable() {
                       }
                       description={
                         data
-                          ? "Ajuste os filtros ou consulte a base atualizada no desktop."
+                          ? "Ajuste os filtros ou consulte a base local atualizada."
                           : "Verifique a conexão com a API e tente novamente. Nenhum dado foi alterado."
                       }
                     />

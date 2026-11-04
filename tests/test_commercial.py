@@ -11,8 +11,6 @@ from core.database.schema import LEADS_SCHEMA
 from core.commercial.service import CommercialService
 from core.commercial.values import STATUSES, utc_iso
 from core.commercial.day import build_day, get_my_day
-from ui.commercial_logic import (CommercialLead, parse_contact_date, parse_reference_date,
-                                 format_date, priority_label, history_text, interaction_values, day_values)
 
 UTC = timezone.utc
 LOCAL = timezone(timedelta(hours=-3))
@@ -147,39 +145,6 @@ def test_ambiguous_dates_rejected(value):
         utc_iso(value)
 
 
-def test_date_helpers():
-    assert parse_contact_date("11/09/2026 10:30", tz=LOCAL) == "2026-09-11T13:30:00+00:00"
-    assert format_date("2026-09-11T13:30:00+00:00", tz=LOCAL) == "11/09/2026 10:30"
-    assert parse_contact_date("") is None and format_date(None) == ""
-    assert utc_iso(None) is None
-    assert format_date("wrong") == "Data inválida"
-    assert parse_reference_date("11/09/2026") == date(2026, 9, 11)
-
-
-@pytest.mark.parametrize("value", ["31/02/2026 10:00", "11/09/2026", "2026-09-11", "11/09/2026 25:00"])
-def test_bad_ui_contact_dates(value):
-    with pytest.raises(ValueError):
-        parse_contact_date(value)
-
-
-def test_day_filters_counts_and_order(repo):
-    def add(name, status, due=None, score=50, owner="Ana"):
-        return repo.create_lead(dict(empresa=name, status=status, proximo_contato=due,
-            qualification_score=score, responsavel=owner))
-    older = add("Older", "Legado", "2026-09-09T10:00:00-03:00", 10)
-    overdue = add("Overdue", "Em conversa", "2026-09-10T23:00:00-03:00", 99)
-    today = add("Today", "Novo", "2026-09-11T10:00:00-03:00", 40)
-    meeting = add("Meeting", "Reunião agendada", score=70)
-    proposal = add("Proposal", "Proposta enviada", score=30)
-    add("Terminal", "Fechado", "2026-09-10T10:00:00-03:00")
-    add("Other", "Novo", owner="Bia")
-    add("Future", "Em conversa", "2026-09-12T10:00:00-03:00")
-    summary = get_my_day(repo, date(2026, 9, 11), responsavel="Ana", tz=LOCAL)
-    assert summary.counts == dict(atrasados=2, hoje=1, novos=1, reunioes=1, propostas=1)
-    assert [r["id"] for r in summary.rows] == [older, overdue, today, meeting, proposal]
-    assert day_values(summary.rows[0])[4] == "Baixa"
-
-
 @pytest.mark.parametrize("status", ["Fechado", "Sem interesse", "Perdido"])
 def test_terminal_not_overdue_but_today_included(repo, status):
     lead = repo.create_lead(dict(empresa="A", status=status, proximo_contato="2026-09-10T23:30:00-03:00"))
@@ -204,35 +169,6 @@ def test_day_score_ties_and_null(repo):
     ids = [repo.create_lead(dict(empresa=str(i), qualification_score=score)) for i, score in enumerate((None, 70, 70, 10))]
     result = get_my_day(repo, date(2026, 9, 11), tz=UTC)
     assert [r["id"] for r in result.rows] == [ids[1], ids[2], ids[3], ids[0]]
-
-
-@pytest.mark.parametrize("score,label", [(None, "Não disponível"), (0, "Baixa"), (30, "Média"), (50, "Boa"), (70, "Alta")])
-def test_priority_reuses_rules(score, label):
-    assert priority_label(score) == label
-
-
-def test_modal_controller_history_and_partial_followup(repo, lead):
-    controller = CommercialLead(repo, lead)
-    assert history_text(controller.history()) == "Nenhuma interação registrada."
-    controller.save(status="Retornar depois", responsavel="Bia", observacoes="Persistir", proxima_acao="Ligar",
-                    proximo_contato="12/09/2026 10:00", canal_preferencial="telefone")
-    first = controller.register(tipo="Ligação", canal="telefone", descricao="Falamos com José")
-    row = controller.load()
-    assert row["status"] == "Retornar depois" and row["proxima_acao"] == "Ligar" and row["observacoes"] == "Persistir"
-    controller.register(tipo="Follow-up", canal="", descricao="", update_followup=True,
-                        status="Em conversa", proxima_acao="Enviar proposta", proximo_contato="")
-    reopened = CommercialLead(LeadRepository(repo.path), lead)
-    assert len(reopened.history()) == 2 and reopened.history()[-1]["id"] == first
-    assert "Falamos com José" in history_text(reopened.history())
-    assert reopened.load()["proximo_contato"] is None and reopened.load()["status"] == "Em conversa"
-    assert reopened.load()["responsavel"] == "Bia" and reopened.load()["observacoes"] == "Persistir"
-
-
-def test_constants_and_validation():
-    assert "Contato realizado" in STATUSES and "Não contatar" in STATUSES
-    with pytest.raises(ValueError):
-        interaction_values(tipo="", canal="", descricao="")
-    assert interaction_values(tipo="Outro", canal="", descricao="")["canal"] is None
 
 
 def test_parameterized_history(repo, lead):

@@ -11,7 +11,6 @@ from core.database.schema import initialize_database, LEADS_SCHEMA
 from core.database.interaction_repository import InteractionRepository
 from core.sales.contact import ContactService, normalize_phone, SDR_STATUSES
 from core.sales.agent import SalesAgent, SalesGenerationError
-from ui.sales_workspace_logic import list_sales_leads, sales_counts
 
 
 @pytest.fixture
@@ -150,17 +149,3 @@ def test_refusal_during_generation_prevents_persistence(setup):
     with pytest.raises(ValueError, match="bloqueado"):
         agent.generate(lead)
     assert agent.outreach.history(lead) == []
-
-
-def test_listing_filters_metrics_reuse_existing_leads(setup):
-    repo, lead, _, _ = setup
-    fake = Mock(generate=Mock(return_value=dict(mensagem="Olá", angulo="contato", confianca=0.8)))
-    agent = SalesAgent(repo, fake)
-    draft = agent.generate(lead)
-    rows = list_sales_leads(repo, search="sÃO", segment="DENTISTA", status="Mensagem gerada")
-    assert len(rows) == 1 and rows[0]["id"] == lead
-    assert sales_counts(rows)["generated"] == 1
-    agent.edit(lead, draft, "Revisada")
-    assert sales_counts(list_sales_leads(repo))["reviewed"] == 1
-    assert list_sales_leads(repo, search="sem correspondência") == []
-    assert repo.count_leads() == 1

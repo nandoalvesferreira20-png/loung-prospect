@@ -27,7 +27,7 @@ export function SdrLeadSummary({ lead }: { lead: SdrContext }) {
         </dl>
         <p className="mt-4 text-xs leading-5 text-slate-500">
           Contato provável: <strong className="font-medium text-slate-700">{contactLabels[lead.contactType]}</strong>
-          {lead.contactSource === "preferencia_desktop" ? " · preferência salva no desktop" : " · indicação do nicho"}.
+          {lead.contactSource === "preferencia_desktop" ? " · preferência salva anteriormente" : " · indicação do nicho"}.
           {" "}Isso não confirma cargo ou poder de decisão.
         </p>
       </CardContent>

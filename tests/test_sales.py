@@ -152,20 +152,11 @@ def test_provider_failure_sanitized(status, raw):
 def test_missing_config(monkeypatch):
     import core.sales.provider as module
     monkeypatch.setattr(module, "load_environment", lambda: None)
+    monkeypatch.setenv("AI_PROVIDER", "openai")  # Isolate from synthetic Groq runner configuration.
     monkeypatch.delenv("AI_API_KEY", raising=False)
     monkeypatch.delenv("AI_MODEL", raising=False)
     with pytest.raises(SalesConfigurationError):
         create_sales_provider()
-
-
-def test_ui_saves_exact_edited_message():
-    from types import SimpleNamespace
-    from ui.sales_panel import SalesPanel
-    page = SimpleNamespace(busy=False, current_id=4, lead_id=1, outreach=Mock(),
-        message=Mock(get=Mock(return_value="Texto editado")), refresh=Mock(), feedback=Mock())
-    SalesPanel.save(page, "APROVADA")
-    page.outreach.update.assert_called_once_with(1, 4, status="APROVADA", message="Texto editado")
-    page.refresh.assert_called_once_with(4)
 
 
 def test_empty_edit_rolls_back(setup):
@@ -175,38 +166,3 @@ def test_empty_edit_rolls_back(setup):
     with pytest.raises(ValueError):
         agent.edit(lead, draft, " ")
     assert dict(agent.outreach.history(lead)[0]) == before
-
-
-def test_workspace_action_requires_selection():
-    from types import SimpleNamespace
-    from ui.lead_workspace import LeadWorkspacePage
-    page = SimpleNamespace(table=Mock(selection=Mock(return_value=[])), notice=Mock(), open_detail=Mock())
-    LeadWorkspacePage.generate_sales(page)
-    page.open_detail.assert_not_called()
-    page.table.selection.return_value = ["3"]
-    LeadWorkspacePage.generate_sales(page)
-    page.open_detail.assert_called_once_with(3, generate_ai=True)
-
-
-def test_ui_generation_is_explicit_worker_and_restores_controls(monkeypatch, setup):
-    import queue
-    from types import SimpleNamespace
-    from ui import sales_panel as ui
-    agent, lead, fake = setup
-    page = SimpleNamespace(busy=False, repository=agent.leads, lead_id=lead, snapshot=None,
-        buttons=[Mock() for _ in range(5)], history=Mock(), message=Mock(), feedback=Mock(),
-        pending=queue.Queue(), after=Mock(), poll=Mock(), refresh=Mock())
-    monkeypatch.setattr(ui, "create_sales_provider", lambda: fake)
-    thread = Mock()
-    monkeypatch.setattr(ui.threading, "Thread", thread)
-    assert not fake.calls
-    ui.SalesPanel.generate(page)
-    assert page.busy and not fake.calls
-    for button in page.buttons:
-        button.configure.assert_called_with(state="disabled")
-    thread.call_args.kwargs["target"]()
-    assert len(fake.calls) == 1
-    ui.SalesPanel.poll(page)
-    assert not page.busy
-    page.refresh.assert_called_once()
-    page.history.configure.assert_called_with(state="readonly")

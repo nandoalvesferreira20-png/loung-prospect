@@ -241,23 +241,9 @@ def cli_main(argv=None):
     run(cidades, segmentos, args.max, args.output, headless=args.headless)
 
 
-def gui_main():
-    """Executa somente a interface gráfica."""
-    from app import LoungLeadsApp
-
-    app = LoungLeadsApp()
-    app.mainloop()
-    
-    
-
-
 def main(argv=None):
-    """Sem argumentos abre a GUI; com argumentos mantém a CLI legada."""
-    argv = sys.argv[1:] if argv is None else argv
-    if argv:
-        cli_main(argv)
-    else:
-        gui_main()
+    """Run the retained headless prospecting CLI; no graphical application."""
+    return cli_main(sys.argv[1:] if argv is None else argv)
 
 
 if __name__ == "__main__":
