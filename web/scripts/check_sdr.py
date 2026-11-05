@@ -102,11 +102,13 @@ def main():
         expect(page.locator("#message")).not_to_have_value("")
         page.get_by_role("button", name="Salvar texto revisado").click()
         expect(page.get_by_text("Texto revisado salvo no histórico.")).to_be_visible()
-        # Search has real pagination semantics and the selection stays attached to its lead.
+        # Changing filters clears the selection; reselect from the matching results.
         page.locator("#lead-search").fill("nenhum resultado")
         expect(page.get_by_text("Nenhum lead encontrado")).to_be_visible()
         page.locator("#lead-search").fill("Clínica")
         expect(page.get_by_text("1 leads encontrados")).to_be_visible()
+        page.get_by_role("button", name="TESTE Clínica Árvore").click()
+        expect(page.locator("#recipient")).to_be_visible()
         for width in (1024, 768, 390):
             page.set_viewport_size({"width":width,"height":900})
             assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"Horizontal overflow at {width}"
@@ -115,7 +117,7 @@ def main():
         assert page.locator("#recipient").evaluate("el => getComputedStyle(el).outlineStyle") != "none"
         saved_text = page.locator("#message").input_value()
         page.locator("#message").fill(saved_text + " Edição pendente.")
-        page.get_by_role("button", name="Regenerar com IA").click()
+        page.get_by_role("button", name="Gerar abordagem com IA").click()
         dialog = page.get_by_role("dialog")
         expect(dialog).to_be_visible()
         bounds = dialog.bounding_box()

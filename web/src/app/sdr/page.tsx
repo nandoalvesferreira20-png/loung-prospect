@@ -14,6 +14,11 @@ import { whatsappLink } from "@/lib/sdr-whatsapp";
 
 export default function Sdr() {
   const [query, setQuery] = useState("");
+  const [niche, setNiche] = useState("");
+  const [stage, setStage] = useState("");
+  const [stages, setStages] = useState<string[]>([]);
+  const [niches, setNiches] = useState<string[]>([]);
+  const [nichesError, setNichesError] = useState("");
   const [page, setPage] = useState(1);
   const [leads, setLeads] = useState<Page<Lead> | null>(null);
   const [listLoading, setListLoading] = useState(true);
@@ -45,18 +50,28 @@ export default function Sdr() {
 
   useEffect(() => {
     const controller = new AbortController();
+    readApi<string[]>("/api/lead-niches", controller.signal).then(result => {
+      if (controller.signal.aborted) return;
+      if (result.status === "ready") { setNiches(result.data); setNichesError(""); }
+      else setNichesError(result.message);
+    }).catch(() => { /* Superseded refresh. */ });
+    return () => controller.abort();
+  }, [refresh]);
+
+  useEffect(() => {
+    const controller = new AbortController();
     const timer = setTimeout(async () => {
       setListLoading(true); setListError("");
       try {
-        const result = await prospectApi.listLeads({ q: query, page, pageSize: 8 }, controller.signal);
+        const result = await prospectApi.listLeads({ q: query, niche, stage, page, pageSize: 8 }, controller.signal);
         if (controller.signal.aborted) return;
-        if (result.status === "ready") setLeads(result.data);
+        if (result.status === "ready") { setLeads(result.data); setStages(result.data.stages); }
         else { setLeads(null); setListError(result.message); }
       } catch { /* Superseded search. */ }
       finally { if (!controller.signal.aborted) setListLoading(false); }
     }, 250);
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [query, page, refresh]);
+  }, [query, niche, stage, page, refresh]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -94,6 +109,16 @@ export default function Sdr() {
   function protect(action: () => void) {
     if (operation.current) return;
     if (dirty) setPending(() => action); else action();
+  }
+
+  function changeFilter(update: () => void) {
+    protect(() => {
+      update(); setPage(1); setListLoading(true); setLeads(null);
+      ++contextVersion.current;
+      setSelected(null); setContext(null); setHistory(null); setContextLoading(false);
+      setMessage(""); setSavedMessage(""); setSavedStatus(""); setDraft(null);
+      setError(""); setFeedback(""); retry.current = null;
+    });
   }
 
   async function generate() {
@@ -157,15 +182,27 @@ export default function Sdr() {
           <label htmlFor="lead-search" className="sr-only">Buscar lead por nome</label>
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-3 text-slate-400" size={16} />
-            <input id="lead-search" className="field !pl-9" placeholder="Buscar empresa…" value={query} maxLength={200} onChange={e => { setQuery(e.target.value); setPage(1); }} />
+            <input id="lead-search" className="field !pl-9" placeholder="Buscar empresa…" value={query} maxLength={200} disabled={busy || saving} onChange={e => { const value = e.target.value; changeFilter(() => setQuery(value)); }} />
           </div>
+          <label htmlFor="lead-niche" className="mt-3 block text-xs text-slate-500">Filtrar por nicho</label>
+          <select id="lead-niche" className="field mt-1" value={niche} disabled={busy || saving} onChange={e => { const value = e.target.value; changeFilter(() => setNiche(value)); }}>
+            <option value="">Todos os nichos</option>
+            {niche && !niches.includes(niche) && <option value={niche}>{niche}</option>}
+            {niches.map(value => <option key={value} value={value}>{value}</option>)}
+          </select>
+          {nichesError && <p role="alert" className="mt-2 text-xs text-red-700">{nichesError} Use Atualizar leads para tentar novamente.</p>}
+          <label htmlFor="lead-stage" className="mt-3 block text-xs text-slate-500">Filtrar por status</label>
+          <select id="lead-stage" className="field mt-1" value={stage} disabled={busy || saving} onChange={e => { const value = e.target.value; changeFilter(() => setStage(value)); }}>
+            <option value="">Todos os status</option>
+            {stages.map(value => <option key={value} value={value}>{value}</option>)}
+          </select>
           <div aria-live="polite" className="mt-3 text-xs text-slate-500">
             {listLoading ? "Carregando leads…" : leads ? `${leads.total} leads encontrados` : "Consulta indisponível"}
           </div>
           {listError && <p role="alert" className="mt-3 text-sm text-red-700">
             {listError}
           </p>}
-          {!listLoading && leads?.items.length === 0 && <EmptyState icon={UserRound} title="Nenhum lead encontrado" description="Ajuste a busca ou importe leads na página Prospecção." />}
+          {!listLoading && leads?.items.length === 0 && <EmptyState icon={UserRound} title="Nenhum lead encontrado" description={niche ? "Nenhum lead deste nicho corresponde aos filtros. Ajuste a busca, o status ou selecione Todos os nichos." : "Ajuste a busca ou importe leads na página Prospecção."} />}
           <ul className="mt-3 space-y-1" aria-label="Leads disponíveis" aria-busy={listLoading}>
             {leads?.items.map(lead => <li key={lead.id}>
               <button type="button" disabled={busy || saving || listLoading} aria-pressed={selected === lead.id} onClick={() => selected !== lead.id && protect(() => void selectLead(lead.id))} className={`w-full rounded-lg border p-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-60 ${selected === lead.id ? "border-blue-200 bg-blue-50" : "border-transparent hover:bg-slate-50"}`}>
@@ -179,13 +216,13 @@ export default function Sdr() {
             </li>)}
           </ul>
           {leads && leads.total > leads.pageSize && <div className="mt-4 flex items-center justify-between gap-2 border-t pt-4">
-            <Button className="px-2 text-xs" variant="outline" disabled={page === 1 || listLoading} onClick={() => setPage(p => p - 1)}>Anterior</Button>
+            <Button className="px-2 text-xs" variant="outline" disabled={page === 1 || listLoading || busy || saving} onClick={() => setPage(p => p - 1)}>Anterior</Button>
             <span className="text-xs text-slate-500">
               {page}
               /
               {Math.ceil(leads.total / leads.pageSize)}
             </span>
-            <Button className="px-2 text-xs" variant="outline" disabled={page * leads.pageSize >= leads.total || listLoading} onClick={() => setPage(p => p + 1)}>Próxima</Button>
+            <Button className="px-2 text-xs" variant="outline" disabled={page * leads.pageSize >= leads.total || listLoading || busy || saving} onClick={() => setPage(p => p + 1)}>Próxima</Button>
           </div>}
         </CardContent>
       </Card>

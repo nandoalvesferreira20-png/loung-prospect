@@ -5,7 +5,7 @@ import { isLocalRequest } from "./local-request";
 // Server-side only. Never forward user-supplied URLs, cookies or credentials.
 export async function proxyRead(
   request: Request,
-  path: "/v1/leads" | "/v1/overview",
+  path: "/v1/leads" | "/v1/overview" | "/v1/lead-niches",
 ) {
   const headers: Record<string,string> = {"Cache-Control":"no-store"};
   if (!isLocalRequest(request)) {
@@ -31,7 +31,7 @@ export async function proxyRead(
     }
     if (path === "/v1/leads") {
       const params = new URL(request.url).searchParams;
-      for (const key of ["q", "stage", "page", "pageSize"]) {
+      for (const key of ["q", "stage", "niche", "page", "pageSize"]) {
         const value = params.get(key);
         if (value !== null) url.searchParams.set(key, value);
       }

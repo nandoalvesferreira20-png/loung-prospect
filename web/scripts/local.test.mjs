@@ -14,6 +14,36 @@ function load(file, stubs={}) {
 }
 const mode=load('lib/runtime-mode.ts');
 
+test('SDR niche and status reach the local backend without losing pagination or search',async()=>{
+  const original=globalThis.fetch;
+  const {proxyRead}=load('lib/api/proxy.ts',{
+    './dashboard-timing':{dashboardFetch:(...args)=>globalThis.fetch(...args)},
+    './local-request':load('lib/api/local-request.ts'),
+  });
+  const {prospectApi}=load('lib/api/client.ts');
+  const niche="Clínica & Saúde '";
+  try {
+    globalThis.fetch=async url=>{
+      const parsed=new URL(url,'http://127.0.0.1');
+      assert.equal(parsed.searchParams.get('niche'),niche);
+      assert.equal(parsed.searchParams.get('stage'),'Novo');
+      assert.equal(parsed.searchParams.get('q'),'Árvore');
+      assert.equal(parsed.searchParams.get('page'),'2');
+      assert.equal(parsed.searchParams.get('pageSize'),'8');
+      return Response.json({items:[],total:0});
+    };
+    assert.equal((await prospectApi.listLeads({niche,stage:'Novo',q:'Árvore',page:2,pageSize:8})).status,'ready');
+    const params=new URLSearchParams({niche,stage:'Novo',q:'Árvore',page:'2',pageSize:'8'});
+    assert.equal((await proxyRead(new Request(`http://127.0.0.1/api/leads?${params}`),'/v1/leads')).status,200);
+    globalThis.fetch=async url=>{
+      assert.equal(new URL(url).pathname,'/v1/lead-niches');
+      return Response.json([niche]);
+    };
+    const response=await proxyRead(new Request('http://127.0.0.1/api/lead-niches'),'/v1/lead-niches');
+    assert.deepEqual(await response.json(),[niche]);
+  } finally {globalThis.fetch=original;}
+});
+
 test('local is the default; invalid, mixed and cloud modes fail closed',()=>{
   delete process.env.LOUNG_AUTH_MODE;
   assert.equal(mode.isLocalMode(),true);

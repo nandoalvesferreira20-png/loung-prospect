@@ -33,6 +33,7 @@ export interface Page<T> {
 export interface LeadFilters {
   q?: string;
   stage?: string;
+  niche?: string;
   page?: number;
   pageSize?: number;
 }

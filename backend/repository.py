@@ -78,10 +78,21 @@ class ReadRepository:
                     contactRole={"recepcao_equipe":"reception", "contato_direto":"direct", "indefinido":"unknown"}[role],
                     nextContact=raw.get("proximo_contato"), nextAction=raw.get("proxima_acao"))
 
-    def list_leads(self, *, q="", stage="", page=1, page_size=20):
+    def list_niches(self):
+        with self.connect() as (connection, columns):
+            if "segmento" not in columns:
+                return []
+            return [row[0] for row in connection.execute(
+                "SELECT DISTINCT segmento FROM leads WHERE segmento IS NOT NULL ORDER BY segmento"
+            ) if str(row[0]).strip()]
+
+    def list_leads(self, *, q="", stage="", niche="", page=1, page_size=20):
         with self.connect() as (connection, columns):
             source = self.source(connection, columns)
             clauses, values = [], []
+            if niche:
+                clauses.append("segmento = ?")
+                values.append(niche)
             if q:
                 clauses.append("instr(fold(coalesce(empresa,'') || ' ' || coalesce(telefone,'') || ' ' || coalesce(segmento,'') || ' ' || coalesce(cidade,'')), ?) > 0" if fold(q) else "0")
                 if fold(q):

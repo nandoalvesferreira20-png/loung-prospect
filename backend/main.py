@@ -92,8 +92,13 @@ def create_app(settings: Settings | None = None, *, provider_factory=configured_
 
     @app.get("/v1/leads", response_model=LeadPage)
     def leads(q: Annotated[str, Query(max_length=200)]="", stage: Annotated[str, Query(max_length=100)]="",
+              niche: str="",
               page: Annotated[int, Query(ge=1, le=1000000)]=1, pageSize: Annotated[int, Query(ge=1, le=100)]=20):
-        return repository.list_leads(q=q.strip(), stage=stage, page=page, page_size=pageSize)
+        return repository.list_leads(q=q.strip(), stage=stage, niche=niche, page=page, page_size=pageSize)
+
+    @app.get("/v1/lead-niches", response_model=list[str])
+    def lead_niches():
+        return repository.list_niches()
 
     @app.get("/v1/leads/{lead_id}", response_model=Lead)
     def lead(lead_id: int):
