@@ -1,125 +1,458 @@
-# Loung Prospect
+# 🚀 Loung Prospect
 
-Ferramenta local de prospecção comercial: **Next.js + FastAPI + SQLite**, sem login. Cada máquina tem uma base independente. Google Places pesquisa estabelecimentos; Groq gera abordagens SDR; Leads, CRM, Pipeline, histórico e follow-ups ficam no SQLite. O WhatsApp é aberto com o texto revisado e o envio é manual.
+### Plataforma inteligente de prospecção comercial, gestão de leads e automação com IA
 
-Não há instalador nem deploy público nesta versão. Frontend e backend devem executar somente em `127.0.0.1`. Supabase, PostgreSQL, organização e JWT não são necessários no modo local.
+![Next.js](https://img.shields.io/badge/Next.js-16-171717?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 
-## Requisitos
+O **Loung Prospect** é uma plataforma desenvolvida para transformar a maneira como empresas identificam potenciais clientes, organizam oportunidades comerciais e preparam abordagens personalizadas utilizando inteligência artificial.
 
-- Windows com PowerShell ou macOS com Terminal.
-- Git, Python 3.11+ e Node.js `^22.19.0 || >=24.6.0`, conforme `web/package.json`.
-- Chaves Google Places e Groq para usar essas integrações. CRM e SQLite funcionam sem elas; buscas e geração exigem internet.
+Desenvolvido no contexto da **Loung Tech**, o sistema integra pesquisa de estabelecimentos via Google Places, gerenciamento de leads, pipeline comercial e geração inteligente de mensagens por meio de modelos de linguagem.
 
-## Clonar e instalar
+O objetivo é centralizar atividades de prospecção em uma aplicação web, reduzindo processos manuais e proporcionando maior organização à operação comercial.
 
-Substitua `URL_DO_REPOSITORIO` pela URL do seu repositório:
+> **Status:** aplicação web local em desenvolvimento e evolução contínua. A versão atual utiliza SQLite e não exige autenticação. A arquitetura SaaS anterior permanece parcialmente preservada no repositório para possível evolução futura.
+
+---
+
+## 🎯 O problema que o projeto resolve
+
+A prospecção comercial tradicional frequentemente envolve tarefas repetitivas:
+
+- Pesquisar empresas individualmente.
+- Coletar informações comerciais.
+- Organizar contatos em planilhas.
+- Identificar oportunidades relevantes.
+- Elaborar mensagens personalizadas.
+- Acompanhar conversas e negociações.
+- Controlar atividades de follow-up.
+
+Esses processos podem consumir tempo e dificultar o acompanhamento de oportunidades.
+
+O Loung Prospect foi criado para centralizar essas operações e integrar recursos de inteligência artificial ao fluxo comercial.
+
+---
+
+## ✨ Principais funcionalidades
+
+### 🔎 1. Prospecção de estabelecimentos
+
+Integração com a **Google Places API** para pesquisar empresas e identificar potenciais oportunidades comerciais.
+
+Funcionalidades:
+
+- Pesquisa de estabelecimentos por critérios comerciais.
+- Consulta de informações disponíveis na API.
+- Seleção de resultados relevantes.
+- Importação de empresas para a carteira.
+- Deduplicação de leads.
+- Exportação de informações em CSV e Excel.
+
+A ferramenta busca facilitar a descoberta de potenciais clientes e a organização dos resultados.
+
+### 👥 2. Gestão de leads
+
+Ambiente centralizado para gerenciamento de potenciais clientes.
+
+- Cadastro e edição de leads.
+- Organização de informações comerciais.
+- Consulta de registros.
+- Filtros e pesquisas.
+- Histórico de atividades.
+- Acompanhamento de oportunidades.
+
+A persistência local utiliza SQLite.
+
+### 🤖 3. SDR Inteligente com IA generativa
+
+Um dos principais diferenciais da plataforma é a integração com modelos de linguagem por meio da **Groq API**.
+
+O SDR Inteligente permite:
+
+- Selecionar o lead que receberá a abordagem.
+- Definir o serviço que será oferecido.
+- Gerar mensagens comerciais personalizadas.
+- Ajustar orientações para a geração.
+- Revisar e editar o conteúdo produzido.
+- Regenerar mensagens.
+- Manter histórico das abordagens.
+
+A inteligência artificial auxilia na elaboração das mensagens, enquanto a decisão sobre o conteúdo final permanece com o operador.
+
+### 💬 4. Integração com WhatsApp
+
+A plataforma permite abrir uma conversa no WhatsApp com uma mensagem comercial previamente preparada.
+
+Fluxo:
+
+1. O operador seleciona um lead.
+2. Define o serviço ou a abordagem.
+3. A inteligência artificial gera uma sugestão.
+4. O operador revisa o conteúdo.
+5. O sistema abre a conversa no WhatsApp com a mensagem preenchida.
+6. O envio é realizado manualmente.
+
+**Importante:** o Loung Prospect não realiza disparos automáticos de mensagens na versão local documentada.
+
+### 📊 5. Pipeline comercial
+
+Ferramentas para organizar o acompanhamento das oportunidades.
+
+- Gerenciamento de etapas comerciais.
+- Atualização do status dos leads.
+- Registro de atividades.
+- Histórico de interações.
+- Agendamento de follow-ups.
+- Visualização da evolução das oportunidades.
+
+### 📈 6. Dashboard
+
+Interface para centralizar informações da operação e facilitar o acompanhamento dos dados comerciais.
+
+O dashboard faz parte da aplicação web, permitindo navegar entre os recursos de prospecção, leads, SDR e pipeline.
+
+---
+
+## 📸 Demonstração da plataforma
+
+As imagens abaixo deverão ser adicionadas a partir de capturas reais do sistema.
+
+### Dashboard
+
+![Dashboard Loung Prospect](docs/screenshots/dashboard.png)
+
+### Prospecção
+
+![Pesquisa de leads](docs/screenshots/prospeccao.png)
+
+### SDR Inteligente
+
+![SDR Inteligente](docs/screenshots/sdr-inteligente.png)
+
+### Pipeline comercial
+
+![Pipeline](docs/screenshots/pipeline.png)
+
+> As imagens são referências de caminho. Para visualizá-las no GitHub, adicione os arquivos correspondentes em `docs/screenshots/`.
+
+---
+
+## 🛠️ Tecnologias utilizadas
+
+### Frontend
+
+| Tecnologia | Utilização |
+|---|---|
+| Next.js 16 | Aplicação web e camada BFF |
+| React 19 | Construção de interfaces |
+| TypeScript | Tipagem e organização do código |
+| Tailwind CSS 4 | Estilização |
+| Recharts | Visualização de dados |
+| React Hook Form | Gerenciamento de formulários |
+| Zod | Validação de dados |
+
+### Backend
+
+| Tecnologia | Utilização |
+|---|---|
+| Python | Linguagem principal do backend |
+| FastAPI | Desenvolvimento da API REST |
+| SQLite | Persistência local |
+| Google Places API | Pesquisa de estabelecimentos |
+| Groq API | Integração com modelos de linguagem |
+
+### Ferramentas
+
+- Git e GitHub
+- VS Code
+- Node.js e npm
+- Python venv
+- Pytest
+- ESLint
+
+---
+
+## 🏗️ Arquitetura
+
+O projeto utiliza uma arquitetura que separa interface, comunicação HTTP, regras de negócio e persistência.
 
 ```text
-git clone URL_DO_REPOSITORIO loung-prospect
+                       USUÁRIO
+                          |
+                          v
+                 +----------------+
+                 |  NEXT.JS / WEB |
+                 |  React + TS    |
+                 +--------+-------+
+                          |
+                          v
+                 +----------------+
+                 | CAMADA BFF/API |
+                 +--------+-------+
+                          |
+                          v
+                 +----------------+
+                 |    FASTAPI     |
+                 |    Python      |
+                 +--------+-------+
+                          |
+           +--------------+--------------+
+           |              |              |
+           v              v              v
+      +---------+   +-----------+   +----------+
+      | SQLITE  |   |  GOOGLE   |   |   GROQ   |
+      |         |   |  PLACES   |   |   API    |
+      +---------+   +-----------+   +----------+
+           |              |              |
+           v              v              v
+      Leads / CRM     Pesquisa de      Geração de
+      / Pipeline      empresas         mensagens
+```
+
+A divisão das responsabilidades permite desenvolver e testar os componentes de maneira independente.
+
+### Estrutura principal
+
+```text
+loung-prospect/
+├── backend/              # API FastAPI
+├── core/                 # Regras e serviços compartilhados
+├── web/                  # Aplicação Next.js
+├── config/               # Configurações
+├── docs/                 # Documentação técnica
+├── scripts/              # Utilitários
+├── tests/                # Testes
+├── supabase/             # Recursos preservados da arquitetura SaaS
+├── templates/            # Templates do projeto
+├── .env.example
+├── requirements.txt
+└── README.md
+```
+
+A implementação histórica de interface desktop foi removida. A interface principal atual é web.
+
+---
+
+## 🚀 Como executar localmente
+
+### Pré-requisitos
+
+- Git.
+- Python 3.11 ou superior.
+- Node.js `^22.19.0` ou `>=24.6.0`.
+- npm.
+- Chaves de API para Google Places e Groq, caso deseje utilizar essas integrações.
+
+O CRM local pode funcionar sem essas duas chaves, mas a pesquisa de empresas e a geração de mensagens precisam delas.
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/nandoalvesferreira20-png/loung-prospect.git
+
 cd loung-prospect
 ```
 
-Windows:
+### 2. Configure o backend (Windows / PowerShell)
+
+Na raiz do projeto:
 
 ```powershell
 py -3 -m venv backend/.venv
+
 backend/.venv/Scripts/python.exe -m pip install -r backend/requirements.txt
-if (!(Test-Path .env)) { Copy-Item .env.example .env }
-if (!(Test-Path web/.env.local)) { Copy-Item web/.env.example web/.env.local }
-cd web
-npm.cmd ci
-cd ..
+
+Copy-Item .env.example .env
 ```
 
-macOS:
+Se o arquivo `.env` já existir, preserve suas configurações.
 
-```bash
-python3 -m venv backend/.venv
-backend/.venv/bin/python -m pip install -r backend/requirements.txt
-cp -n .env.example .env
-cp -n web/.env.example web/.env.local
-cd web
-npm ci
-cd ..
-```
+### 3. Configure as variáveis de ambiente
 
-Arquivos de ambiente existentes são preservados. No `.env` do backend, configure:
+No arquivo `.env`:
 
 ```dotenv
 LOUNG_AUTH_MODE=local
 LOUNG_STORAGE_BACKEND=sqlite
 LOUNG_DATABASE_PATH=data/loung_prospect.db
 LOUNG_ENABLE_WRITES=1
+
 GOOGLE_PLACES_API_KEY=
 GROQ_API_KEY=
 GROQ_MODEL=openai/gpt-oss-20b
 GROQ_TIMEOUT=30
 ```
 
-Preencha as chaves sem versioná-las. No `web/.env.local`, use `LOUNG_AUTH_MODE=local` e `LOUNG_API_URL=http://127.0.0.1:8000`. Chaves Google/Groq ficam exclusivamente no backend; não use `NEXT_PUBLIC_` para elas.
+Preencha suas credenciais localmente.
 
-## Executar
+**Nunca publique chaves privadas no GitHub.**
 
-Terminal 1, na raiz, Windows:
+### 4. Configure o frontend
+
+Na raiz:
+
+```powershell
+Copy-Item web/.env.example web/.env.local
+
+cd web
+
+npm.cmd ci
+```
+
+Configure `web/.env.local` com:
+
+```dotenv
+LOUNG_AUTH_MODE=local
+LOUNG_API_URL=http://127.0.0.1:8000
+```
+
+### 5. Execute o backend
+
+Em um terminal, a partir da raiz:
 
 ```powershell
 backend/.venv/Scripts/python.exe -m backend.scripts.run_api --env-file .env
 ```
 
-No macOS:
+API:
 
-```bash
-backend/.venv/bin/python -m backend.scripts.run_api --env-file .env
-```
+http://127.0.0.1:8000
 
-Terminal 2:
+Verificação de funcionamento:
 
-```text
-cd web
-npm run dev
-```
+http://127.0.0.1:8000/health
 
-No PowerShell, use `npm.cmd run dev` se `npm.ps1` estiver bloqueado. Abra **http://127.0.0.1:3000/**. O backend atende em **http://127.0.0.1:8000/health**. Para build local: `npm run build` e `npm start` em `web`; os scripts mantêm o bind loopback.
+### 6. Execute o frontend
 
-## Dados e uso
-
-- **Prospecção:** pesquise no Google Places, selecione resultados e importe leads deduplicados; exporte CSV ou Excel.
-- **Leads e Pipeline:** crie/edite fichas, registre atividades, altere etapas e agende follow-ups.
-- **SDR:** escolha lead, serviço e orientação; gere com Groq, revise e salve no histórico. O botão WhatsApp apenas abre a conversa com o texto preenchido.
-- **SQLite:** `data/loung_prospect.db` por padrão; caminhos relativos são resolvidos pela raiz. Base nova começa vazia. Base existente recebe backup antes da migração local aditiva. Nunca compartilhe esse arquivo em unidade de rede.
-- **Backups e privacidade:** preserve `data/backups/`; bancos, WAL/SHM, ambientes, logs e exportações comerciais ficam fora do Git. Testes usam bases temporárias.
-
-## Problemas comuns
-
-| Sintoma | Verificação |
-| --- | --- |
-| API indisponível | Inicie o backend e confira `/health` e `LOUNG_API_URL`. |
-| Login ou exigência de PostgreSQL | Confira `LOUNG_AUTH_MODE=local` nos dois processos e `LOUNG_STORAGE_BACKEND=sqlite`; reinicie após alterar configuração. |
-| Valores do `.env` não são usados | Variáveis exportadas no terminal têm precedência. Use o relatório offline abaixo no mesmo terminal do backend. |
-| Groq falha por TLS no Windows | Atualize as dependências e reinicie o backend; o cliente usa os certificados confiáveis nativos, mantendo validação TLS. Veja o diagnóstico Groq. |
-| Google Places retorna erro | Confira chave, API habilitada, faturamento e quota. A interface distingue falhas de pesquisa de resultados vazios. |
-| SQLite ocupado ou conflito 409 | Aguarde a escrita e atualize a ficha; use uma instância de backend por base. Não apague a base ou seus arquivos WAL/SHM para resolver bloqueios. |
-
-Diagnóstico Groq sem chamada externa nem exposição de chaves, Windows:
+Em outro terminal:
 
 ```powershell
-backend/.venv/Scripts/python.exe -m backend.scripts.check_groq_config --env-file .env
+cd web
+
+npm.cmd run dev
 ```
 
-No macOS, use `backend/.venv/bin/python`. Consulte [guia local completo](docs/local/README.md), [diagnóstico Groq](docs/local/GROQ_DIAGNOSIS.md), [auditoria de arquitetura](docs/local/AUDIT.md) e [limpeza do repositório](docs/local/CLEANUP_REPORT.md).
+Abra:
 
-## Arquitetura e desenvolvimento
+http://127.0.0.1:3000
 
-`core/` contém regras compartilhadas; `backend/` oferece a API; `web/` contém Next.js/BFF. Instale `backend/requirements-dev.txt` para testes da API e `requirements-dev.txt` para testes dos serviços de negócio e da CLI. Em `web`: `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`.
+A aplicação é destinada à execução local, utilizando o endereço `127.0.0.1`.
 
-A implementação SaaS foi preservada em `backend/persistence/`, `supabase/` e nas rotas/componentes de autenticação. Ela **não é uma dependência de configuração do modo local**. A implementação histórica permanece versionada, sem ativação no modo local. Veja a [classificação arquivo a arquivo](docs/local/CLEANUP_INVENTORY.json) e o [procedimento de retorno ao SaaS](docs/local/README.md#retorno-ao-saas).
+---
 
+## 🧪 Qualidade e testes
 
-A aplicação é exclusivamente Web local. `main.py` mantém somente a CLI de prospecção sem interface gráfica. A GUI Python e o empacotamento PyInstaller foram removidos. Consulte o [mapa de dependências](docs/local/DESKTOP_REMOVAL_MAP.json), o [relatório da remoção](docs/local/DESKTOP_REMOVAL_REPORT.md) e a [documentação histórica](docs/desktop-history.md).
+O projeto possui estrutura de testes para o backend, serviços de negócio e aplicação web.
 
-Para executar toda a suíte Python em um único ambiente, instale ambos os arquivos de desenvolvimento:
+### Testes do frontend
 
-```text
+Dentro de `web/`:
+
+```bash
+npm test
+npm run typecheck
+npm run lint
+npm run build
+```
+
+### Testes Python
+
+Na raiz do repositório, em um ambiente Python com as dependências de desenvolvimento instaladas:
+
+```bash
 python -m pip install -r requirements-dev.txt -r backend/requirements-dev.txt
+
 python -m backend.scripts.run_offline_tests tests backend/tests
 ```
+
+Os testes utilizam recursos locais e ambientes controlados, sem depender de uma base comercial real.
+
+---
+
+## 🔐 Privacidade e segurança
+
+O Loung Prospect utiliza diferentes medidas para organizar o tratamento das informações:
+
+- Separação entre configurações públicas e credenciais privadas.
+- Armazenamento local dos leads na versão atual.
+- Exclusão de bancos e arquivos de ambiente do versionamento.
+- Backups para operações de migração local.
+- Revisão humana de mensagens geradas por IA.
+- Envio manual das abordagens por WhatsApp.
+- Validações de dados nas operações comerciais.
+
+O sistema deve ser utilizado respeitando a legislação aplicável de proteção de dados, as políticas das APIs integradas e as regras das plataformas de comunicação.
+
+---
+
+## 🧠 Desafios técnicos e aprendizados
+
+### Integração entre diferentes tecnologias
+
+Combinar uma interface Next.js com um backend Python exigiu definir contratos de comunicação, organização de rotas e responsabilidades entre as camadas.
+
+### Consistência e deduplicação de leads
+
+O gerenciamento de dados comerciais exige evitar registros duplicados e preservar informações existentes durante importações.
+
+### Aplicação prática de IA generativa
+
+A integração com Groq foi desenvolvida para apoiar um processo comercial real, permitindo gerar, revisar e utilizar abordagens personalizadas.
+
+### Persistência e integridade dos dados
+
+A utilização de SQLite exigiu cuidados com migrações, operações de escrita, backups e consistência das informações.
+
+### Evolução arquitetural
+
+O projeto passou por mudanças de arquitetura, incluindo a transição de uma interface desktop para uma aplicação web e a experimentação com recursos de uma estrutura SaaS.
+
+Essas mudanças fazem parte do processo de evolução e aprendizado em engenharia de software.
+
+---
+
+## 🗺️ Roadmap
+
+Possibilidades de evolução:
+
+- [ ] Evoluir a arquitetura para utilização multiusuário.
+- [ ] Retomar e validar a estrutura SaaS com PostgreSQL e autenticação.
+- [ ] Ampliar os indicadores do dashboard.
+- [ ] Expandir automações comerciais com controles de segurança.
+- [ ] Melhorar observabilidade e monitoramento.
+- [ ] Ampliar testes automatizados e cobertura de integração.
+- [ ] Avaliar integração oficial com WhatsApp Business para novos fluxos comerciais.
+
+Os itens representam possibilidades futuras e não funcionalidades disponíveis na versão local atual.
+
+---
+
+## 👨‍💻 Sobre o desenvolvedor
+
+**Fernando Ferreira Alves**
+
+Estudante de Engenharia de Software, com experiência prática em desenvolvimento de aplicações, análise de dados, automações e integração de inteligência artificial.
+
+O Loung Prospect representa minha experiência construindo uma solução de ponta a ponta, desde a organização das regras de negócio até a integração entre frontend, backend, banco de dados e APIs externas.
+
+O projeto faz parte das soluções desenvolvidas no contexto da **Loung Tech**.
+
+### Contato
+
+[![GitHub](https://img.shields.io/badge/GitHub-171717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/nandoalvesferreira20-png)
+[![Instagram](https://img.shields.io/badge/Instagram-171717?style=for-the-badge&logo=instagram&logoColor=E4405F)](https://www.instagram.com/fernandev.tech/)
+[![Loung Tech](https://img.shields.io/badge/Loung_Tech-171717?style=for-the-badge&logo=vercel&logoColor=white)](https://loung-tech.vercel.app/)
+
+---
+
+<p align="center">
+  <strong>Loung Prospect — Transformando prospecção comercial em um processo mais inteligente, organizado e eficiente.</strong>
+</p>
+
+<p align="center">
+  Desenvolvido com Python, Next.js e Inteligência Artificial.
+</p>
