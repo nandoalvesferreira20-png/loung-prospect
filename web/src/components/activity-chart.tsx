@@ -26,7 +26,7 @@ export function ActivityChart({
             layout="vertical"
             margin={{ left: 0, right: 20, top: 10, bottom: 0 }}
           >
-            <CartesianGrid horizontal={false} stroke="#e8edf5" />
+            <CartesianGrid horizontal={false} stroke="var(--color-border)" />
             <XAxis
               type="number"
               allowDecimals={false}
@@ -40,11 +40,11 @@ export function ActivityChart({
               tickLine={false}
               axisLine={false}
             />
-            <Tooltip />
+            <Tooltip cursor={{ fill: "var(--color-muted)" }} contentStyle={{ borderColor: "var(--color-border)", borderRadius: 6, fontSize: 12 }} />
             <Bar
               dataKey="count"
               name="Leads"
-              fill="#2563eb"
+              fill="var(--color-chart)"
               radius={[0, 4, 4, 0]}
               maxBarSize={20}
             />

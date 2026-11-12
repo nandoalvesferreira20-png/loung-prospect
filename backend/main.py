@@ -53,6 +53,8 @@ def create_app(settings: Settings | None = None, *, provider_factory=configured_
     app.state.prospecting = jobs
     app.state.sdr = sdr
     app.state.crm = CrmService(store)
+    from .sales_ai import create_router as sales_ai_router
+    app.include_router(sales_ai_router(repository, settings.sales_ai_token))
     app.include_router(prospecting_router)
     app.include_router(sdr_router)
     app.include_router(crm_router)

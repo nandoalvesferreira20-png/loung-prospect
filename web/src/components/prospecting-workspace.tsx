@@ -400,7 +400,7 @@ export function ProspectingWorkspace() {
               </label>
             </fieldset>
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="max-w-xl text-xs leading-5 text-slate-500">
+              <p className="max-w-xl text-xs leading-5 text-neutral-500">
                 A pesquisa consulta Google Places e pode consumir a quota da
                 integração. Os resultados não são salvos automaticamente.
               </p>
@@ -419,7 +419,7 @@ export function ProspectingWorkspace() {
       {notice && (
         <p
           role="status"
-          className="mt-5 rounded-lg border bg-blue-50 p-4 text-sm text-blue-900"
+          className="mt-5 rounded-lg border bg-accent-soft p-4 text-sm text-accent-foreground"
         >
           {notice}
         </p>
@@ -433,21 +433,21 @@ export function ProspectingWorkspace() {
                   {active && (
                     <LoaderCircle
                       size={16}
-                      className="animate-spin text-blue-600"
+                      className="animate-spin text-accent-foreground"
                     />
                   )}
                   {current ? labels[current.status] : "Carregando pesquisa…"}
                 </p>
-                <p className="mt-2 text-xs leading-6 text-slate-500">
+                <p className="mt-2 text-xs leading-6 text-neutral-500">
                   {current
                     ? `${current.found} resultado(s) · ${current.scanned} empresa(s) analisada(s) · ${current.requestsMade} chamada(s) · ${current.pagesFetched} página(s)`
                     : "Consultando andamento no backend local."}
                 </p>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-neutral-500">
                   {current?.message}
                 </p>
                 {current && (
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-xs text-neutral-500">
                     {current.query.niche} · {current.query.location} · até{" "}
                     {current.requested} resultados. Disponíveis por 15 minutos
                     após o término.
@@ -498,7 +498,7 @@ export function ProspectingWorkspace() {
         <CardHeader className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <CardTitle>Resultados da prospecção</CardTitle>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-neutral-500">
               {results
                 ? `${results.total} resultado(s) · ${selected.size} selecionado(s)`
                 : resultsReady ? "Carregando resultados da pesquisa…" : "Nenhuma pesquisa carregada"}
@@ -547,7 +547,7 @@ export function ProspectingWorkspace() {
           <>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[850px] text-left text-xs">
-                <thead className="bg-slate-50 text-slate-500">
+                <thead className="bg-neutral-50 text-neutral-500">
                   <tr>
                     <th className="p-4">
                       <input
@@ -592,7 +592,7 @@ export function ProspectingWorkspace() {
                   {results.items.map((row) => (
                     <tr
                       key={row.id}
-                      className={`border-t ${selected.has(row.id) ? "bg-blue-50" : ""}`}
+                      className={`border-t ${selected.has(row.id) ? "bg-accent-soft" : ""}`}
                     >
                       <td className="p-4">
                         <input
@@ -620,7 +620,7 @@ export function ProspectingWorkspace() {
                       </td>
                       <td className="px-4 py-4">
                         <span
-                          className={`rounded-full px-2 py-1 whitespace-nowrap ${row.alreadySaved ? "bg-slate-100 text-slate-600" : "bg-blue-50 text-blue-700"}`}
+                          className={`rounded-full px-2 py-1 whitespace-nowrap ${row.alreadySaved ? "bg-neutral-100 text-neutral-600" : "bg-accent-soft text-accent-foreground"}`}
                         >
                           {row.alreadySaved
                             ? "Já cadastrado"
@@ -632,10 +632,10 @@ export function ProspectingWorkspace() {
                 </tbody>
               </table>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t p-4 text-xs text-slate-500">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t p-4 text-xs text-neutral-500">
               <p>
                 Página {page} de {Math.max(1, Math.ceil(results.total / 20))} ·{" "}
-                <Link href="/leads" className="text-blue-600 hover:underline">
+                <Link href="/leads" className="text-accent-foreground hover:underline">
                   Consultar carteira
                 </Link>
               </p>
@@ -684,7 +684,7 @@ export function ProspectingWorkspace() {
         <div className="border-t px-5 py-3 text-right">
           <span
             translate="no"
-            className="text-xs font-normal whitespace-nowrap text-[#5e5e5e]"
+            className="text-xs font-normal whitespace-nowrap text-neutral-600"
           >
             Google Maps
           </span>

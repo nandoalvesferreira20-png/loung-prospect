@@ -89,7 +89,7 @@ export default function Settings() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Settings2 size={17} className="text-blue-600" />
+                <Settings2 size={17} className="text-accent-foreground" />
                 Preferências locais
               </CardTitle>
             </CardHeader>
@@ -138,12 +138,12 @@ export default function Settings() {
                 </Button>
                 <Link
                   href={preferences.startPage}
-                  className="ml-4 inline-block text-sm font-medium text-blue-600 hover:underline"
+                  className="ml-4 inline-block text-sm font-medium text-accent-foreground hover:underline"
                 >
                   Abrir atalho escolhido →
                 </Link>
                 {feedback && (
-                  <p role="status" className="text-sm text-blue-700">
+                  <p role="status" className="text-sm text-accent-foreground">
                     {feedback}
                   </p>
                 )}
@@ -153,30 +153,30 @@ export default function Settings() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Building2 size={17} className="text-blue-600" />
+                <Building2 size={17} className="text-accent-foreground" />
                 Organização
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm font-semibold">{session?.organization}</p>
-              {session?.role !== "local" && <><Link href="/configuracoes/equipe" className="mt-3 inline-block text-sm text-blue-600">Consultar equipe e acessos →</Link>
-              <p className="mt-2 text-sm leading-6 text-slate-500">
+              {session?.role !== "local" && <><Link href="/configuracoes/equipe" className="mt-3 inline-block text-sm text-accent-foreground">Consultar equipe e acessos →</Link>
+              <p className="mt-2 text-sm leading-6 text-neutral-500">
                 Carteira compartilhada entre os membros autorizados. Convites e
                 permissões são provisionados pelo administrador do workspace.
               </p>
-              <div className="mt-4 flex items-start gap-2 rounded-lg bg-slate-50 p-3 text-xs leading-5 text-slate-500">
+              <div className="mt-4 flex items-start gap-2 rounded-lg bg-neutral-50 p-3 text-xs leading-5 text-neutral-500">
                 <ShieldCheck size={16} className="mt-0.5 shrink-0" />
                 Sessão individual e acesso por organização. A publicação depende
                 da configuração e validação operacional descritas na Fase 3.1.
               </div></>}
-              {session?.role === "local" && <p className="mt-2 text-sm text-slate-500">Base independente neste computador. Configure Google Places e Groq no arquivo de ambiente do backend.</p>}
+              {session?.role === "local" && <p className="mt-2 text-sm text-neutral-500">Base independente neste computador. Configure Google Places e Groq no arquivo de ambiente do backend.</p>}
             </CardContent>
           </Card>
         </div>
         <Card className="self-start">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Plug size={17} className="text-blue-600" />
+              <Plug size={17} className="text-accent-foreground" />
               Integrações
             </CardTitle>
           </CardHeader>
@@ -196,17 +196,17 @@ export default function Settings() {
               <div key={i.name} className="rounded-lg border p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <h3 className="text-sm font-semibold">{i.name}</h3>
-                  <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] text-slate-500">
+                  <span className="rounded-full bg-neutral-100 px-2 py-1 text-[10px] text-neutral-500">
                     Configuração no backend
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-blue-600">{i.tag}</p>
-                <p className="mt-3 text-xs leading-6 text-slate-500">
+                <p className="mt-1 text-xs text-accent-foreground">{i.tag}</p>
+                <p className="mt-3 text-xs leading-6 text-neutral-500">
                   {i.text}
                 </p>
               </div>
             ))}
-            <p className="text-xs leading-6 text-slate-500">
+            <p className="text-xs leading-6 text-neutral-500">
               Nenhuma chave é solicitada ou exposta no frontend. Os arquivos de
               configuração local permanecem intactos.
             </p>

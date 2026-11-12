@@ -1,5 +1,5 @@
 """Explicit local/SaaS configuration; never implicitly load credentials."""
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import os
 from pathlib import Path
 
@@ -16,8 +16,11 @@ class Settings:
     auth_audience: str = "authenticated"
     mode: str | None = None
     initialize_local: bool = False
+    sales_ai_token: str = field(default="", repr=False)
 
     def validate(self):
+        if self.sales_ai_token and (len(self.sales_ai_token) < 32 or not self.sales_ai_token.isascii() or any(c.isspace() for c in self.sales_ai_token)):
+            raise ValueError("LOUNG_SALES_AI_TOKEN exige pelo menos 32 caracteres ASCII sem espacos.")
         mode = self.mode or ("local" if self.storage_backend == "sqlite" else "saas")
         if mode not in ("local", "saas"):
             raise ValueError("LOUNG_AUTH_MODE deve ser local ou saas")
@@ -41,4 +44,5 @@ class Settings:
                    os.environ.get("LOUNG_STORAGE_BACKEND", "sqlite" if mode == "local" else "postgres"),
                    os.environ.get("LOUNG_POSTGRES_DSN", ""),
                    os.environ.get("SUPABASE_URL", ""),
-                   os.environ.get("SUPABASE_AUTH_AUDIENCE", "authenticated"), mode, mode == "local").validate()
+                   os.environ.get("SUPABASE_AUTH_AUDIENCE", "authenticated"), mode, mode == "local",
+                   os.environ.get("LOUNG_SALES_AI_TOKEN", "")).validate()

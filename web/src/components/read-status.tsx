@@ -10,14 +10,14 @@ export function ReadStatus({
 }) {
   if (result?.status === "ready")
     return (
-      <div className="mb-5 flex items-center gap-2 text-xs text-slate-500">
+      <div className="mb-5 flex items-center gap-2 text-xs text-neutral-500">
         <Database size={14} />
         Base local · somente leitura
       </div>
     );
   if (!result)
     return (
-      <p role="status" className="mb-5 animate-pulse text-sm text-slate-500">
+      <p role="status" className="mb-5 animate-pulse text-sm text-neutral-500">
         Carregando dados da base local…
       </p>
     );

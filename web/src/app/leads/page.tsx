@@ -17,7 +17,7 @@ export default function Leads() {
               <Download />
               Exportar leads
             </Button>
-            <p className="mt-2 text-[11px] text-slate-500">
+            <p className="mt-2 text-[11px] text-neutral-500">
               Exportação da carteira ainda não disponível
             </p>
           </div>

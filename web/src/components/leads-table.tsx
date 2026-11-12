@@ -53,7 +53,7 @@ export function LeadsTable() {
             <div className="relative mt-2">
               <Search
                 size={16}
-                className="absolute left-3 top-3 text-slate-400"
+                className="absolute left-3 top-3 text-neutral-400"
               />
               <input
                 className="field pl-9"
@@ -95,7 +95,7 @@ export function LeadsTable() {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[800px] text-left text-xs">
-            <thead className="bg-slate-50 text-slate-500">
+            <thead className="bg-neutral-50 text-neutral-500">
               <tr>
                 <th className="w-10 p-4">
                   <input
@@ -132,7 +132,7 @@ export function LeadsTable() {
             <tbody>
               {pending ? (
                 <tr>
-                  <td colSpan={7} className="p-10 text-center text-slate-500">
+                  <td colSpan={7} className="p-10 text-center text-neutral-500">
                     Carregando leads…
                   </td>
                 </tr>
@@ -140,7 +140,7 @@ export function LeadsTable() {
                 data.items.map((lead) => (
                   <tr
                     key={lead.id}
-                    className={`border-t transition-colors ${selected.has(lead.id) ? "bg-blue-50" : "hover:bg-slate-50"}`}
+                    className={`border-t transition-colors ${selected.has(lead.id) ? "bg-accent-soft" : "hover:bg-neutral-50"}`}
                   >
                     <td className="p-4">
                       <input
@@ -151,7 +151,7 @@ export function LeadsTable() {
                       />
                     </td>
                     <td className="max-w-64 px-4 py-4 font-semibold break-words">
-                      <Link href={`/leads/${lead.id}`} className="hover:text-blue-700 hover:underline">{lead.company}</Link>
+                      <Link href={`/leads/${lead.id}`} className="hover:text-accent-foreground hover:underline">{lead.company}</Link>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       {lead.phone || "Não informado"}
@@ -172,7 +172,7 @@ export function LeadsTable() {
                             ? `Salvo originalmente como: ${lead.originalStage}`
                             : undefined
                         }
-                        className="inline-block rounded-full bg-slate-100 px-2.5 py-1 text-slate-600"
+                        className="inline-block rounded-full bg-neutral-100 px-2.5 py-1 text-neutral-600"
                       >
                         {lead.stage}
                       </span>
@@ -203,7 +203,7 @@ export function LeadsTable() {
             </tbody>
           </table>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t px-5 py-3 text-xs text-slate-500">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t px-5 py-3 text-xs text-neutral-500">
           <span role="status">
             {data
               ? `${data.total} lead(s) encontrado(s) · ${selected.size} selecionado(s) nesta página`

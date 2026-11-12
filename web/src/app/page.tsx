@@ -29,7 +29,7 @@ export default function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Da descoberta à conversa</CardTitle>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-neutral-500">
               Um fluxo simples para sua equipe
             </p>
           </CardHeader>
@@ -59,18 +59,18 @@ export default function Dashboard() {
                 key={x.n}
                 className="group flex items-start gap-3"
               >
-                <span className="rounded-lg bg-blue-50 p-2 text-xs font-semibold text-blue-600">
+                <span className="rounded-lg bg-accent-soft p-2 text-xs font-semibold text-accent-foreground">
                   {x.n}
                 </span>
                 <div className="flex-1">
-                  <p className="text-sm font-medium group-hover:text-blue-600">
+                  <p className="text-sm font-medium group-hover:text-accent-foreground">
                     {x.title}
                   </p>
-                  <p className="mt-1 text-xs leading-5 text-slate-500">
+                  <p className="mt-1 text-xs leading-5 text-neutral-500">
                     {x.text}
                   </p>
                 </div>
-                <ArrowUpRight size={15} className="mt-1 text-slate-400" />
+                <ArrowUpRight size={15} className="mt-1 text-neutral-400" />
               </Link>
             ))}
           </CardContent>

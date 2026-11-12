@@ -67,18 +67,18 @@ export function DashboardData() {
           <Card key={label}>
             <CardContent>
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-medium text-slate-500">{label}</p>
-                <Icon size={17} className="shrink-0 text-slate-400" />
+                <p className="text-xs font-medium text-neutral-500">{label}</p>
+                <Icon size={17} className="shrink-0 text-neutral-400" />
               </div>
               <p
-                className="my-4 text-3xl font-semibold"
+                className="my-3 text-3xl font-semibold tracking-tight tabular-nums"
                 aria-label={
                   value === undefined ? "Dado indisponível" : String(value)
                 }
               >
                 {value ?? "—"}
               </p>
-              <p className="text-[11px] leading-5 text-slate-500">{help}</p>
+              <p className="text-[11px] leading-5 text-neutral-500">{help}</p>
             </CardContent>
           </Card>
         ))}
@@ -86,7 +86,7 @@ export function DashboardData() {
       <Card className="mt-6">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>Distribuição por etapa comercial</CardTitle>
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-neutral-500">
             {data ? `${data.total} leads · situação atual` : "Aguardando dados"}
           </span>
         </CardHeader>
@@ -114,7 +114,7 @@ export function DashboardData() {
           <CardTitle>Próximas ações</CardTitle>
           <Link
             href="/leads"
-            className="flex items-center gap-2 text-xs text-blue-600"
+            className="flex items-center gap-2 text-xs text-accent-foreground"
           >
             Ver carteira
             <ArrowRight size={14} />
@@ -128,14 +128,14 @@ export function DashboardData() {
                 className="flex flex-wrap items-start justify-between gap-3 px-5 py-4"
               >
                 <div>
-                  <Link href={`/leads/${lead.id}`} className="text-sm font-semibold hover:text-blue-700">{lead.company}</Link>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <Link href={`/leads/${lead.id}`} className="text-sm font-semibold hover:text-accent-foreground">{lead.company}</Link>
+                  <p className="mt-1 text-xs text-neutral-500">
                     {lead.nextAction || "Próxima ação não definida"}
                   </p>
                 </div>
                 <div className="text-right text-xs">
                   <p>{lead.stage}</p>
-                  <p className="mt-1 text-slate-500">
+                  <p className="mt-1 text-neutral-500">
                     {lead.nextContact
                       ? formatDate(lead.nextContact)
                       : "Sem agendamento"}
@@ -159,7 +159,7 @@ export function DashboardData() {
         )}
       </Card>
       {data && (
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-neutral-500">
           Referência dos agendamentos: {data.referenceDate} · fuso local do
           backend.
           {data.invalidDates > 0

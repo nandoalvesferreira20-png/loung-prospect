@@ -109,6 +109,8 @@ exports/
 !backend/tests/fixtures/**/*.key
 
 # Logs, temporary files and disposable QA output
+# Controlled lead exports can contain private notes.
+/sales-ai-export-*.json
 logs/
 *.log
 temp/

@@ -66,22 +66,22 @@ export default function PipelinePage() {
       <label>Nicho<select className="field mt-2" value={niche} disabled={busy} onChange={e => {setNiche(e.target.value);setFeedback("");}}><option value="">Todos os nichos</option>{data?.niches.map(item => <option key={item}>{item}</option>)}</select></label>
       <Button asChild variant="outline" className="self-end"><Link href="/meu-dia">Meu Dia</Link></Button>
     </div>
-    {data?.reason && <p className="mb-4 rounded-lg border bg-blue-50 p-3 text-sm text-blue-900">{data.reason}</p>}
+    {data?.reason && <p className="mb-4 rounded-lg border bg-accent-soft p-3 text-sm text-accent-foreground">{data.reason}</p>}
     {error && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{error}</p>}
-    <p role="status" className="mb-4 text-sm text-slate-500">{loading ? "Carregando pipeline…" : feedback || (data ? `${data.total} leads · arraste um card ou use o seletor de etapa.` : "Quadro indisponível.")}</p>
-    <div role="region" aria-label="Etapas do pipeline" tabIndex={0} className="max-w-full overflow-x-auto rounded-xl pb-5 focus-visible:outline-blue-500" aria-busy={loading || busy}>
+    <p role="status" className="mb-4 text-sm text-neutral-500">{loading ? "Carregando pipeline…" : feedback || (data ? `${data.total} leads · arraste um card ou use o seletor de etapa.` : "Quadro indisponível.")}</p>
+    <div role="region" aria-label="Etapas do pipeline" tabIndex={0} className="max-w-full overflow-x-auto rounded-lg pb-5 focus-visible:outline-ring" aria-busy={loading || busy}>
       <div className="flex items-start gap-4">
-        {data?.columns.map((column,index) => <section key={column.stage} aria-label={`Etapa ${column.stage}`} onDragOver={event => {if (data.writesEnabled && dragged && !busy) {event.preventDefault();setTarget(column.stage);}}} onDragLeave={() => setTarget(null)} onDrop={event => {event.preventDefault();if (dragged) void move(dragged,column.stage);setDragged(null);setTarget(null);}} className={`w-72 shrink-0 rounded-xl border p-3 ${target === column.stage ? "border-blue-400 bg-blue-50" : "bg-slate-100/70"}`}>
-          <div className="mb-4 flex items-center gap-2"><span className={`size-2 rounded-full ${index === 5 ? "bg-emerald-500" : "bg-blue-400"}`} /><h2 className="flex-1 text-sm font-semibold">{column.stage}</h2><span className="rounded-full bg-white px-2 py-1 text-xs">{column.total}</span></div>
+        {data?.columns.map((column,index) => <section key={column.stage} aria-label={`Etapa ${column.stage}`} onDragOver={event => {if (data.writesEnabled && dragged && !busy) {event.preventDefault();setTarget(column.stage);}}} onDragLeave={() => setTarget(null)} onDrop={event => {event.preventDefault();if (dragged) void move(dragged,column.stage);setDragged(null);setTarget(null);}} className={`w-72 shrink-0 rounded-lg border p-3 ${target === column.stage ? "border-accent bg-accent-soft" : "bg-neutral-100/70"}`}>
+          <div className="mb-4 flex items-center gap-2"><span className={`size-2 rounded-full ${index === 5 ? "bg-emerald-500" : "bg-accent"}`} /><h2 className="flex-1 text-sm font-semibold">{column.stage}</h2><span className="rounded-full bg-white px-2 py-1 text-xs">{column.total}</span></div>
           <ul className="space-y-3">{column.items.map(lead => <li key={lead.id} draggable={data.writesEnabled && !busy && !loading} onDragStart={event => {setDragged(lead);event.dataTransfer.setData("text/plain",String(lead.id));event.dataTransfer.effectAllowed="move";}} onDragEnd={() => {setDragged(null);setTarget(null);}} className={`rounded-lg border bg-white p-3 shadow-sm ${dragged?.id === lead.id ? "opacity-50" : ""}`}>
-            <div className="flex items-start gap-2"><Link className="flex-1 break-words text-sm font-semibold text-slate-900 hover:text-blue-700" href={`/leads/${lead.id}`}>{lead.company}</Link><GripVertical size={16} className="shrink-0 text-slate-300" aria-hidden="true" /></div>
-            <p className="mt-2 text-xs text-slate-500">{lead.niche || "Nicho não informado"} · {lead.location || "Local não informado"}</p>
-            {lead.originalStage !== lead.stage && <p className="mt-2 text-xs text-slate-500">Registro original: {lead.originalStage || "Sem etapa"}</p>}
-            <p className="mt-3 text-xs text-slate-600">Retorno: {dateLabel(lead.nextContact)}{lead.nextAction ? ` · ${lead.nextAction}` : ""}</p>
-            <p className="mt-2 text-xs text-slate-400">{lead.lastActivity ? `${lead.lastActivity.kind} · ${dateLabel(lead.lastActivity.at)}` : "Nenhuma atividade registrada"}</p>
+            <div className="flex items-start gap-2"><Link className="flex-1 break-words text-sm font-semibold text-neutral-900 hover:text-accent-foreground" href={`/leads/${lead.id}`}>{lead.company}</Link><GripVertical size={16} className="shrink-0 text-neutral-300" aria-hidden="true" /></div>
+            <p className="mt-2 text-xs text-neutral-500">{lead.niche || "Nicho não informado"} · {lead.location || "Local não informado"}</p>
+            {lead.originalStage !== lead.stage && <p className="mt-2 text-xs text-neutral-500">Registro original: {lead.originalStage || "Sem etapa"}</p>}
+            <p className="mt-3 text-xs text-neutral-600">Retorno: {dateLabel(lead.nextContact)}{lead.nextAction ? ` · ${lead.nextAction}` : ""}</p>
+            <p className="mt-2 text-xs text-neutral-400">{lead.lastActivity ? `${lead.lastActivity.kind} · ${dateLabel(lead.lastActivity.at)}` : "Nenhuma atividade registrada"}</p>
             <label className="mt-3 text-xs">Mover {lead.company}<select aria-label={`Mover ${lead.company}`} className="field mt-1" disabled={!data.writesEnabled || busy || loading} value={lead.stage} onChange={event => void move(lead,event.target.value)}>{data.stages.map(stage => <option key={stage}>{stage}</option>)}</select></label>
           </li>)}</ul>
-          {column.total === 0 && <p className="rounded-lg border border-dashed bg-white/60 p-5 text-center text-xs text-slate-400">Nenhum lead nesta etapa</p>}
+          {column.total === 0 && <p className="rounded-lg border border-dashed bg-white/60 p-5 text-center text-xs text-neutral-400">Nenhum lead nesta etapa</p>}
           {column.items.length < column.total && <Button className="mt-3 w-full text-xs" variant="outline" disabled={busy || loading} onClick={() => void more(column.stage)}>Carregar mais · {column.items.length} de {column.total}</Button>}
         </section>)}
       </div>

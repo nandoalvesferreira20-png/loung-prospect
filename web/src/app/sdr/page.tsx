@@ -163,8 +163,8 @@ export default function Sdr() {
 
   return <>
     <PageHeader eyebrow="SDR INTELIGENTE" title="Do contexto à conversa" description="Escolha um lead, prepare a abordagem e revise antes de abrir o WhatsApp." />
-    <div className="mb-6 flex flex-wrap items-center gap-3 text-xs text-slate-500">
-      <span className="font-medium text-blue-700">1. Selecionar lead</span>
+    <div className="mb-6 flex flex-wrap items-center gap-3 text-xs text-neutral-500">
+      <span className="font-medium text-accent-foreground">1. Selecionar lead</span>
       <ArrowRight size={13} />
       <span>2. Gerar e revisar</span>
       <ArrowRight size={13} />
@@ -181,22 +181,22 @@ export default function Sdr() {
         <CardContent>
           <label htmlFor="lead-search" className="sr-only">Buscar lead por nome</label>
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-3 text-slate-400" size={16} />
+            <Search className="pointer-events-none absolute left-3 top-3 text-neutral-400" size={16} />
             <input id="lead-search" className="field !pl-9" placeholder="Buscar empresa…" value={query} maxLength={200} disabled={busy || saving} onChange={e => { const value = e.target.value; changeFilter(() => setQuery(value)); }} />
           </div>
-          <label htmlFor="lead-niche" className="mt-3 block text-xs text-slate-500">Filtrar por nicho</label>
+          <label htmlFor="lead-niche" className="mt-3 block text-xs text-neutral-500">Filtrar por nicho</label>
           <select id="lead-niche" className="field mt-1" value={niche} disabled={busy || saving} onChange={e => { const value = e.target.value; changeFilter(() => setNiche(value)); }}>
             <option value="">Todos os nichos</option>
             {niche && !niches.includes(niche) && <option value={niche}>{niche}</option>}
             {niches.map(value => <option key={value} value={value}>{value}</option>)}
           </select>
           {nichesError && <p role="alert" className="mt-2 text-xs text-red-700">{nichesError} Use Atualizar leads para tentar novamente.</p>}
-          <label htmlFor="lead-stage" className="mt-3 block text-xs text-slate-500">Filtrar por status</label>
+          <label htmlFor="lead-stage" className="mt-3 block text-xs text-neutral-500">Filtrar por status</label>
           <select id="lead-stage" className="field mt-1" value={stage} disabled={busy || saving} onChange={e => { const value = e.target.value; changeFilter(() => setStage(value)); }}>
             <option value="">Todos os status</option>
             {stages.map(value => <option key={value} value={value}>{value}</option>)}
           </select>
-          <div aria-live="polite" className="mt-3 text-xs text-slate-500">
+          <div aria-live="polite" className="mt-3 text-xs text-neutral-500">
             {listLoading ? "Carregando leads…" : leads ? `${leads.total} leads encontrados` : "Consulta indisponível"}
           </div>
           {listError && <p role="alert" className="mt-3 text-sm text-red-700">
@@ -205,11 +205,11 @@ export default function Sdr() {
           {!listLoading && leads?.items.length === 0 && <EmptyState icon={UserRound} title="Nenhum lead encontrado" description={niche ? "Nenhum lead deste nicho corresponde aos filtros. Ajuste a busca, o status ou selecione Todos os nichos." : "Ajuste a busca ou importe leads na página Prospecção."} />}
           <ul className="mt-3 space-y-1" aria-label="Leads disponíveis" aria-busy={listLoading}>
             {leads?.items.map(lead => <li key={lead.id}>
-              <button type="button" disabled={busy || saving || listLoading} aria-pressed={selected === lead.id} onClick={() => selected !== lead.id && protect(() => void selectLead(lead.id))} className={`w-full rounded-lg border p-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-60 ${selected === lead.id ? "border-blue-200 bg-blue-50" : "border-transparent hover:bg-slate-50"}`}>
-                <span className="block break-words text-sm font-semibold text-slate-800">
+              <button type="button" disabled={busy || saving || listLoading} aria-pressed={selected === lead.id} onClick={() => selected !== lead.id && protect(() => void selectLead(lead.id))} className={`w-full rounded-lg border p-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-60 ${selected === lead.id ? "border-accent-border bg-accent-soft" : "border-transparent hover:bg-neutral-50"}`}>
+                <span className="block break-words text-sm font-semibold text-neutral-800">
                   {lead.company}
                 </span>
-                <span className="mt-1 block truncate text-xs text-slate-500">
+                <span className="mt-1 block truncate text-xs text-neutral-500">
                   {lead.niche || "Segmento não informado"}
                 </span>
               </button>
@@ -217,7 +217,7 @@ export default function Sdr() {
           </ul>
           {leads && leads.total > leads.pageSize && <div className="mt-4 flex items-center justify-between gap-2 border-t pt-4">
             <Button className="px-2 text-xs" variant="outline" disabled={page === 1 || listLoading || busy || saving} onClick={() => setPage(p => p - 1)}>Anterior</Button>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-neutral-500">
               {page}
               /
               {Math.ceil(leads.total / leads.pageSize)}
@@ -227,11 +227,11 @@ export default function Sdr() {
         </CardContent>
       </Card>
       <div className="min-w-0 space-y-5">
-        {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+        {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
           {error}
         </p>}
         {contextLoading ? <Card>
-          <div role="status" className="flex items-center gap-2 p-8 text-sm text-slate-500">
+          <div role="status" className="flex items-center gap-2 p-8 text-sm text-neutral-500">
             <LoaderCircle size={18} className="animate-spin" />
             Carregando dados do lead…
           </div>
@@ -242,7 +242,7 @@ export default function Sdr() {
           <Card>
             <CardHeader>
               <CardTitle>Prepare a abordagem</CardTitle>
-              <p className="mt-1 text-xs text-slate-500">A configuração Groq existente é utilizada pelo backend.</p>
+              <p className="mt-1 text-xs text-neutral-500">A configuração Groq existente é utilizada pelo backend.</p>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -272,7 +272,7 @@ export default function Sdr() {
               </div>
               <label htmlFor="instruction" className="mt-4 block">
                 Orientação de redação
-                <span className="font-normal text-slate-400">· opcional</span>
+                <span className="font-normal text-neutral-400">· opcional</span>
                 <input id="instruction" className="field mt-2" placeholder="Ex.: use uma abertura mais breve e formal" value={instruction} maxLength={500} disabled={busy || saving} onChange={e => setInstruction(e.target.value)} />
               </label>
               <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -280,7 +280,7 @@ export default function Sdr() {
                   {busy ? <LoaderCircle className="animate-spin" /> : <Sparkles />}
                   {busy ? "Gerando abordagem…" : draft ? "Regenerar com IA" : "Gerar abordagem com IA"}
                 </Button>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-neutral-500">
                   {draft ? "Cria outra versão; o histórico salvo é preservado." : "Cria um rascunho editável, sem salvar ou enviar."}
                 </span>
               </div>
@@ -292,12 +292,12 @@ export default function Sdr() {
           <Card>
             <CardHeader className="flex flex-wrap items-center justify-between gap-3">
               <CardTitle>Revise a mensagem</CardTitle>
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs text-blue-700">
+              <span className="rounded-full bg-accent-soft px-3 py-1 text-xs text-accent-foreground">
                 {savedStatus === "APROVADA" ? "Versão aprovada" : !dirty && savedMessage ? "Texto salvo" : draft ? "Rascunho não salvo" : "Editor local"}
               </span>
             </CardHeader>
             <CardContent>
-              {draft && <p className="mb-3 text-xs leading-5 text-slate-500">
+              {draft && <p className="mb-3 text-xs leading-5 text-neutral-500">
                 Abordagem:{" "}
                 {draft.angle}
                 {" · "}
@@ -305,7 +305,7 @@ export default function Sdr() {
               </p>}
               <label htmlFor="message" className="sr-only">Mensagem para revisão</label>
               <textarea id="message" className="field min-h-64 resize-y !leading-7" placeholder="Gere uma abordagem ou escreva uma mensagem para este lead…" value={message} disabled={busy || saving} readOnly={savedStatus === "APROVADA"} onChange={e => { setMessage(e.target.value); setFeedback(""); }} aria-describedby="message-help message-count" />
-              <div className="mt-2 flex justify-between gap-3 text-xs text-slate-500">
+              <div className="mt-2 flex justify-between gap-3 text-xs text-neutral-500">
                 <span id="message-help">
                   {savedStatus === "APROVADA" ? "Gere outra versão para editar e preservar esta aprovação." : "Revise os fatos. O texto só é salvo quando você solicita."}
                 </span>
@@ -329,7 +329,7 @@ export default function Sdr() {
                   Abrir WhatsApp
                 </Button>}
               </div>
-              <p id="whatsapp-help" className="mt-3 text-xs leading-5 text-slate-500">
+              <p id="whatsapp-help" className="mt-3 text-xs leading-5 text-neutral-500">
                 {context.whatsappReason || (!message.trim() ? "Escreva ou gere uma mensagem para abrir o WhatsApp." : count > 1200 ? "Reduza a mensagem para até 1200 caracteres." : "Abre uma nova aba com o texto preenchido. Confira o destinatário e envie manualmente no WhatsApp.")}
               </p>
               <div className="mt-5 flex flex-wrap gap-2">
@@ -339,11 +339,11 @@ export default function Sdr() {
                 </Button>
                 <Button className="text-xs" variant="outline" disabled={!canSave || busy || saving} onClick={() => void save("APROVADA")}>Aprovar e salvar versão</Button>
               </div>
-              {history?.reason && <p className="mt-2 text-xs leading-5 text-slate-500">
+              {history?.reason && <p className="mt-2 text-xs leading-5 text-neutral-500">
                 {history.reason}
               </p>}
-              {!draft && message.trim() && <p className="mt-2 text-xs text-slate-500">Este texto pode ser copiado ou aberto no WhatsApp. O salvamento está disponível para versões geradas nesta sessão.</p>}
-              {feedback && <p role="status" className="mt-4 rounded-lg bg-blue-50 p-3 text-sm text-blue-800">
+              {!draft && message.trim() && <p className="mt-2 text-xs text-neutral-500">Este texto pode ser copiado ou aberto no WhatsApp. O salvamento está disponível para versões geradas nesta sessão.</p>}
+              {feedback && <p role="status" className="mt-4 rounded-lg bg-accent-soft p-3 text-sm text-accent-foreground">
                 {feedback}
               </p>}
             </CardContent>

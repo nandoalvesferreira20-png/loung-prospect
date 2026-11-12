@@ -2,6 +2,8 @@ O padrão atual é SQLite local sem login. Veja [execução local](../docs/local
 
 # Loung Prospect API — Fase 2.4
 
+Integração local de leitura e exportação: [Loung Sales AI](../docs/sales-ai-integration.md).
+
 CRM disponível: pipeline, atividades, perfil comercial, follow-ups e indicadores.
 Reutiliza schema/status/Meu Dia compartilhados, sem migrações. Alterações exigem revisão
 do registro e `LOUNG_ENABLE_WRITES=1`, com backup e transação. Consulte
